@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import logo from './logo.svg';
 import './App.css';
 
+async function fetchQuinoa(setValue) {
+  let response = await fetch('api/quinoa')
+  response = await response.text()
+  setValue(response)
+}
+
 function App() {
   const [value, setValue] = useState(null);
-  useEffect(async () => {
+  useEffect(() => {
     if(value == null) {
-      const result = await fetch(
-          '/api/quinoa',
-      );
-      let text = await result.text();
-      setValue(text);
+      fetchQuinoa(setValue);
     }
   }, [value, setValue]);
   return (
