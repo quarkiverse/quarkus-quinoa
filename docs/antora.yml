@@ -1,0 +1,5 @@
+name: quarkus-quinoa
+title: Quarkus - Quinoa
+version: dev
+nav:
+  - modules/ROOT/nav.adoc
