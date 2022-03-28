@@ -1,17 +1,13 @@
 package io.quarkiverse.quinoa;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.jboss.logging.Logger;
 
 import io.quarkus.runtime.annotations.Recorder;
 import io.vertx.core.Handler;
-import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.FileSystemAccess;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -21,19 +17,8 @@ public class QuinoaRecorder {
     private static final Logger log = Logger.getLogger(QuinoaRecorder.class);
     public static final String META_INF_UI = "META-INF/ui";
 
-    public Consumer<Route> start(final String directory, final Set<String> uiResources) throws IOException {
-        List<Handler<RoutingContext>> handlers = new ArrayList<>();
-        if (!uiResources.isEmpty()) {
-            handlers.add(new QuinoaUIResourceHandler(directory, uiResources));
-        }
-        return new Consumer<Route>() {
-            @Override
-            public void accept(Route route) {
-                for (Handler<RoutingContext> handler : handlers) {
-                    route.handler(handler);
-                }
-            }
-        };
+    public Handler<RoutingContext> quinoaHandler(final String directory, final Set<String> uiResources) throws IOException {
+        return new QuinoaUIResourceHandler(directory, uiResources);
     }
 
     private static class QuinoaUIResourceHandler implements Handler<RoutingContext> {

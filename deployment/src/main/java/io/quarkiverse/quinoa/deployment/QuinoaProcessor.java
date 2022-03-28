@@ -39,6 +39,7 @@ import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.DefaultRouteBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.quarkus.vertx.http.runtime.VertxHttpRecorder;
 
 public class QuinoaProcessor {
 
@@ -164,14 +165,15 @@ public class QuinoaProcessor {
             CoreVertxBuildItem vertx, BeanContainerBuildItem beanContainer,
             BuildProducer<DefaultRouteBuildItem> defaultRoutes,
             BuildProducer<RouteBuildItem> routes) throws IOException {
-        if (uiResources.isPresent()) {
+        if (uiResources.isPresent() && !uiResources.get().getNames().isEmpty()) {
             String directory = null;
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            defaultRoutes.produce(
-                    new DefaultRouteBuildItem(recorder.start(directory,
-                            uiResources.get().getNames())));
+            routes.produce(RouteBuildItem.builder().orderedRoute("/*", VertxHttpRecorder.DEFAULT_ROUTE_ORDER)
+                    .handler(recorder.quinoaHandler(directory,
+                            uiResources.get().getNames()))
+                    .build());
             // TODO: Handle single page web-app html5 urls by re-routing not found to /
         }
     }
