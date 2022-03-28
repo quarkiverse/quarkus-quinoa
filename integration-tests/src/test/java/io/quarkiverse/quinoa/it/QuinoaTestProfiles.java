@@ -26,4 +26,11 @@ public class QuinoaTestProfiles {
             return "angular";
         }
     }
+
+    public static class LitTests extends EnableAndRunUITests {
+        @Override
+        public String getConfigProfile() {
+            return "lit";
+        }
+    }
 }
