@@ -1,9 +1,9 @@
 name: Quinoa
-#description: Quinoa ...
+description: "Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps (built with NodeJS: React, Angular, …) alongside Quarkus . It is possible to use it with a Quarkus backend in a single project."
 metadata:
-#  keywords:
-#    - quinoa
-#  guide: ...
-#  categories:
-#    - "miscellaneous"
-#  status: "preview"
+  keywords:
+    - quinoa
+  guide: ...
+  categories:
+    - "web"
+  status: "experimental"

@@ -1,7 +1,7 @@
 = Quarkus - Quinoa
 :extension-status: preview
 
-Describe what the extension does here.
+Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps (built with NodeJS: React, Angular, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single projec
 
 == Installation
 
@@ -16,7 +16,93 @@ In your `pom.xml` file, add:
 </dependency>
 ----
 
+== Prerequisite
+
+- Install NodeJS (https://nodejs.org/)
+- Get a Quarkus application with Quinoa extension installed
+
+== Getting Started
+
+Create a UI directory in `src/main/ui`. This directory should contain your node code with a `package.json`.
+
+From here, either generate an application from any existing Node built UI framework (like React, Angular, Lit, ...). Or, you may also create your own Node built wep-app.
+
+The key points are the `package.json` scripts (`build` and optionally `test`) and the directory where the files are generated (`build/` by default).
+
+*It's done!* The web application is now built alongside Quarkus and dev-mode is available:
+
+[source,shell]
+----
+$ mvn quarkus:dev
+
+2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Build directory: 'xxx/target/quinoa-build'
+2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/favicon.ico'
+2022-03-28 09:24:46,740 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/index.html'
+2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/simple-greeting.js'
+----
+
+The generated files are also served by Quinoa if you hit http://localhost:8080
+
+
+== How to use the extension.
+
+=== Custom Web App
+
+Add a `build` in the `package.json` to generate your web application index.html, scripts and media (styles, images, ...) in the `build` directory.
+
+Optionally add a `test` script to test the application from node.
+
+=== React
+
+App created by Create React App (https://create-react-app.dev/docs/getting-started) are compatible without any change.
+
+=== Angular
+
+App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration.
+
+Change the package.json test script:
+[source,json]
+----
+  "scripts": {
+    ...
+    "test": "ng test -- --no-watch --no-progress --browsers=ChromeHeadlessCI"
+  },
+----
+
+Edit the karma.conf.js:
+[source,javascript]
+----
+  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessCI'],
+  customLaunchers: {
+    ChromeHeadlessCI: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox']
+    }
+},
+----
+
+=== Testing
+
+By default, the UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the UI build.
+
+In order to enable the UI in a particular test, you can create a testing profile:
+
+[source,java]
+----
+    public static class Enable implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of(
+                "quarkus.quinoa", "true",
+                // If you also want to run the node "test" script before the build, uncomment the line bellow:
+                // "quarkus.quinoa.run-ui-tests", "true"
+            );
+        }
+    }
+----
+
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
-include::config.adoc[leveloffset=+1, opts=optional]
+include::includes/quarkus-quinoa.adoc[leveloffset=+1, opts=optional]
