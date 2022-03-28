@@ -9,7 +9,7 @@ Quinoa is a Quarkus extension which eases the development, the build and serving
 
 Some setup is needed to compile this project. This extension use node package manager (npm) that 
 needs to be installed.
-The tests also uses a headless chrome browser, so you need to install Chromium or Chrome.
+The Angular tests also uses a headless Chrome browser, so you might need to install Chromium or Chrome.
 
 
 ### Fedora
