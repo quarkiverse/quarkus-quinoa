@@ -9,7 +9,16 @@ public class QuinoaTestProfiles {
     public static class EnableAndRunUITests implements QuarkusTestProfile {
         @Override
         public Map<String, String> getConfigOverrides() {
-            return Map.of("quarkus.quinoa", "true", "quarkus.quinoa.run-ui-tests", "true");
+            return Map.of(
+                    "quarkus.quinoa", "true",
+                    "quarkus.quinoa.run-ui-tests", "true");
+        }
+    }
+
+    public static class Enable implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            return Map.of("quarkus.quinoa", "true");
         }
     }
 
@@ -20,14 +29,14 @@ public class QuinoaTestProfiles {
         }
     }
 
-    public static class AngularTests extends EnableAndRunUITests {
+    public static class AngularTests extends Enable {
         @Override
         public String getConfigProfile() {
             return "angular";
         }
     }
 
-    public static class LitTests extends EnableAndRunUITests {
+    public static class LitTests extends Enable {
         @Override
         public String getConfigProfile() {
             return "lit";
