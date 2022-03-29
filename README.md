@@ -10,26 +10,16 @@
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps (built with NodeJS: React, Angular, …) alongside Quarkus . It is possible to use it with a Quarkus backend in a single project.
 
-## Setup
+## User Doc
+
+https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/pages/index.adoc
+
+## Setup to contribute
 
 Some setup is needed to compile this project. This extension use node package manager (npm) that 
 needs to be installed.
-The Angular tests also uses a headless Chrome browser, so you might need to install Chromium or Chrome.
-
 
 ### Fedora
-
-* Install Chromium
-
-`sudo dnf install chromium`
-
-You also need to make use the 'CHROME_BIN' var is set:
-
-`export CHROME_BIN='/usr/bin/chromium-browser'`
-
-(You can get the value by doing `type chromium-browser`)
-
-You can make the above permanent by adding it to your `~/.bashrc` file.
 
 * Install npm:
 

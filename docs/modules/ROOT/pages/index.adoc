@@ -60,6 +60,8 @@ App created by Create React App (https://create-react-app.dev/docs/getting-start
 
 App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration.
 
+To use the Angular tests (instead of Playwright from the @QuarkusTest):
+
 Change the package.json test script:
 [source,json]
 ----
