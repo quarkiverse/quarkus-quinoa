@@ -19,6 +19,7 @@ package io.quarkiverse.quinoa.it;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 @Path("/api/quinoa")
 @ApplicationScoped
@@ -26,6 +27,7 @@ public class QuinoaResource {
     // add some rest methods here
 
     @GET
+    @Produces(value = "plain/text")
     public String hello() {
         return "Hello Quinoa";
     }
