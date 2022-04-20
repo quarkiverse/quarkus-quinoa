@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.quarkiverse.quinoa</groupId>
     <artifactId>quarkus-quinoa-parent</artifactId>
-    <version>1.0.0-alpha-4-SNAPSHOT</version>
+    <version>1.0.0-alpha-4</version>
   </parent>
   <artifactId>quarkus-quinoa-testing</artifactId>
   <name>Quarkus - Quinoa - Testing</name>
