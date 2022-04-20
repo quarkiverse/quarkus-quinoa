@@ -1,7 +1,9 @@
 = Quarkus - Quinoa
 :extension-status: preview
 
-Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps (built with NodeJS: React, Angular, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single projec
+Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single project.
+
+You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
 
 == Installation
 
@@ -41,26 +43,63 @@ $ mvn quarkus:dev
 2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/simple-greeting.js'
 ----
 
-The generated files are also served by Quinoa if you hit http://localhost:8080
-
+The generated files are served by Quinoa if you hit http://localhost:8080
 
 == How to use the extension.
 
-=== Custom Web App
+=== For a custom Web App or any SPA node based framework
 
-Add a `build` in the `package.json` to generate your web application index.html, scripts and media (styles, images, ...) in the `build` directory.
+Add a `build` script in the `package.json` to generate your web application index.html, scripts and media (styles, images, ...) in the `./build` directory (can be changed in the config):
+[source,json]
+----
+ "scripts": {
+    "start": "[start the UI live coding server]",
+    "build": "[build the UI]",
+    "test": "[test the UI]"
+  },
+----
 
-Optionally add a `test` script to test the application from node.
+Optionally add a `start` script to start the live coding dev server and activate it in the app config:
+[source,properties]
+----
+quarkus.quinoa.dev-server-port=3000
+----
+
+You can differentiate dev from production builds using the `MODE` environment variable (`dev`, `prod`, `test`):
+[source,json]
+----
+ "scripts": {
+        "build": "if [[ $MODE == \"dev\" ]]; then webpack --mode=development; else webpack --mode=production; fi",
+  },
+----
 
 === React
 
 App created by Create React App (https://create-react-app.dev/docs/getting-started) are compatible without any change.
 
+To enable React live coding server:
+[source,properties]
+----
+quarkus.quinoa.dev-server-port=3000
+----
+
 === Angular
 
-App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration.
+App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration:
+[source,properties]
+----
+quarkus.quinoa.build-dir=dist/[your-app-name]
+----
 
-To use the Angular tests (instead of Playwright from the @QuarkusTest):
+To enable Angular live coding server, you need to edit the package.json start script with `ng serve --host 0.0.0.0 --no-live-reload`, then add this configuration:
+[source,properties]
+----
+quarkus.quinoa.dev-server-port=4200
+----
+
+
+
+If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
 
 Change the package.json test script:
 [source,json]
@@ -87,22 +126,61 @@ Edit the karma.conf.js:
 
 By default, the UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the UI build.
 
-In order to enable the UI in a particular test, you can create a testing profile:
+Quinoa features a testing library to make it easier to test your UI:
+[source,xml]
+----
+<dependency>
+    <groupId>io.quarkiverse.quinoa</groupId>
+    <artifactId>quarkus-quinoa-testing</artifactId>
+    <scope>test</scope>
+</dependency>
+----
+
+In order to enable the UI (build and serve) in a particular test, you can use the `Enable` test profile:
 
 [source,java]
 ----
-    public static class Enable implements QuarkusTestProfile {
-        @Override
-        public Map<String, String> getConfigOverrides() {
-            return Map.of(
-                "quarkus.quinoa", "true",
-                // If you also want to run the node "test" script before the build, uncomment the line bellow:
-                // "quarkus.quinoa.run-ui-tests", "true"
-            );
+    @QuarkusTest
+    @TestProfile(QuinoaTestProfiles.Enable.class)
+    public class MyUITest {
+        @Test
+        public void someTest() {
         }
     }
 ----
 
+If you also want to run the tests included in your UI (i.e npm test) alongside this class, you can use the `EnableAndRunTests` test profile:
+
+The library also brings a very elegant way to do e2e testing using https://github.com/microsoft/playwright-java[Playright]:
+[source,java]
+----
+    @QuarkusTest
+    @TestProfile(QuinoaTestProfiles.Enable.class)
+    @QuarkusTestResource(QuarkusPlaywrightManager.class)
+    public class MyUITest {
+        @PlaywrightManager.InjectPlaywright
+        BrowserContext context;
+
+        @TestHTTPResource("/")
+        URL url;
+
+        @Test
+        void name() {
+            final Page page = context.newPage();
+            Response response = page.navigate(url.toString());
+            Assertions.assertEquals("OK", response.statusText());
+
+            page.waitForLoadState();
+
+            String title = page.title();
+            Assertions.assertEquals("My App", title);
+
+            // Make sure the app content is ok
+            String greeting = page.innerText(".quinoa");
+            Assertions.assertEquals("Hello World", greeting);
+        }
+    }
+----
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference

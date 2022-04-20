@@ -19,8 +19,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-junit5</artifactId>
+      <groupId>io.quarkiverse.quinoa</groupId>
+      <artifactId>quarkus-quinoa-testing</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -28,18 +29,7 @@
       <artifactId>rest-assured</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>playwright</artifactId>
-      <version>1.20.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>driver-bundle</artifactId>
-      <version>1.20.1</version>
-      <scope>test</scope>
-    </dependency>
+
   </dependencies>
   <build>
     <plugins>

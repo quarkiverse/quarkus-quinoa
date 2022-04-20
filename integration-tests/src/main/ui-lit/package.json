@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "build": "webpack --mode=development",
+        "build": "if [[ $MODE == \"dev\" ]]; then webpack --mode=development; else webpack --mode=production; fi",
         "test": ""
     },
     "dependencies": {

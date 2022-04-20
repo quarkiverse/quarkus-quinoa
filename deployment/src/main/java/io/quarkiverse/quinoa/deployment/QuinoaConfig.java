@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
@@ -12,13 +13,13 @@ public class QuinoaConfig {
     /**
      * Indicate if the extension should be enabled
      * Default is true if the UI directory exists and dev and prod mode
-     * Default is false in test mode (to avoid building the ui during backend tests)
+     * Default is false in test mode (to avoid building the UI during backend tests)
      */
     @ConfigItem(name = ConfigItem.PARENT)
     Optional<Boolean> enable;
 
     /**
-     * Path to the frontend root directory.
+     * Path to the UI (node) root directory.
      * If not set ${project.root}/src/main/ui/ will be used
      * If set to an absolute path then the absolute path will be used, otherwise the path
      * will be considered relative to the project root
@@ -30,15 +31,15 @@ public class QuinoaConfig {
      * Path of the directory which contains the resulting ui built files.
      * If not set build/ will be used
      * If set to an absolute path then the absolute path will be used, otherwise the path
-     * will be considered relative to the ui path
+     * will be considered relative to the UI path
      */
     @ConfigItem
     public Optional<String> buildDir;
 
     /**
      * Name of the package manager binary.
-     * If not set "npm" will be used.
-     * Only npm and yarn are supported for the moment
+     * If not set, it will be auto-detected depending on the lockfile falling back to "npm".
+     * Only npm, pnpm and yarn are supported for the moment
      */
     @ConfigItem
     public Optional<String> packageManager;
@@ -47,10 +48,10 @@ public class QuinoaConfig {
      * Indicate if the UI should also be tested during the build phase (i.e: npm test)
      * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have UI test running during a
      * {@link io.quarkus.test.junit.QuarkusTest}
-     * Default is ![](../../../../../../../../../../../../Downloads/logo192.png)false
+     * Default is false
      */
-    @ConfigItem(name = "run-ui-tests")
-    Optional<Boolean> runUITests;
+    @ConfigItem(name = "run-tests")
+    Optional<Boolean> runTests;
 
     /**
      * Install the packages using a frozen lockfile. Don’t generate a lockfile and fail if an update is needed (useful in CI).
@@ -65,5 +66,21 @@ public class QuinoaConfig {
      */
     @ConfigItem
     public Optional<Boolean> alwaysInstallPackages;
+
+    /**
+     * Enable using an external server for dev (live coding).
+     * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
+     * This defines the port of the server to forward requests to.
+     */
+    @ConfigItem
+    public OptionalInt devServerPort;
+
+    /**
+     * Enable external dev server live coding logs.
+     * This is not enabled by default because most dev servers display compilation errors directly in the browser.
+     * False if not set.
+     */
+    @ConfigItem
+    public Optional<Boolean> enableDevServerLogs;
 
 }

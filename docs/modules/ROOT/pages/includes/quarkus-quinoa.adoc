@@ -12,7 +12,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa]]`link:#q
 
 [.description]
 --
-Indicate if the extension should be enabled Default is true if the UI directory exists and dev and prod mode Default is false in test mode (to avoid building the ui during backend tests)
+Indicate if the extension should be enabled Default is true if the UI directory exists and dev and prod mode Default is false in test mode (to avoid building the UI during backend tests)
 --|boolean 
 |
 
@@ -21,7 +21,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`
 
 [.description]
 --
-Path to the frontend root directory. If not set $++{++project.root++}++/src/main/ui/ will be used If set to an absolute path then the absolute path will be used, otherwise the path will be considered relative to the project root
+Path to the UI (node) root directory. If not set $++{++project.root++}++/src/main/ui/ will be used If set to an absolute path then the absolute path will be used, otherwise the path will be considered relative to the project root
 --|string 
 |
 
@@ -30,7 +30,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir
 
 [.description]
 --
-Path of the directory which contains the resulting ui built files. If not set build/ will be used If set to an absolute path then the absolute path will be used, otherwise the path will be considered relative to the ui path
+Path of the directory which contains the resulting ui built files. If not set build/ will be used If set to an absolute path then the absolute path will be used, otherwise the path will be considered relative to the UI path
 --|string 
 |
 
@@ -39,16 +39,16 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-Name of the package manager binary. If not set "npm" will be used. Only npm and yarn are supported for the moment
+Name of the package manager binary. If not set, it will be auto-detected depending on the lockfile falling back to "npm". Only npm, pnpm and yarn are supported for the moment
 --|string 
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.run-ui-tests]]`link:#quarkus-quinoa_quarkus.quinoa.run-ui-tests[quarkus.quinoa.run-ui-tests]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.run-tests]]`link:#quarkus-quinoa_quarkus.quinoa.run-tests[quarkus.quinoa.run-tests]`
 
 [.description]
 --
-Indicate if the UI should also be tested during the build phase (i.e: npm test) To be used in a `io.quarkus.test.junit.QuarkusTestProfile` to have UI test running during a `io.quarkus.test.junit.QuarkusTest` Default is !++[]++(../../../../../../../../../../../../Downloads/logo192.png)false
+Indicate if the UI should also be tested during the build phase (i.e: npm test) To be used in a `io.quarkus.test.junit.QuarkusTestProfile` to have UI test running during a `io.quarkus.test.junit.QuarkusTest` Default is false
 --|boolean 
 |
 
@@ -67,6 +67,24 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.always-in
 [.description]
 --
 Always install packages before building. If not set, it will install packages only if the node_modules directory is absent.
+--|boolean 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server-port]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server-port[quarkus.quinoa.dev-server-port]`
+
+[.description]
+--
+Enable using an external server for dev (live coding). The dev server process (i.e npm start) is managed like a dev service by Quarkus. This defines the port of the server to forward requests to.
+--|int 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-dev-server-logs]]`link:#quarkus-quinoa_quarkus.quinoa.enable-dev-server-logs[quarkus.quinoa.enable-dev-server-logs]`
+
+[.description]
+--
+Enable external dev server live coding logs. This is not enabled by default because most dev servers display compilation errors directly in the browser. False if not set.
 --|boolean 
 |
 

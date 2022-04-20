@@ -9,17 +9,18 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
+import io.quarkiverse.quinoa.testing.QuarkusPlaywrightManager;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
-@TestProfile(QuinoaTestProfiles.AngularTests.class)
-@QuarkusTestResource(PlaywrightManager.class)
+@TestProfile(TestProfiles.AngularTests.class)
+@QuarkusTestResource(QuarkusPlaywrightManager.class)
 public class QuinoaUIAngularTest {
 
-    @PlaywrightManager.InjectPlaywright
+    @QuarkusPlaywrightManager.InjectPlaywright
     BrowserContext context;
 
     @TestHTTPResource("/")
@@ -37,7 +38,10 @@ public class QuinoaUIAngularTest {
         Assertions.assertEquals("QuinoaApp", title);
 
         // Make sure the component loaded and hits the backend
-        String greeting = page.innerText(".content span");
-        Assertions.assertEquals("quinoa-app app is running!", greeting);
+        String button = page.innerText(".content span");
+        Assertions.assertEquals("quinoa-app app is running!", button);
+
+        String greeting = page.innerText(".quinoa");
+        Assertions.assertEquals("Hello Quinoa", greeting);
     }
 }

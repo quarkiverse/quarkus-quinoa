@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_UI;
+import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
+import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.DefaultRouteBuildItem;
@@ -43,7 +45,7 @@ import io.quarkus.vertx.http.runtime.VertxHttpRecorder;
 
 public class QuinoaProcessor {
 
-    private static final Logger log = Logger.getLogger(QuinoaProcessor.class);
+    private static final Logger LOG = Logger.getLogger(QuinoaProcessor.class);
 
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
@@ -55,114 +57,116 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    public SrcUIDirBuildItem prepareSrcUI(
-            LaunchModeBuildItem launchModeBuildItem,
+    public QuinoaDirectoryBuildItem prepareQuinoaDirectory(
+            LaunchModeBuildItem launchMode,
+            LiveReloadBuildItem liveReload,
             QuinoaConfig quinoaConfig,
-            OutputTargetBuildItem outputTargetBuildItem) throws IOException {
+            OutputTargetBuildItem outputTarget) throws IOException {
         if (!quinoaConfig.enable.orElse(true)) {
             return null;
         }
-        if (launchModeBuildItem.isTest() && !quinoaConfig.enable.isPresent()) {
+        if (launchMode.isTest() && !quinoaConfig.enable.isPresent()) {
             // Default to disabled in tests
             return null;
         }
-        final AbstractMap.SimpleEntry<Path, Path> srcUIDirEntry = getUIDir(quinoaConfig, outputTargetBuildItem);
-        if (srcUIDirEntry == null || !Files.isDirectory(srcUIDirEntry.getKey())) {
-            log.warnf(
-                    "No Quinoa UI directory found. It is recommended to remove the quarkus-quinoa extension if not used.");
+        final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(quinoaConfig, outputTarget);
+        if (uiDirEntry == null || !Files.isDirectory(uiDirEntry.getKey())) {
+            LOG.warnf(
+                    "No Quinoa directory found. It is recommended to remove the quarkus-quinoa extension if not used.");
             return null;
         }
-        if (!Files.isRegularFile(srcUIDirEntry.getKey().resolve("package.json"))) {
+        final Path packageFile = uiDirEntry.getKey().resolve("package.json");
+        if (!Files.isRegularFile(packageFile)) {
             throw new ConfigurationException(
-                    "No package.json found in UI directory: '" + srcUIDirEntry.getKey() + "'");
+                    "No package.json found in UI directory: '" + uiDirEntry.getKey() + "'");
         }
-        return new SrcUIDirBuildItem(srcUIDirEntry.getKey());
+        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, uiDirEntry.getKey());
+        final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
+        final boolean packageFileModified = liveReload.isLiveReload()
+                && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
+        if (quinoaConfig.alwaysInstallPackages.orElse(!alreadyInstalled || packageFileModified)) {
+            packageManager.install(quinoaConfig.frozenLockfile.orElseGet(() -> Objects.equals(System.getenv("CI"), "true")));
+        }
+        return new QuinoaDirectoryBuildItem(packageManager);
     }
 
     @BuildStep
-    public UIBuildOutcomeBuildItem uiBuild(
+    public TargetDirBuildItem processBuild(
             QuinoaConfig quinoaConfig,
-            Optional<SrcUIDirBuildItem> srcUIDirBuildItem,
-            OutputTargetBuildItem outputTargetBuildItem,
-            LaunchModeBuildItem launchModeBuildItem,
-            LiveReloadBuildItem liveReloadBuildItem) throws IOException, BuildException {
-        if (!srcUIDirBuildItem.isPresent()) {
+            Optional<QuinoaDirectoryBuildItem> quinoaDir,
+            OutputTargetBuildItem outputTarget,
+            LaunchModeBuildItem launchMode,
+            LiveReloadBuildItem liveReload) throws IOException, BuildException {
+        if (!quinoaDir.isPresent()) {
             return null;
         }
-        final QuinoaLiveContext contextObject = liveReloadBuildItem.getContextObject(QuinoaLiveContext.class);
-        if (liveReloadBuildItem.isLiveReload()
-                && liveReloadBuildItem.getChangedResources().stream()
-                        .noneMatch(r -> r.startsWith(srcUIDirBuildItem.get().getDirectory().toString()))
+
+        final PackageManager packageManager = quinoaDir.get().getPackageManager();
+        final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
+        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.devServerPort.isPresent()) {
+            return null;
+        }
+        if (liveReload.isLiveReload()
+                && liveReload.getChangedResources().stream()
+                        .noneMatch(r -> r.startsWith(packageManager.getDirectory().toString()))
                 && contextObject != null) {
-            return new UIBuildOutcomeBuildItem(contextObject.getLocation());
+            return new TargetDirBuildItem(contextObject.getLocation());
         }
-        final String packageManagerBinary = quinoaConfig.packageManager.orElse("npm");
-        PackageManager packageManager = new PackageManager(packageManagerBinary, srcUIDirBuildItem.get().getDirectory());
-        if (quinoaConfig.alwaysInstallPackages
-                .orElse(!Files.isDirectory(srcUIDirBuildItem.get().getDirectory().resolve("node_modules")))) {
-            if (!packageManager
-                    .install(quinoaConfig.frozenLockfile.orElseGet(() -> Objects.equals(System.getenv("CI"), "true")))) {
-                throw new RuntimeException("Error while installing the UI");
-            }
+        if (quinoaConfig.runTests.orElse(false)) {
+            packageManager.test();
         }
-        if (quinoaConfig.runUITests.orElse(false)) {
-            if (!packageManager.test()) {
-                throw new RuntimeException("Error while testing the UI");
-            }
-        }
-        if (!packageManager.build()) {
-            throw new RuntimeException("Error while building the UI");
-        }
-        final Path buildDir = srcUIDirBuildItem.get().getDirectory().resolve(quinoaConfig.buildDir.orElse("build"));
+        packageManager.build(launchMode.getLaunchMode());
+        final Path buildDir = packageManager.getDirectory().resolve(quinoaConfig.buildDir.orElse("build"));
         if (!Files.isDirectory(buildDir)) {
-            throw new ConfigurationException("Invalid UI build directory: '" + buildDir + "'");
+            throw new ConfigurationException("Invalid Quinoa build directory: '" + buildDir + "'");
         }
-        final Path targetBuildDir = outputTargetBuildItem.getOutputDirectory().resolve(TARGET_DIR_NAME);
+        final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
         Files.move(buildDir, targetBuildDir);
-        liveReloadBuildItem.setContextObject(QuinoaLiveContext.class, new QuinoaLiveContext(targetBuildDir));
-        return new UIBuildOutcomeBuildItem(targetBuildDir);
+        liveReload.setContextObject(QuinoaLiveContext.class, new QuinoaLiveContext(targetBuildDir));
+        return new TargetDirBuildItem(targetBuildDir);
     }
 
     @BuildStep(onlyIf = IsNormal.class)
-    public UIResourcesBuildItem prepareResourcesForNormalMode(
-            Optional<UIBuildOutcomeBuildItem> uiBuildOutcomeBuildItem,
+    public BuiltResourcesBuildItem prepareResourcesForNormalMode(
+            Optional<TargetDirBuildItem> targetDir,
             BuildProducer<GeneratedResourceBuildItem> generatedResources) throws IOException {
-        if (!uiBuildOutcomeBuildItem.isPresent()) {
+        if (!targetDir.isPresent()) {
             return null;
         }
-        return new UIResourcesBuildItem(getUIEntries(generatedResources, uiBuildOutcomeBuildItem.get().getUiBuildDirectory()));
+        return new BuiltResourcesBuildItem(prepareBuiltResources(generatedResources, targetDir.get().getBuildDirectory()));
     }
 
     @BuildStep(onlyIfNot = IsNormal.class)
-    public UIResourcesBuildItem prepareResourcesForOtherMode(
-            Optional<UIBuildOutcomeBuildItem> uiBuildOutcomeBuildItem,
+    public BuiltResourcesBuildItem prepareResourcesForOtherMode(
+            Optional<TargetDirBuildItem> targetDir,
             BuildProducer<GeneratedResourceBuildItem> generatedResources) throws IOException {
-        if (!uiBuildOutcomeBuildItem.isPresent()) {
+        if (!targetDir.isPresent()) {
             return null;
         }
-        final HashSet<UIResourcesBuildItem.UIEntry> entries = getUIEntries(generatedResources,
-                uiBuildOutcomeBuildItem.get().getUiBuildDirectory());
-        return new UIResourcesBuildItem(uiBuildOutcomeBuildItem.get().getUiBuildDirectory(), entries);
+        final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = prepareBuiltResources(generatedResources,
+                targetDir.get().getBuildDirectory());
+        return new BuiltResourcesBuildItem(targetDir.get().getBuildDirectory(), entries);
     }
 
     @BuildStep
     void watchChanges(
             QuinoaConfig quinoaConfig,
-            Optional<SrcUIDirBuildItem> srcUIDirBuildItem,
+            Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (!srcUIDirBuildItem.isPresent()) {
+        if (!quinoaDir.isPresent() || quinoaConfig.devServerPort.isPresent()) {
             return;
         }
-        scan(srcUIDirBuildItem.get().getDirectory(), watchedPaths);
+        scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);
     }
 
     @BuildStep
     @Record(RUNTIME_INIT)
     public void runtimeInit(
-            Optional<UIResourcesBuildItem> uiResources,
+            Optional<BuiltResourcesBuildItem> uiResources,
             QuinoaRecorder recorder,
-            CoreVertxBuildItem vertx, BeanContainerBuildItem beanContainer,
+            CoreVertxBuildItem vertx,
+            BeanContainerBuildItem beanContainer,
             BuildProducer<DefaultRouteBuildItem> defaultRoutes,
             BuildProducer<RouteBuildItem> routes) throws IOException {
         if (uiResources.isPresent() && !uiResources.get().getNames().isEmpty()) {
@@ -178,18 +182,18 @@ public class QuinoaProcessor {
         }
     }
 
-    private HashSet<UIResourcesBuildItem.UIEntry> getUIEntries(
+    private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
             BuildProducer<GeneratedResourceBuildItem> generatedResources,
-            Path uiDir) throws IOException {
-        final List<Path> files = Files.walk(uiDir).filter(Files::isRegularFile)
+            Path targetDir) throws IOException {
+        final List<Path> files = Files.walk(targetDir).filter(Files::isRegularFile)
                 .collect(Collectors.toList());
-        final HashSet<UIResourcesBuildItem.UIEntry> entries = new HashSet<>(files.size());
-        log.infof("Quinoa Build directory: '%s'", uiDir);
+        final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
+        LOG.infof("Quinoa Target directory: '%s'", targetDir);
         for (Path file : files) {
-            final String name = "/" + uiDir.relativize(file);
-            log.infof("Quinoa Generated: '%s'", name);
+            final String name = "/" + targetDir.relativize(file);
+            LOG.infof("Quinoa generated resource: '%s'", name);
             generatedResources.produce(new GeneratedResourceBuildItem(META_INF_UI + name, Files.readAllBytes(file), true));
-            entries.add(new UIResourcesBuildItem.UIEntry(name));
+            entries.add(new BuiltResourcesBuildItem.BuiltResource(name));
         }
         return entries;
     }
@@ -201,19 +205,19 @@ public class QuinoaProcessor {
             while (iter.hasNext()) {
                 Path filePath = iter.next();
                 if (Files.isRegularFile(filePath)) {
-                    log.debugf("Quinoa is watching: %s", filePath);
+                    LOG.debugf("Quinoa is watching: %s", filePath);
                     watchedPaths.produce(new HotDeploymentWatchedFileBuildItem(filePath.toString()));
                 } else if (Files.isDirectory(filePath) && !IGNORE_WATCH.contains(filePath.getFileName().toString())) {
-                    log.debugf("Quinoa is scanning directory: %s", filePath);
+                    LOG.debugf("Quinoa is scanning directory: %s", filePath);
                     scan(filePath, watchedPaths);
                 }
             }
         }
     }
 
-    private AbstractMap.SimpleEntry<Path, Path> getUIDir(QuinoaConfig quinoaConfig,
-            OutputTargetBuildItem outputTargetBuildItem) {
-        Map.Entry<Path, Path> mainSourcesRoot = findMainSourcesRoot(outputTargetBuildItem.getOutputDirectory());
+    private AbstractMap.SimpleEntry<Path, Path> computeUIDir(QuinoaConfig quinoaConfig,
+            OutputTargetBuildItem outputTarget) {
+        Map.Entry<Path, Path> mainSourcesRoot = findMainSourcesRoot(outputTarget.getOutputDirectory());
         if (mainSourcesRoot == null) {
             return null;
         }
