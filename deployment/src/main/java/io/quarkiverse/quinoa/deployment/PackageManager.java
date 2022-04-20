@@ -1,14 +1,27 @@
 package io.quarkiverse.quinoa.deployment;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.jboss.logging.Logger;
+
+import io.quarkus.deployment.util.ProcessUtil;
+import io.quarkus.runtime.LaunchMode;
 
 public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
@@ -19,38 +32,140 @@ public class PackageManager {
     private final Path directory;
     private final Commands commands;
 
-    public PackageManager(String packageManagerBinary, Path directory) {
+    private PackageManager(String packageManagerBinary, Path directory) {
         this.packageManagerBinary = packageManagerBinary;
         this.directory = directory;
-        this.commands = detect(packageManagerBinary);
+        this.commands = resolveCommands(packageManagerBinary);
     }
 
-    public boolean install(boolean frozenLockfile) {
+    public Path getDirectory() {
+        return directory;
+    }
+
+    public void install(boolean frozenLockfile) {
         final Command install = commands.install(frozenLockfile);
-        LOG.infof("Running Quinoa install command: %s %s", packageManagerBinary, String.join(" ", install.args));
-        return exec(install);
+        final String printable = install.printable(packageManagerBinary);
+        LOG.infof("Running Quinoa package manager install command: %s", printable);
+        if (!exec(install)) {
+            throw new RuntimeException(format("Error in Quinoa while running package manager install command: %s", printable));
+        }
     }
 
-    public boolean build() {
-        final Command build = commands.build();
-        LOG.infof("Running Quinoa build command: %s %s", packageManagerBinary, String.join(" ", build.args));
-        return exec(build);
+    public void build(LaunchMode mode) {
+        final Command build = commands.build(mode);
+        final String printable = build.printable(packageManagerBinary);
+        LOG.infof("Running Quinoa package manager build command: %s", printable);
+        if (!exec(build)) {
+            throw new RuntimeException(format("Error in Quinoa while running package manager build command: %s", printable));
+        }
     }
 
-    public boolean test() {
+    public void test() {
         final Command test = commands.test();
-        LOG.infof("Running Quinoa test command: %s %s", packageManagerBinary, String.join(" ", test.args));
-        return exec(test);
+        final String printable = test.printable(packageManagerBinary);
+        LOG.infof("Running Quinoa package manager test command: %s", printable);
+        if (!exec(test)) {
+            throw new RuntimeException(format("Error in Quinoa while running package manager test command: %s", printable));
+        }
     }
 
-    static Commands detect(String binary) {
-        if (binary.contains("npm")) {
+    public void stopDev(Process process) {
+        if (process == null) {
+            return;
+        }
+        LOG.infof("Stopping Quinoa package manager live coding as a dev service.");
+        // Kill children before because react is swallowing the signal
+        process.descendants().forEach(new Consumer<ProcessHandle>() {
+            @Override
+            public void accept(ProcessHandle processHandle) {
+                processHandle.destroy();
+            }
+        });
+        if (process.isAlive()) {
+            process.destroy();
+            try {
+                if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                    process.destroyForcibly();
+                }
+                ;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+    }
+
+    public Process dev(int checkPort) {
+        final Command dev = commands.dev();
+        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable(packageManagerBinary));
+        Process p = process(dev);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                stopDev(p);
+            }
+        });
+        try {
+            int i = 0;
+            while (!isDevServerUp(checkPort)) {
+                if (++i >= 30) {
+                    stopDev(p);
+                    throw new RuntimeException(
+                            "Quinoa package manager live coding port " + checkPort
+                                    + " is still not listening after the timeout.");
+                }
+                Thread.sleep(500);
+            }
+            // Add a small safety delay to make sure all logs are outputted
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            stopDev(p);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+        return p;
+    }
+
+    public static PackageManager autoDetectPackageManager(Optional<String> binary, Path directory) {
+        String resolved = binary.orElse("npm");
+        if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
+            resolved = "yarn";
+        }
+        if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
+            resolved = "pnpm";
+        }
+        return new PackageManager(resolved, directory);
+
+    }
+
+    static Commands resolveCommands(String binary) {
+        if (binary.contains("npm") || binary.contains("pnpm")) {
             return NPM;
         }
         if (binary.contains("yarn")) {
             return YARN;
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
+    }
+
+    private Process process(Command command) {
+        Process process = null;
+        String[] cmd = new String[command.args.length + 1];
+        cmd[0] = packageManagerBinary;
+        if (command.args.length > 0) {
+            System.arraycopy(command.args, 0, cmd, 1, command.args.length);
+        }
+        final ProcessBuilder builder = new ProcessBuilder()
+                .directory(directory.toFile())
+                .command(cmd);
+        if (!command.envs.isEmpty()) {
+            builder.environment().putAll(command.envs);
+        }
+        try {
+            process = ProcessUtil.launchProcess(builder, true);
+        } catch (IOException e) {
+            throw new RuntimeException("Input/Output error while running process.", e);
+        }
+        return process;
     }
 
     private boolean exec(Command command) {
@@ -93,38 +208,32 @@ public class PackageManager {
             this.envs = envs;
             this.args = args;
         }
+
+        public String printable(String binary) {
+            return binary + " " + String.join(" ", args);
+        }
     }
 
     interface Commands {
         Command install(boolean frozenLockfile);
 
-        Command build();
+        default Command build(LaunchMode mode) {
+            // MODE=dev/test/normal to be able to build differently depending on the mode
+            return new Command(Collections.singletonMap("MODE", mode.getDefaultProfile()), "run", "build");
+        }
 
-        Command test();
+        default Command test() {
+            // CI=true to avoid watch mode on Angular
+            return new Command(Collections.singletonMap("CI", "true"), "test");
+        }
+
+        default Command dev() {
+            // BROWSER=NONE so the browser is not automatically opened with React
+            return new Command(Collections.singletonMap("BROWSER", "none"), "start");
+        }
     }
 
     private static class NPMCommands implements Commands {
-
-        @Override
-        public Command install(boolean frozenLockfile) {
-            if (frozenLockfile) {
-                return new Command("install", "--frozen-lockfile");
-            }
-            return new Command("install");
-        }
-
-        @Override
-        public Command build() {
-            return new Command("run", "build");
-        }
-
-        @Override
-        public Command test() {
-            return new Command(Collections.singletonMap("CI", "true"), "test");
-        }
-    }
-
-    private static class YarnCommands implements Commands {
 
         @Override
         public Command install(boolean frozenLockfile) {
@@ -134,14 +243,16 @@ public class PackageManager {
             return new Command("install");
         }
 
-        @Override
-        public Command build() {
-            return new Command("build");
-        }
+    }
+
+    private static class YarnCommands implements Commands {
 
         @Override
-        public Command test() {
-            return new Command(Collections.singletonMap("CI", "true"), "test");
+        public Command install(boolean frozenLockfile) {
+            if (frozenLockfile) {
+                return new Command("install", "--frozen-lockfile");
+            }
+            return new Command("install");
         }
     }
 
@@ -174,6 +285,26 @@ public class PackageManager {
                     LOG.log(logLevel, "Failed to handle output", e);
                 }
             }
+        }
+    }
+
+    private static boolean isDevServerUp(int port) {
+        try {
+            URL url = new URL("http://localhost:" + port);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(200);
+            connection.setReadTimeout(200);
+            connection.connect();
+            int code = connection.getResponseCode();
+            if (code == 200) {
+                return true;
+            }
+            return false;
+        } catch (ConnectException | SocketTimeoutException e) {
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException("Error while checking if package manager dev server is up", e);
         }
     }
 }

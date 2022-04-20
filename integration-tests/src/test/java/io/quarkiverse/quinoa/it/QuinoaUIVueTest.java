@@ -16,14 +16,14 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
-@TestProfile(TestProfiles.LitTests.class)
+@TestProfile(TestProfiles.VueTests.class)
 @QuarkusTestResource(QuarkusPlaywrightManager.class)
-public class QuinoaUILitTest {
+public class QuinoaUIVueTest {
 
     @QuarkusPlaywrightManager.InjectPlaywright
     BrowserContext context;
 
-    @TestHTTPResource("index.html")
+    @TestHTTPResource("/")
     URL url;
 
     @Test
@@ -35,10 +35,10 @@ public class QuinoaUILitTest {
         page.waitForLoadState();
 
         String title = page.title();
-        Assertions.assertEquals("Quinoa Lit App", title);
+        Assertions.assertEquals("hello-quinoa", title);
 
         // Make sure the component loaded and hits the backend
-        String greeting = page.innerText(".greeting");
-        Assertions.assertEquals("Hello Quinoa and World", greeting);
+        String greeting = page.innerText(".hello h1");
+        Assertions.assertEquals("Welcome to Your Vue Quinoa App", greeting);
     }
 }

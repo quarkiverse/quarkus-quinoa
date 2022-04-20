@@ -8,19 +8,19 @@ import java.util.Set;
 
 import io.quarkus.builder.item.SimpleBuildItem;
 
-public final class UIResourcesBuildItem extends SimpleBuildItem {
+public final class BuiltResourcesBuildItem extends SimpleBuildItem {
 
     private final Optional<Path> directory;
-    private final Set<UIEntry> entries;
+    private final Set<BuiltResource> resources;
 
-    public UIResourcesBuildItem(Path directory, Set<UIEntry> entries) {
+    public BuiltResourcesBuildItem(Path directory, Set<BuiltResource> resources) {
         this.directory = Optional.ofNullable(directory);
-        this.entries = entries;
+        this.resources = resources;
     }
 
-    public UIResourcesBuildItem(Set<UIEntry> entries) {
+    public BuiltResourcesBuildItem(Set<BuiltResource> entries) {
         this.directory = Optional.empty();
-        this.entries = entries;
+        this.resources = entries;
     }
 
     public Optional<Path> getDirectory() {
@@ -28,17 +28,17 @@ public final class UIResourcesBuildItem extends SimpleBuildItem {
     }
 
     public Set<String> getNames() {
-        Set<String> names = new HashSet<>(entries.size());
-        for (UIEntry entry : entries) {
+        Set<String> names = new HashSet<>(resources.size());
+        for (BuiltResource entry : resources) {
             names.add(entry.getName());
         }
         return names;
     }
 
-    public static class UIEntry {
+    public static class BuiltResource {
         private final String name;
 
-        public UIEntry(String name) {
+        public BuiltResource(String name) {
             this.name = name;
         }
 
@@ -52,7 +52,7 @@ public final class UIResourcesBuildItem extends SimpleBuildItem {
                 return true;
             if (o == null || getClass() != o.getClass())
                 return false;
-            UIEntry entry = (UIEntry) o;
+            BuiltResource entry = (BuiltResource) o;
             return name.equals(entry.name);
         }
 

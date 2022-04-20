@@ -1,4 +1,4 @@
-package io.quarkiverse.quinoa.it;
+package io.quarkiverse.quinoa.testing;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,7 +15,7 @@ import com.microsoft.playwright.Playwright;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
-public class PlaywrightManager implements QuarkusTestResourceLifecycleManager {
+public class QuarkusPlaywrightManager implements QuarkusTestResourceLifecycleManager {
 
     private BrowserContext context;
     private Playwright playwright;
