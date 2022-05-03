@@ -7,6 +7,7 @@ import static java.lang.String.join;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,7 @@ import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
+import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.runtime.VertxHttpRecorder;
@@ -49,6 +51,7 @@ public class ForwardedDevProcessor {
             return thread.getName().matches("Process (stdout|stderr) streamer");
         }
     };
+    private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
 
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
     private static volatile QuinoaConfig cfg;
@@ -110,11 +113,17 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServerPort.getAsInt();
-            dev.set(packageManager.dev(devServerPort));
+            final int timeout = quinoaConfig.devServerTimeout.orElse(DEFAULT_DEV_SERVER_TIMEOUT);
+            if (timeout < 1000) {
+                throw new ConfigurationException("dev-server-timeout must be greater than 1000ms");
+            }
+            final long start = Instant.now().toEpochMilli();
+            dev.set(packageManager.dev(devServerPort, timeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
                     quinoaConfig.enableDevServerLogs.orElse(false));
-            LOG.info("Quinoa package manager live coding is up and running on port: " + devServerPort);
+            LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
+                    devServerPort, Instant.now().toEpochMilli() - start);
             final Closeable onClose = new Closeable() {
                 @Override
                 public void close() throws IOException {

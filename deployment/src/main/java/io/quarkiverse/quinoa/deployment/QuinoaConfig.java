@@ -74,6 +74,13 @@ public class QuinoaConfig {
     public OptionalInt devServerPort;
 
     /**
+     * Timeout in ms for the dev server to be up and running.
+     * If not set the default is ~3000ms
+     */
+    @ConfigItem
+    public OptionalInt devServerTimeout;
+
+    /**
      * Enable external dev server live coding logs.
      * This is not enabled by default because most dev servers display compilation errors directly in the browser.
      * False if not set.

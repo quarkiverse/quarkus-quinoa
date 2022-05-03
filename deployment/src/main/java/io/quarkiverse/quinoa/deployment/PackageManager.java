@@ -95,7 +95,7 @@ public class PackageManager {
 
     }
 
-    public Process dev(int checkPort) {
+    public Process dev(int checkPort, int timeout) {
         final Command dev = commands.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable(packageManagerBinary));
         Process p = process(dev);
@@ -107,7 +107,7 @@ public class PackageManager {
         try {
             int i = 0;
             while (!isDevServerUp(checkPort)) {
-                if (++i >= 30) {
+                if (++i >= timeout / 500) {
                     stopDev(p);
                     throw new RuntimeException(
                             "Quinoa package manager live coding port " + checkPort
