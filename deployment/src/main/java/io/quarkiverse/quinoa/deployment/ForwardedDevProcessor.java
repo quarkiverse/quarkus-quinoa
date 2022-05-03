@@ -58,11 +58,14 @@ public class ForwardedDevProcessor {
     public ForwardedDevServerBuildItem prepareDevService(
             QuinoaConfig quinoaConfig,
             LaunchModeBuildItem launchMode,
-            Optional<QuinoaDirectoryBuildItem> srcUIDir,
+            Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<DevServicesResultBuildItem> devServices,
             Optional<ConsoleInstalledBuildItem> consoleInstalled,
             LoggingSetupBuildItem loggingSetup,
             CuratedApplicationShutdownBuildItem shutdown) {
+        if (!quinoaDir.isPresent()) {
+            return null;
+        }
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(cfg);
             if (!shouldShutdownTheBroker) {
@@ -103,7 +106,7 @@ public class ForwardedDevProcessor {
                 loggingSetup,
                 PROCESS_THREAD_PREDICATE);
 
-        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, srcUIDir.get().getDirectory());
+        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, quinoaDir.get().getDirectory());
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServerPort.getAsInt();

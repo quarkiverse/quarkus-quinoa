@@ -50,6 +50,7 @@ public class QuinoaProcessor {
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
     private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "build", "target", "dist");
+    public static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -221,7 +222,8 @@ public class QuinoaProcessor {
         if (mainSourcesRoot == null) {
             return null;
         }
-        Path uiRoot = mainSourcesRoot.getKey().resolve(quinoaConfig.uiDir.orElse("ui"));
+        final String uiDir = quinoaConfig.uiDir.orElse(DEFAULT_WEB_UI_DIR);
+        final Path uiRoot = mainSourcesRoot.getValue().resolve(uiDir);
         final File file = uiRoot.toFile();
         if (!file.exists() || !file.isDirectory()) {
             return null;

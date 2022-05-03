@@ -12,26 +12,24 @@ public class QuinoaConfig {
 
     /**
      * Indicate if the extension should be enabled
-     * Default is true if the UI directory exists and dev and prod mode
-     * Default is false in test mode (to avoid building the UI during backend tests)
+     * Default is true if the Web UI directory exists and dev and prod mode
+     * Default is false in test mode (to avoid building the Web UI during backend tests)
      */
     @ConfigItem(name = ConfigItem.PARENT)
     Optional<Boolean> enable;
 
     /**
-     * Path to the UI (node) root directory.
-     * If not set ${project.root}/src/main/ui/ will be used
-     * If set to an absolute path then the absolute path will be used, otherwise the path
-     * will be considered relative to the project root
+     * Path to the Web UI (node) root directory.
+     * If not set ${project.root}/src/main/webui/ will be used
+     * otherwise the path will be considered relative to the project root
      */
     @ConfigItem
     public Optional<String> uiDir;
 
     /**
-     * Path of the directory which contains the resulting ui built files.
+     * Path of the directory which contains the resulting Web UI built files.
      * If not set build/ will be used
-     * If set to an absolute path then the absolute path will be used, otherwise the path
-     * will be considered relative to the UI path
+     * otherwise the path will be considered relative to the Web UI path
      */
     @ConfigItem
     public Optional<String> buildDir;
@@ -45,8 +43,8 @@ public class QuinoaConfig {
     public Optional<String> packageManager;
 
     /**
-     * Indicate if the UI should also be tested during the build phase (i.e: npm test)
-     * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have UI test running during a
+     * Indicate if the Web UI should also be tested during the build phase (i.e: npm test)
+     * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have Web UI test running during a
      * {@link io.quarkus.test.junit.QuarkusTest}
      * Default is false
      */
