@@ -84,7 +84,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 
 [.description]
 --
-Timeout in ms for the dev server to be up and running. If not set the default is ~3000ms
+Timeout in ms for the dev server to be up and running. If not set the default is ~30000ms
 --|int 
 |
 

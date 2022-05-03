@@ -75,7 +75,7 @@ public class QuinoaConfig {
 
     /**
      * Timeout in ms for the dev server to be up and running.
-     * If not set the default is ~3000ms
+     * If not set the default is ~30000ms
      */
     @ConfigItem
     public OptionalInt devServerTimeout;
