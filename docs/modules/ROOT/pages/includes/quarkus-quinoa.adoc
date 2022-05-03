@@ -80,6 +80,15 @@ Enable using an external server for dev (live coding). The dev server process (i
 |
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server-timeout]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server-timeout[quarkus.quinoa.dev-server-timeout]`
+
+[.description]
+--
+Timeout in ms for the dev server to be up and running. If not set the default is ~3000ms
+--|int 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-dev-server-logs]]`link:#quarkus-quinoa_quarkus.quinoa.enable-dev-server-logs[quarkus.quinoa.enable-dev-server-logs]`
 
 [.description]
