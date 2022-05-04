@@ -15,13 +15,18 @@ In your `pom.xml` file, add:
 <dependency>
     <groupId>io.quarkiverse.quinoa</groupId>
     <artifactId>quarkus-quinoa</artifactId>
+    <version>...</version>
 </dependency>
 ----
+
+You may find the latest release version here:
+image:https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central[link=https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa]
 
 == Prerequisite
 
 - Install NodeJS (https://nodejs.org/)
-- Get a Quarkus application with Quinoa extension installed
+- Create or use an existing Quarkus application
+- Add the Quinoa extension
 
 == Getting Started
 
