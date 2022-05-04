@@ -37,6 +37,7 @@ import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
+import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
@@ -167,20 +168,28 @@ public class QuinoaProcessor {
     @BuildStep
     @Record(RUNTIME_INIT)
     public void runtimeInit(
+            QuinoaConfig quinoaConfig,
             Optional<BuiltResourcesBuildItem> uiResources,
             QuinoaRecorder recorder,
             CoreVertxBuildItem vertx,
             BeanContainerBuildItem beanContainer,
             BuildProducer<DefaultRouteBuildItem> defaultRoutes,
-            BuildProducer<RouteBuildItem> routes) throws IOException {
+            BuildProducer<RouteBuildItem> routes,
+            BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
         if (uiResources.isPresent() && !uiResources.get().getNames().isEmpty()) {
             String directory = null;
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", VertxHttpRecorder.DEFAULT_ROUTE_ORDER)
+            final Boolean enableSPARouting = quinoaConfig.enableSPARouting.orElse(false);
+            int order = VertxHttpRecorder.DEFAULT_ROUTE_ORDER;
+            if (enableSPARouting) {
+                order += 2; // We put it behind rest extensions
+                resumeOn404.produce(new ResumeOn404BuildItem());
+            }
+            routes.produce(RouteBuildItem.builder().orderedRoute("/*", order)
                     .handler(recorder.quinoaHandler(directory,
-                            uiResources.get().getNames()))
+                            uiResources.get().getNames(), enableSPARouting))
                     .build());
             // TODO: Handle single page web-app html5 urls by re-routing not found to /
         }

@@ -66,6 +66,13 @@ public class QuinoaConfig {
     public Optional<Boolean> alwaysInstallPackages;
 
     /**
+     * Enable SPA (Single Page Application) routing, all unhandled requests will be re-routed to the index.html
+     * If not set, it is disabled.
+     */
+    @ConfigItem
+    public Optional<Boolean> enableSPARouting;
+
+    /**
      * Enable using an external server for dev (live coding).
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
      * This defines the port of the server to forward requests to.

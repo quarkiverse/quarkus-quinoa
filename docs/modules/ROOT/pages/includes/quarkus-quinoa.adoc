@@ -71,6 +71,15 @@ Always install packages before building. If not set, it will install packages on
 |
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-spa-routing]]`link:#quarkus-quinoa_quarkus.quinoa.enable-spa-routing[quarkus.quinoa.enable-spa-routing]`
+
+[.description]
+--
+Enable SPA (Single Page Application) routing, all unhandled requests will be re-routed to the index.html If not set, it is disabled.
+--|boolean 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server-port]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server-port[quarkus.quinoa.dev-server-port]`
 
 [.description]

@@ -20,8 +20,9 @@ public class QuinoaRecorder {
         return new QuinoaDevProxyHandler(vertx.get(), port);
     }
 
-    public Handler<RoutingContext> quinoaHandler(final String directory, final Set<String> uiResources) throws IOException {
-        return new QuinoaUIResourceHandler(directory, uiResources);
+    public Handler<RoutingContext> quinoaHandler(final String directory, final Set<String> uiResources,
+            boolean enableSPARouting) throws IOException {
+        return new QuinoaUIResourceHandler(directory, uiResources, enableSPARouting);
     }
 
 }
