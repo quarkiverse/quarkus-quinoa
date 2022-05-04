@@ -15,12 +15,14 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
 
     private final Set<String> uiResources;
     private final Handler<RoutingContext> staticHandler;
+    private final boolean enableSPARouting;
     private final ClassLoader currentClassLoader;
 
-    QuinoaUIResourceHandler(String directory, Set<String> uiResources) {
+    QuinoaUIResourceHandler(String directory, Set<String> uiResources, boolean enableSPARouting) {
         this.uiResources = uiResources;
         this.staticHandler = directory != null ? StaticHandler.create(FileSystemAccess.ROOT, directory)
                 : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
+        this.enableSPARouting = enableSPARouting;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -33,6 +35,8 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
         if (uiResources.contains(rel) || Objects.equals(rel, "/")) {
             LOG.infof("Quinoa is serving: '%s'", rel);
             staticHandler.handle(ctx);
+        } else if (enableSPARouting) {
+            ctx.reroute("/");
         } else {
             // make sure we don't lose the correct TCCL to Vert.x...
             Thread.currentThread().setContextClassLoader(currentClassLoader);
