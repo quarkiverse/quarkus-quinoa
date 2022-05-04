@@ -20,7 +20,7 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
     QuinoaUIResourceHandler(String directory, Set<String> uiResources) {
         this.uiResources = uiResources;
         this.staticHandler = directory != null ? StaticHandler.create(FileSystemAccess.ROOT, directory)
-                : StaticHandler.create(QuinoaRecorder.META_INF_UI);
+                : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
