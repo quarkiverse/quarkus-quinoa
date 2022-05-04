@@ -14,7 +14,7 @@ import io.vertx.ext.web.RoutingContext;
 @Recorder
 public class QuinoaRecorder {
     private static final Logger LOG = Logger.getLogger(QuinoaRecorder.class);
-    public static final String META_INF_UI = "META-INF/ui";
+    public static final String META_INF_WEB_UI = "META-INF/webui";
 
     public Handler<RoutingContext> quinoaProxyDevHandler(Supplier<Vertx> vertx, final Integer port) {
         return new QuinoaDevProxyHandler(vertx.get(), port);

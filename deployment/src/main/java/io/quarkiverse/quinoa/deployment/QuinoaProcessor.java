@@ -1,6 +1,6 @@
 package io.quarkiverse.quinoa.deployment;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_UI;
+import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
 import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
@@ -34,6 +34,7 @@ import io.quarkus.deployment.builditem.GeneratedResourceBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
@@ -131,11 +132,13 @@ public class QuinoaProcessor {
     @BuildStep(onlyIf = IsNormal.class)
     public BuiltResourcesBuildItem prepareResourcesForNormalMode(
             Optional<TargetDirBuildItem> targetDir,
-            BuildProducer<GeneratedResourceBuildItem> generatedResources) throws IOException {
+            BuildProducer<GeneratedResourceBuildItem> generatedResources,
+            BuildProducer<NativeImageResourceBuildItem> nativeImageResources) throws IOException {
         if (!targetDir.isPresent()) {
             return null;
         }
-        return new BuiltResourcesBuildItem(prepareBuiltResources(generatedResources, targetDir.get().getBuildDirectory()));
+        return new BuiltResourcesBuildItem(
+                prepareBuiltResources(generatedResources, nativeImageResources, targetDir.get().getBuildDirectory()));
     }
 
     @BuildStep(onlyIfNot = IsNormal.class)
@@ -146,7 +149,7 @@ public class QuinoaProcessor {
             return null;
         }
         final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = prepareBuiltResources(generatedResources,
-                targetDir.get().getBuildDirectory());
+                null, targetDir.get().getBuildDirectory());
         return new BuiltResourcesBuildItem(targetDir.get().getBuildDirectory(), entries);
     }
 
@@ -185,6 +188,7 @@ public class QuinoaProcessor {
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
             BuildProducer<GeneratedResourceBuildItem> generatedResources,
+            BuildProducer<NativeImageResourceBuildItem> nativeImageResources,
             Path targetDir) throws IOException {
         final List<Path> files = Files.walk(targetDir).filter(Files::isRegularFile)
                 .collect(Collectors.toList());
@@ -193,7 +197,11 @@ public class QuinoaProcessor {
         for (Path file : files) {
             final String name = "/" + targetDir.relativize(file);
             LOG.infof("Quinoa generated resource: '%s'", name);
-            generatedResources.produce(new GeneratedResourceBuildItem(META_INF_UI + name, Files.readAllBytes(file), true));
+            generatedResources.produce(new GeneratedResourceBuildItem(META_INF_WEB_UI + name, Files.readAllBytes(file), true));
+            if (nativeImageResources != null) {
+                nativeImageResources
+                        .produce(new NativeImageResourceBuildItem(META_INF_WEB_UI + name));
+            }
             entries.add(new BuiltResourcesBuildItem.BuiltResource(name));
         }
         return entries;
