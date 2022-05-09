@@ -1,0 +1,3 @@
+quarkus:
+  quinoa:
+    dev-server-port: 3000

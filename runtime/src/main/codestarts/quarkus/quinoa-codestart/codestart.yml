@@ -1,0 +1,8 @@
+name: quinoa-codestart
+ref: quinoa
+type: code
+tags: extension-codestart
+metadata:
+  title: Quinoa
+  description: This is a tiny webpack app to get started with Quinoa.
+  related-guide-section: https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/index.html
