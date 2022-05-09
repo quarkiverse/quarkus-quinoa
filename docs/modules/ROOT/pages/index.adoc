@@ -102,8 +102,6 @@ To enable Angular live coding server, you need to edit the package.json start sc
 quarkus.quinoa.dev-server-port=4200
 ----
 
-
-
 If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
 
 Change the package.json test script:
@@ -125,6 +123,23 @@ Edit the karma.conf.js:
       flags: ['--no-sandbox']
     }
 },
+----
+
+=== Http Headers
+
+It's very common to set up headers for caching on static resources, for example React proposes https://create-react-app.dev/docs/production-build/#static-file-caching[this configuration]:
+
+To configure Quarkus with those headers :
+[source,properties]
+----
+quarkus.http.filter.others.header.Cache-Control=no-cache
+quarkus.http.filter.others.matches=/.*
+quarkus.http.filter.others.methods=GET
+quarkus.http.filter.others.order=0
+quarkus.http.filter.static.header.Cache-Control=max-age=31536000
+quarkus.http.filter.static.matches=/static/.+
+quarkus.http.filter.static.methods=GET
+quarkus.http.filter.static.order=1
 ----
 
 === Testing
