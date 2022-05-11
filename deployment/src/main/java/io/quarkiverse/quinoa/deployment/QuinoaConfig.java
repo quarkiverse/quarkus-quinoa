@@ -63,7 +63,7 @@ public class QuinoaConfig {
      * If not set, it will install packages only if the node_modules directory is absent.
      */
     @ConfigItem
-    public Optional<Boolean> alwaysInstallPackages;
+    public Optional<Boolean> alwaysInstall;
 
     /**
      * Enable SPA (Single Page Application) routing, all unhandled requests will be re-routed to the index.html

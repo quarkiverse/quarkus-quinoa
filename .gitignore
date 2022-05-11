@@ -65,3 +65,5 @@ release.properties
 
 #npm
 **/node_modules/**
+**/build/**
+**/dist/**

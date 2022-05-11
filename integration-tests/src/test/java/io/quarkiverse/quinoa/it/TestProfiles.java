@@ -11,6 +11,13 @@ public class TestProfiles {
         }
     }
 
+    public static class ReactTests extends QuinoaTestProfiles.Enable {
+        @Override
+        public String getConfigProfile() {
+            return "react";
+        }
+    }
+
     public static class AngularTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {

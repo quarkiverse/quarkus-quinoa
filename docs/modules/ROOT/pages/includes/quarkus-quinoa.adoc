@@ -62,7 +62,7 @@ Install the packages using a frozen lockfile. Don’t generate a lockfile and fa
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.always-install-packages]]`link:#quarkus-quinoa_quarkus.quinoa.always-install-packages[quarkus.quinoa.always-install-packages]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.always-install]]`link:#quarkus-quinoa_quarkus.quinoa.always-install[quarkus.quinoa.always-install]`
 
 [.description]
 --

@@ -27,6 +27,7 @@ public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
     private static final Commands NPM = new NPMCommands();
     private static final Commands YARN = new YarnCommands();
+    private static final Commands PNPM = new PNPMCommands();
 
     private final String packageManagerBinary;
     private final Path directory;
@@ -138,7 +139,10 @@ public class PackageManager {
     }
 
     static Commands resolveCommands(String binary) {
-        if (binary.contains("npm") || binary.contains("pnpm")) {
+        if (binary.contains("pnpm")) {
+            return PNPM;
+        }
+        if (binary.contains("npm")) {
             return NPM;
         }
         if (binary.contains("yarn")) {
@@ -243,6 +247,17 @@ public class PackageManager {
             return new Command("install");
         }
 
+    }
+
+    private static class PNPMCommands implements Commands {
+
+        @Override
+        public Command install(boolean frozenLockfile) {
+            if (frozenLockfile) {
+                return new Command("install", "--frozen-lockfile");
+            }
+            return new Command("install");
+        }
     }
 
     private static class YarnCommands implements Commands {
