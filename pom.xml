@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.quarkiverse.quinoa</groupId>
   <artifactId>quarkus-quinoa-parent</artifactId>
-  <version>1.0.0</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus - Quinoa - Parent</name>
   <modules>
@@ -76,8 +76,4 @@
       </modules>
     </profile>
   </profiles>
-
-  <scm>
-    <tag>1.0.0</tag>
-  </scm>
 </project>
