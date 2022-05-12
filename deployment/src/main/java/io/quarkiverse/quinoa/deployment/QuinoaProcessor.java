@@ -66,29 +66,34 @@ public class QuinoaProcessor {
             QuinoaConfig quinoaConfig,
             OutputTargetBuildItem outputTarget) throws IOException {
         if (!quinoaConfig.enable.orElse(true)) {
+            LOG.info("Quinoa is disabled.");
             return null;
         }
         if (launchMode.isTest() && !quinoaConfig.enable.isPresent()) {
             // Default to disabled in tests
+            LOG.warn("Quinoa is disabled by default in tests.");
             return null;
         }
-        final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(quinoaConfig, outputTarget);
-        if (uiDirEntry == null || !Files.isDirectory(uiDirEntry.getKey())) {
+        final String configuredDir = quinoaConfig.uiDir.orElse(DEFAULT_WEB_UI_DIR);
+        final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(configuredDir, outputTarget);
+        if (uiDirEntry == null) {
             LOG.warnf(
-                    "No Quinoa directory found. It is recommended to remove the quarkus-quinoa extension if not used.");
+                    "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
+                    configuredDir);
             return null;
         }
         final Path packageFile = uiDirEntry.getKey().resolve("package.json");
         if (!Files.isRegularFile(packageFile)) {
             throw new ConfigurationException(
-                    "No package.json found in UI directory: '" + uiDirEntry.getKey() + "'");
+                    "No package.json found in Web UI directory: '" + configuredDir + "'");
         }
         PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, uiDirEntry.getKey());
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
-        if (quinoaConfig.alwaysInstallPackages.orElse(!alreadyInstalled || packageFileModified)) {
-            packageManager.install(quinoaConfig.frozenLockfile.orElseGet(() -> Objects.equals(System.getenv("CI"), "true")));
+        if (quinoaConfig.alwaysInstall.orElse(!alreadyInstalled || packageFileModified)) {
+            final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
+            packageManager.install(frozenLockfile);
         }
         return new QuinoaDirectoryBuildItem(packageManager);
     }
@@ -119,9 +124,11 @@ public class QuinoaProcessor {
             packageManager.test();
         }
         packageManager.build(launchMode.getLaunchMode());
-        final Path buildDir = packageManager.getDirectory().resolve(quinoaConfig.buildDir.orElse("build"));
+        final String configuredBuildDir = quinoaConfig.buildDir.orElse("build");
+        final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
-            throw new ConfigurationException("Invalid Quinoa build directory: '" + buildDir + "'");
+            throw new ConfigurationException("Quinoa build directory not found: '" + configuredBuildDir + "'",
+                    Set.of("quarkus.quinoa.build-dir"));
         }
         final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
@@ -233,14 +240,13 @@ public class QuinoaProcessor {
         }
     }
 
-    private AbstractMap.SimpleEntry<Path, Path> computeUIDir(QuinoaConfig quinoaConfig,
+    private AbstractMap.SimpleEntry<Path, Path> computeUIDir(String configuredDir,
             OutputTargetBuildItem outputTarget) {
         Map.Entry<Path, Path> mainSourcesRoot = findMainSourcesRoot(outputTarget.getOutputDirectory());
         if (mainSourcesRoot == null) {
             return null;
         }
-        final String uiDir = quinoaConfig.uiDir.orElse(DEFAULT_WEB_UI_DIR);
-        final Path uiRoot = mainSourcesRoot.getValue().resolve(uiDir);
+        final Path uiRoot = mainSourcesRoot.getValue().resolve(configuredDir);
         final File file = uiRoot.toFile();
         if (!file.exists() || !file.isDirectory()) {
             return null;
@@ -265,6 +271,16 @@ public class QuinoaProcessor {
                 return null;
             }
         } while (true);
+    }
+
+    private static boolean isCI() {
+        String ci;
+        if (System.getProperties().containsKey("CI")) {
+            ci = System.getProperty("CI");
+        } else {
+            ci = System.getenv().getOrDefault("CI", "false");
+        }
+        return Objects.equals(ci, "true");
     }
 
     private static class QuinoaLiveContext {

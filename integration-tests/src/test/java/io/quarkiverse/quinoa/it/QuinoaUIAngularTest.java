@@ -24,10 +24,18 @@ public class QuinoaUIAngularTest {
     BrowserContext context;
 
     @TestHTTPResource("/")
-    URL url;
+    URL index;
+
+    @TestHTTPResource("/some-route")
+    URL someRoute;
 
     @Test
     public void testUIIndex() {
+        checkUrl(index);
+        checkUrl(someRoute);
+    }
+
+    private void checkUrl(URL url) {
         final Page page = context.newPage();
         Response response = page.navigate(url.toString());
         Assertions.assertEquals("OK", response.statusText());

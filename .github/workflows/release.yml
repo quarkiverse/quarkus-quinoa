@@ -48,6 +48,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Maven release ${{steps.metadata.outputs.current-version}}
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GPG_PASSPHRASE}}" --output /tmp/maven-settings.xml .github/release/maven-settings.xml.gpg

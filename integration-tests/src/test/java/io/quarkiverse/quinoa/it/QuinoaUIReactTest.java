@@ -13,14 +13,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
 import io.quarkiverse.quinoa.testing.QuarkusPlaywrightManager;
-import io.quarkiverse.quinoa.testing.QuinoaTestProfiles;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
-@TestProfile(QuinoaTestProfiles.Enable.class)
+@TestProfile(TestProfiles.ReactTests.class)
 @QuarkusTestResource(QuarkusPlaywrightManager.class)
 public class QuinoaUIReactTest {
 
@@ -29,6 +28,12 @@ public class QuinoaUIReactTest {
 
     @TestHTTPResource("/")
     URL url;
+
+    @TestHTTPResource("/something")
+    URL url404;
+
+    @TestHTTPResource("/api/quinoa")
+    URL api;
 
     @Test
     public void testUIIndex() {
@@ -47,9 +52,17 @@ public class QuinoaUIReactTest {
     }
 
     @Test
+    public void test404Endpoint() {
+        given()
+                .when().get(url404)
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
     public void testHelloEndpoint() {
         given()
-                .when().get("/api/quinoa")
+                .when().get(api)
                 .then()
                 .statusCode(200)
                 .body(is("Hello Quinoa"));
