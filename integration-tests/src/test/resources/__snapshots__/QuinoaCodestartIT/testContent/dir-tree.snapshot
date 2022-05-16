@@ -2,7 +2,8 @@
 package-lock.json
 package.json
 public/
-public/index.html
+public/quinoa.gif
+public/quinoa.html
 src/
 src/index.js
 webpack.config.js
