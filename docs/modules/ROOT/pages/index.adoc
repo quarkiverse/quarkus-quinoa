@@ -43,9 +43,9 @@ image:https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quino
 
 == Getting Started
 
-Create a UI directory in `src/main/ui`. This directory should contain your node code with a `package.json`.
+Create a Web UI directory in `src/main/webui` (. This directory should contain your node code with a `package.json`.
 
-From here, either generate an application from any existing Node built UI framework (like React, Angular, Lit, ...). Or, you may also create your own Node built wep-app.
+From here, either generate an application from any existing Node built Web UI framework (like React, Angular, Lit, ...). Or, you may also create your own Node built wep-app.
 
 The key points are the `package.json` scripts (`build` and optionally `test`) and the directory where the files are generated (`build/` by default).
 
@@ -71,9 +71,9 @@ Add a `build` script in the `package.json` to generate your web application inde
 [source,json]
 ----
  "scripts": {
-    "start": "[start the UI live coding server]",
-    "build": "[build the UI]",
-    "test": "[test the UI]"
+    "start": "[start the Web UI live coding server]",
+    "build": "[build the Web UI]",
+    "test": "[test the Web UI]"
   },
 ----
 
@@ -157,9 +157,9 @@ quarkus.http.filter.static.order=1
 
 === Testing
 
-By default, the UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the UI build.
+By default, the Web UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the Web UI build.
 
-Quinoa features a testing library to make it easier to test your UI:
+Quinoa features a testing library to make it easier to test your Web UI:
 [source,xml]
 ----
 <dependency>
@@ -169,20 +169,20 @@ Quinoa features a testing library to make it easier to test your UI:
 </dependency>
 ----
 
-In order to enable the UI (build and serve) in a particular test, you can use the `Enable` test profile:
+In order to enable the Web UI (build and serve) in a particular test, you can use the `Enable` test profile:
 
 [source,java]
 ----
     @QuarkusTest
     @TestProfile(QuinoaTestProfiles.Enable.class)
-    public class MyUITest {
+    public class MyWebUITest {
         @Test
         public void someTest() {
         }
     }
 ----
 
-If you also want to run the tests included in your UI (i.e npm test) alongside this class, you can use the `EnableAndRunTests` test profile:
+If you also want to run the tests included in your Web UI (i.e npm test) alongside this class, you can use the `EnableAndRunTests` test profile:
 
 The library also brings a very elegant way to do e2e testing using https://github.com/microsoft/playwright-java[Playright]:
 [source,java]
@@ -190,7 +190,7 @@ The library also brings a very elegant way to do e2e testing using https://githu
     @QuarkusTest
     @TestProfile(QuinoaTestProfiles.Enable.class)
     @QuarkusTestResource(QuarkusPlaywrightManager.class)
-    public class MyUITest {
+    public class MyWebUITest {
         @PlaywrightManager.InjectPlaywright
         BrowserContext context;
 
