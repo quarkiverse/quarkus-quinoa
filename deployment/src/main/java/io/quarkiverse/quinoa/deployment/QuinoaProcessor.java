@@ -188,7 +188,7 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final Boolean enableSPARouting = quinoaConfig.enableSPARouting.orElse(false);
+            final boolean enableSPARouting = quinoaConfig.enableSPARouting.orElse(false);
             int order = VertxHttpRecorder.DEFAULT_ROUTE_ORDER;
             if (enableSPARouting) {
                 order += 2; // We put it behind rest extensions

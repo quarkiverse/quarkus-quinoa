@@ -34,6 +34,9 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         if (event.succeeded()) {
                             final int statusCode = event.result().statusCode();
                             if (statusCode == 200) {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debugf("Quinoa is forwarding: '%s'", request.uri());
+                                }
                                 ctx.response().headers().addAll(event.result().headers());
                                 ctx.response().send(event.result().body());
                             } else if (statusCode == 404) {
@@ -45,7 +48,8 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                             }
                         } else {
                             ctx.response().setStatusCode(500);
-                            ctx.response().send();
+                            ctx.response().send("Quinoa failed to forward request, see logs.");
+                            LOG.error("Quinoa failed to forward request, see logs.", event.cause());
                         }
 
                     }
