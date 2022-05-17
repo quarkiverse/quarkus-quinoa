@@ -1,5 +1,7 @@
 package io.quarkiverse.quinoa;
 
+import static io.vertx.ext.web.handler.StaticHandler.DEFAULT_INDEX_PAGE;
+
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,8 +34,11 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
                 : ctx.normalizedPath().substring(
                         // let's be extra careful here in case Vert.x normalizes the mount points at some point
                         ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
-        if (uiResources.contains(rel) || Objects.equals(rel, "/")) {
-            LOG.infof("Quinoa is serving: '%s'", rel);
+        if (uiResources.contains(rel)
+                || (uiResources.contains("/" + DEFAULT_INDEX_PAGE) && Objects.equals(rel, "/"))) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debugf("Quinoa is serving: '%s'", rel);
+            }
             staticHandler.handle(ctx);
         } else if (enableSPARouting) {
             ctx.reroute("/");
