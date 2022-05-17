@@ -1,5 +1,5 @@
 {
-  "name": "quinoa-app",
+  "name": "quinoa-bowl",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -8,10 +8,9 @@
     "start": "webpack-dev-server --mode=development --port 3000"
   },
   "keywords": [],
-  "author": "",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "theaterjs": "3.2.0"
   },
   "devDependencies": {
     "webpack": "^5.72.0",
