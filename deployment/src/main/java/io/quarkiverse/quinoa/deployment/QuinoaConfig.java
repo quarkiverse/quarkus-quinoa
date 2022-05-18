@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -95,4 +96,23 @@ public class QuinoaConfig {
     @ConfigItem
     public Optional<Boolean> enableDevServerLogs;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        QuinoaConfig that = (QuinoaConfig) o;
+        return enable.equals(that.enable) && uiDir.equals(that.uiDir) && buildDir.equals(that.buildDir) &&
+                packageManager.equals(that.packageManager) && runTests.equals(that.runTests) &&
+                frozenLockfile.equals(that.frozenLockfile) && alwaysInstall.equals(that.alwaysInstall) &&
+                enableSPARouting.equals(that.enableSPARouting) && devServerPort.equals(that.devServerPort) &&
+                devServerTimeout.equals(that.devServerTimeout) && enableDevServerLogs.equals(that.enableDevServerLogs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(enable, uiDir, buildDir, packageManager, runTests, frozenLockfile, alwaysInstall,
+                enableSPARouting, devServerPort, devServerTimeout, enableDevServerLogs);
+    }
 }

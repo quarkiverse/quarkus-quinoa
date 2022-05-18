@@ -32,6 +32,7 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CuratedApplicationShutdownBuildItem;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
+import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
@@ -54,8 +55,6 @@ public class ForwardedDevProcessor {
     private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
 
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
-    private static volatile QuinoaConfig cfg;
-    private static volatile boolean first = true;
 
     @BuildStep(onlyIf = IsDevelopment.class)
     public ForwardedDevServerBuildItem prepareDevService(
@@ -65,35 +64,35 @@ public class ForwardedDevProcessor {
             BuildProducer<DevServicesResultBuildItem> devServices,
             Optional<ConsoleInstalledBuildItem> consoleInstalled,
             LoggingSetupBuildItem loggingSetup,
-            CuratedApplicationShutdownBuildItem shutdown) {
+            CuratedApplicationShutdownBuildItem shutdown,
+            LiveReloadBuildItem liveReload) {
         if (!quinoaDir.isPresent()) {
             return null;
         }
+        QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
+        liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
         if (devService != null) {
-            boolean shouldShutdownTheBroker = !quinoaConfig.equals(cfg);
+            boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
                 if (quinoaConfig.devServerPort.isEmpty()) {
                     throw new IllegalStateException(
                             "Quinoa package manager live coding shouldn't running with an empty the dev-server-port");
                 }
+                LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
                 return new ForwardedDevServerBuildItem(quinoaConfig.devServerPort.getAsInt());
             }
             shutdownDevService();
-            cfg = null;
         }
 
-        if (first) {
-            first = false;
+        if (oldConfig == null) {
             Runnable closeTask = new Runnable() {
                 @Override
                 public void run() {
                     if (devService != null) {
                         shutdownDevService();
                     }
-                    first = true;
                     devService = null;
-                    cfg = null;
                 }
             };
             shutdown.addCloseTask(closeTask, true);
