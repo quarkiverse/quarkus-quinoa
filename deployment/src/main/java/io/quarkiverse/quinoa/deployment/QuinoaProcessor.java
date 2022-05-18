@@ -209,7 +209,7 @@ public class QuinoaProcessor {
         final List<Path> files = Files.walk(targetDir).filter(Files::isRegularFile)
                 .collect(Collectors.toList());
         final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
-        LOG.infof("Quinoa Target directory: '%s'", targetDir);
+        LOG.infof("Quinoa target directory: '%s'", targetDir);
         for (Path file : files) {
             final String name = "/" + targetDir.relativize(file);
             LOG.infof("Quinoa generated resource: '%s'", name);

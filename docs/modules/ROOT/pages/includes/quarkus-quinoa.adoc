@@ -30,7 +30,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir
 
 [.description]
 --
-Path of the directory which contains the resulting Web UI built files. If not set build/ will be used otherwise the path will be considered relative to the Web UI path
+Path of the directory which contains the Web UI built files (generated during the build). After the build, Quinoa will take the files from this directory, copy them to the right location and serve them at runtime. The path is relative to the Web UI path If not set "build/" will be used
 --|string 
 |
 

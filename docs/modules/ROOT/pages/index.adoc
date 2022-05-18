@@ -1,27 +1,46 @@
 = Quarkus - Quinoa
-:extension-status: preview
+:extension-status: experimental
 
-Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single project.
+Quinoa is a Quarkus extension which eases the development, the build and serving single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside other Quarkus services (REST, GraphQL, Security, Events, ...).
 
-You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
+Live code the backend and frontend together with close to no configuration. When enabled in development mode, Quinoa will start the UI live coding server provided by the target framework and forward relevant requests to it. In production mode, Quinoa will run the build and process the generated files to serve them at runtime.
 
+== Prerequisite
+
+* Install NodeJS (https://nodejs.org/)
+* Create or use an existing Quarkus application
+* Add the Quinoa extension
+
+[#installation]
 == Installation
 
 To use this, you need the `io.quarkiverse.quinoa:quarkus-quinoa` extension first.
 
-Create a new Quinoa project (with a base Quinoa starter code) using the https://quarkus.io/guides/cli-tooling[Quarkus CLI]:
+Create a new Quinoa project (with a base Quinoa starter code):
+
+* With https://code.quarkus.io/?a=quinoa-bowl&j=17&e=io.quarkiverse.quinoa%3Aquarkus-quinoa[code.quarkus.io]
+* With the https://quarkus.io/guides/cli-tooling[Quarkus CLI]:
 [source,bash]
 ----
-quarkus create app quinoa-app io.quarkiverse.quinoa:quarkus-quinoa
+quarkus create app quinoa-app -x=io.quarkiverse.quinoa:quarkus-quinoa
 ----
 
-Or just add the extension with the https://quarkus.io/guides/cli-tooling[Quarkus CLI]:
+Then start the live-coding:
+[source,bash]
+----
+quarkus dev
+----
+
+And navigate to http://0.0.0.0:8080/quinoa.html
+
+You could also just add the extension (but you won't get the starter code):
+
+* With the https://quarkus.io/guides/cli-tooling[Quarkus CLI]:
 [source,bash]
 ----
 quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 ----
-
-Or in your `pom.xml` file, add (with a valid version):
+* In your `pom.xml` file, add (with a valid version):
 
 [source,xml]
 ----
@@ -35,38 +54,47 @@ Or in your `pom.xml` file, add (with a valid version):
 You may find the latest release version here:
 image:https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central[link=https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa]
 
-== Prerequisite
-
-- Install NodeJS (https://nodejs.org/)
-- Create or use an existing Quarkus application
-- Add the Quinoa extension
-
+[#getting-started]
 == Getting Started
 
-Create a Web UI directory in `src/main/webui` (. This directory should contain your node code with a `package.json`.
+Create a Web UI directory in `src/main/webui`. This directory will contain your NodeJS Web application code with a `package.json`. The location is configurable, the directory could be outside the Quarkus project as soon as the file are available at build time.
+[source,properties]
+----
+quarkus.quinoa.ui-dir=../my-webui
+----
 
-From here, either generate an application from any existing Node built Web UI framework (like React, Angular, Lit, ...). Or, you may also create your own Node built wep-app.
+From here, copy your existing Web UI or generate an application from any existing Node based Web UI framework such as <<react>>, <<angular>>, Lit, Webpack, Rollup, ... or your own. Example:
 
-The key points are the `package.json` scripts (`build` and optionally `test`) and the directory where the files are generated (`build/` by default).
 
-*It's done!* The web application is now built alongside Quarkus and dev-mode is available:
+The key points are the `package.json` scripts (`build` and optionally `test`) and the directory where the web files (index.html, scripts, ...) are generated (by default, it will use `build/` relative to the `ui-dir`).
 
+Quinoa provides two options for live-coding:
+
+* Delegate to the <<dev-server>>. To enable it, configure the port of the UI server. By convention Quinoa will call the `start` script from the `package.json` to start the UI server process. Then it will transparently proxy relevant requests to the given port.
+* Quarkus watches the files and Quinoa triggers a new Web UI build on changes (you can configure different builds for dev and prod).
+
+Start the Quarkus live coding:
 [source,shell]
 ----
 $ mvn quarkus:dev
-
-2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Build directory: 'xxx/target/quinoa-build'
-2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/favicon.ico'
-2022-03-28 09:24:46,740 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/index.html'
-2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa Generated: '/simple-greeting.js'
 ----
 
-The generated files are served by Quinoa if you hit http://localhost:8080
+*It's done!* The web application is now built alongside Quarkus, dev-mode is available, and the generated files will be automatically copied to the right place and be served by Quinoa if you hit http://localhost:8080
 
+[source,shell]
+----
+2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa target directory: 'xxx/target/quinoa-build'
+2022-03-28 09:24:46,739 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa generated resource: '/favicon.ico'
+2022-03-28 09:24:46,740 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa generated resource: '/index.html'
+2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa generated resource: '/simple-greeting.js'
+----
+
+NOTE: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. If you have conflicting files in `META-INF/resources`, they will have priority over Quinoa.
+
+[#how-to]
 == How to use the extension.
 
-=== For a custom Web App or any SPA node based framework
-
+=== Configure the build
 Add a `build` script in the `package.json` to generate your web application index.html, scripts and media (styles, images, ...) in the `./build` directory (can be changed in the config):
 [source,json]
 ----
@@ -77,12 +105,6 @@ Add a `build` script in the `package.json` to generate your web application inde
   },
 ----
 
-Optionally add a `start` script to start the live coding dev server and activate it in the app config:
-[source,properties]
-----
-quarkus.quinoa.dev-server-port=3000
-----
-
 You can differentiate dev from production builds using the `MODE` environment variable (`dev`, `prod`, `test`):
 [source,json]
 ----
@@ -91,6 +113,16 @@ You can differentiate dev from production builds using the `MODE` environment va
   },
 ----
 
+[#dev-server]
+=== UI live-coding dev server
+
+To enable the UI live-coding dev server, set a `start` script and set the port in the app config. Quinoa will transparently proxy relevant requests to the given port:
+[source,properties]
+----
+quarkus.quinoa.dev-server-port=3000
+----
+
+[#react]
 === React
 
 App created by Create React App (https://create-react-app.dev/docs/getting-started) are compatible without any change.
@@ -101,6 +133,7 @@ To enable React live coding server:
 quarkus.quinoa.dev-server-port=3000
 ----
 
+[#angular]
 === Angular
 
 App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration:
@@ -138,6 +171,20 @@ Edit the karma.conf.js:
 },
 ----
 
+[#spa-routing]
+=== Single Page application routing
+
+Client-side/Browser/SPA routing is the internal handling of a route from the javascript in the browser. It uses the https://developer.mozilla.org/en-US/docs/Web/API/History[HTML5 History API]
+
+When enabled, to allow SPA routing, all unhandled requests will be internally re-routed to index.html, this way the javascript can take care of the route inside the web-application.
+
+To enable Single Page application routing:
+[source,properties]
+----
+quarkus.quinoa.enable-spa-routing=true
+----
+
+[#headers]
 === Http Headers
 
 It's very common to set up headers for caching on static resources, for example React proposes https://create-react-app.dev/docs/production-build/#static-file-caching[this configuration]:
@@ -217,7 +264,7 @@ The library also brings a very elegant way to do e2e testing using https://githu
 
 === CI
 
-Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven (and Yarn/PNPM if needed). Then you can use it like any Maven project.
+Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven/Gradle (and Yarn/PNPM if needed). Then you can use it like any Maven/Gradle project.
 
 On compatible CIs, don't forget to enable the Maven and NPM/Yarn repository caching.
 
