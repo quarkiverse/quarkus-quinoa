@@ -1,6 +1,8 @@
 = Quarkus - Quinoa
 :extension-status: experimental
 
+include::./includes/attributes.adoc[]
+
 Quinoa is a Quarkus extension which eases the development, the build and serving single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside other Quarkus services (REST, GraphQL, Security, Events, ...).
 
 Live code the backend and frontend together with close to no configuration. When enabled in development mode, Quinoa will start the UI live coding server provided by the target framework and forward relevant requests to it. In production mode, Quinoa will run the build and process the generated files to serve them at runtime.
@@ -40,19 +42,16 @@ You could also just add the extension (but you won't get the starter code):
 ----
 quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 ----
-* In your `pom.xml` file, add (with a valid version):
+* In your `pom.xml` file, add this dependency:
 
-[source,xml]
+[source,xml,subs=attributes+]
 ----
 <dependency>
     <groupId>io.quarkiverse.quinoa</groupId>
     <artifactId>quarkus-quinoa</artifactId>
-    <version>...</version>
+    <version>{quarkus-quinoa-version}</version>
 </dependency>
 ----
-
-You may find the latest release version here:
-image:https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central[link=https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa]
 
 [#getting-started]
 == Getting Started
