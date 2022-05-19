@@ -1,0 +1,16 @@
+:quarkus-version: 2.9.1.Final
+:quarkus-quinoa-version: 1.0.3
+:maven-version: 3.8.1+
+
+:quarkus-org-url: https://github.com/quarkusio
+:quarkus-base-url: {quarkus-org-url}/quarkus
+:quarkus-clone-url: {quarkus-base-url}.git
+:quarkus-archive-url: {quarkus-base-url}/archive/master.zip
+:quarkus-tree-url: {quarkus-base-url}/tree/main
+:quarkus-issues-url: {quarkus-base-url}/issues
+:quarkus-guides-url: https://quarkus.io/guides
+:quickstarts-base-url: https://github.com/quarkusio/quarkus-quickstarts
+:quickstarts-clone-url: https://github.com/quarkusio/quarkus-quickstarts.git
+:quickstarts-archive-url: https://github.com/quarkusio/quarkus-quickstarts/archive/main.zip
+:quickstarts-blob-url: https://github.com/quarkusio/quarkus-quickstarts/blob/main
+:quickstarts-tree-url: https://github.com/quarkusio/quarkus-quickstarts/tree/main

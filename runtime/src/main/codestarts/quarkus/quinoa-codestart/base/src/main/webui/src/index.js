@@ -18,5 +18,5 @@ theater
     .addScene('Quarkus:With your training and this power,', 100)
     .addScene('Quarkus:You will create awesome web apps.', 100)
     .addScene('Quarkus:It is your destiny!', 200)
-    .addScene('Quarkus:Meet Quarkus UI with NO hAssles!', 200)
+    .addScene('Quarkus:Meet Quarkus UI with NO hAssle!', 200)
     .addScene('Me:Neat!', 200)
