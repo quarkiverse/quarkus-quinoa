@@ -76,7 +76,7 @@ Quinoa provides two options for live-coding:
 Start the Quarkus live coding:
 [source,shell]
 ----
-$ mvn quarkus:dev
+$ quarkus dev
 ----
 
 *It's done!* The web application is now built alongside Quarkus, dev-mode is available, and the generated files will be automatically copied to the right place and be served by Quinoa if you hit http://localhost:8080
@@ -112,6 +112,28 @@ You can differentiate dev from production builds using the `MODE` environment va
         "build": "if [[ $MODE == \"dev\" ]]; then webpack --mode=development; else webpack --mode=production; fi",
   },
 ----
+
+[#package-manager]
+=== Package manager
+
+It is not necessary (but possible) to configure the package manager (NPM, Yarn or PNPM), it will be auto-detected depending on the project lockfile, NPM is the fallback:
+
+* Use `quarkus.quinoa.package-manager` if present
+* Else if `yarn.lock` then *Yarn*
+* Else if `pnpm-lock.yaml` then *PNPM*
+* Else *NPM*
+
+NOTE: Quinoa is aware of the command to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
+
+[#install-packages]
+=== Node packages installation (node_modules)
+
+By default, Quinoa will call the appropriate package manager install command (before building or starting) *only if* the `node_modules` directory doesn't exist.
+
+You may force a new installation using `-Dquarkus.quinoa.always-install=true`.
+
+[#frozen-lockfile]
+NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
 
 [#dev-server]
 === UI live-coding dev server
@@ -266,7 +288,9 @@ The library also brings a very elegant way to do e2e testing using https://githu
 
 Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven/Gradle (and Yarn/PNPM if needed). Then you can use it like any Maven/Gradle project.
 
-On compatible CIs, don't forget to enable the Maven and NPM/Yarn repository caching.
+Quinoa can be configured to install packages with a link:#frozen-lockfile[frozen lockfile].
+
+On compatible CIs, don't forget to enable the Maven/Gradle and NPM/Yarn repository caching.
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
