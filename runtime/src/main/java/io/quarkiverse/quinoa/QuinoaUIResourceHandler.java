@@ -1,8 +1,9 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.vertx.ext.web.handler.StaticHandler.DEFAULT_INDEX_PAGE;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
@@ -17,35 +18,34 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
 
     private final Set<String> uiResources;
     private final Handler<RoutingContext> staticHandler;
-    private final boolean enableSPARouting;
+    private final List<String> ignoredPathPrefixes;
     private final ClassLoader currentClassLoader;
 
-    QuinoaUIResourceHandler(String directory, Set<String> uiResources, boolean enableSPARouting) {
+    QuinoaUIResourceHandler(final String directory, final Set<String> uiResources, final List<String> ignoredPathPrefixes) {
         this.uiResources = uiResources;
         this.staticHandler = directory != null ? StaticHandler.create(FileSystemAccess.ROOT, directory)
                 : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
-        this.enableSPARouting = enableSPARouting;
+        this.ignoredPathPrefixes = ignoredPathPrefixes;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
     public void handle(RoutingContext ctx) {
-        String rel = ctx.mountPoint() == null ? ctx.normalizedPath()
-                : ctx.normalizedPath().substring(
-                        // let's be extra careful here in case Vert.x normalizes the mount points at some point
-                        ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
-        if (uiResources.contains(rel)
-                || (uiResources.contains("/" + DEFAULT_INDEX_PAGE) && Objects.equals(rel, "/"))) {
+        String path = QuinoaRecorder.resolvePath(ctx);
+        if (!isIgnored(path, ignoredPathPrefixes) && isUIResource(path)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debugf("Quinoa is serving: '%s'", rel);
+                LOG.debugf("Quinoa is serving: '%s'", path);
             }
             staticHandler.handle(ctx);
-        } else if (enableSPARouting) {
-            ctx.reroute("/");
         } else {
-            // make sure we don't lose the correct TCCL to Vert.x...
             Thread.currentThread().setContextClassLoader(currentClassLoader);
             ctx.next();
         }
+
     }
+
+    private boolean isUIResource(String path) {
+        return uiResources.contains(path) || (path.endsWith("/") && uiResources.contains(path + DEFAULT_INDEX_PAGE));
+    }
+
 }

@@ -1,6 +1,8 @@
 package io.quarkiverse.quinoa.deployment;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
+import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
@@ -43,7 +45,6 @@ import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.DefaultRouteBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
-import io.quarkus.vertx.http.runtime.VertxHttpRecorder;
 
 public class QuinoaProcessor {
 
@@ -52,7 +53,6 @@ public class QuinoaProcessor {
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
     private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "build", "target", "dist");
-    public static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -65,7 +65,7 @@ public class QuinoaProcessor {
             LiveReloadBuildItem liveReload,
             QuinoaConfig quinoaConfig,
             OutputTargetBuildItem outputTarget) throws IOException {
-        if (!quinoaConfig.enable.orElse(true)) {
+        if (!quinoaConfig.isEnabled()) {
             LOG.info("Quinoa is disabled.");
             return null;
         }
@@ -74,7 +74,7 @@ public class QuinoaProcessor {
             LOG.warn("Quinoa is disabled by default in tests.");
             return null;
         }
-        final String configuredDir = quinoaConfig.uiDir.orElse(DEFAULT_WEB_UI_DIR);
+        final String configuredDir = quinoaConfig.getUIDir();
         final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(configuredDir, outputTarget);
         if (uiDirEntry == null) {
             LOG.warnf(
@@ -120,11 +120,11 @@ public class QuinoaProcessor {
                 && contextObject != null) {
             return new TargetDirBuildItem(contextObject.getLocation());
         }
-        if (quinoaConfig.runTests.orElse(false)) {
+        if (quinoaConfig.shouldRunTests()) {
             packageManager.test();
         }
         packageManager.build(launchMode.getLaunchMode());
-        final String configuredBuildDir = quinoaConfig.buildDir.orElse("build");
+        final String configuredBuildDir = quinoaConfig.getBuildDir();
         final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
             throw new ConfigurationException("Quinoa build directory not found: '" + configuredBuildDir + "'",
@@ -188,17 +188,18 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final boolean enableSPARouting = quinoaConfig.enableSPARouting.orElse(false);
-            int order = VertxHttpRecorder.DEFAULT_ROUTE_ORDER;
-            if (enableSPARouting) {
-                order += 2; // We put it behind rest extensions
-                resumeOn404.produce(new ResumeOn404BuildItem());
-            }
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", order)
+            final List<String> ignoredPathPrefixes = quinoaConfig.getIgnoredPathPrefixes();
+            final boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
+            resumeOn404.produce(new ResumeOn404BuildItem());
+            routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaHandler(directory,
-                            uiResources.get().getNames(), enableSPARouting))
+                            uiResources.get().getNames(), ignoredPathPrefixes))
                     .build());
-            // TODO: Handle single page web-app html5 urls by re-routing not found to /
+            if (enableSPARouting) {
+                routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
+                        .handler(recorder.quinoaSPARoutingHandler(ignoredPathPrefixes))
+                        .build());
+            }
         }
     }
 

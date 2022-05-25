@@ -1,5 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
+import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 import static io.quarkus.deployment.dev.testing.MessageFormat.RESET;
@@ -41,7 +43,6 @@ import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
-import io.quarkus.vertx.http.runtime.VertxHttpRecorder;
 
 public class ForwardedDevProcessor {
 
@@ -52,8 +53,6 @@ public class ForwardedDevProcessor {
             return thread.getName().matches("Process (stdout|stderr) streamer");
         }
     };
-    private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
-
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
 
     @BuildStep(onlyIf = IsDevelopment.class)
@@ -112,7 +111,7 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServerPort.getAsInt();
-            final int timeout = quinoaConfig.devServerTimeout.orElse(DEFAULT_DEV_SERVER_TIMEOUT);
+            final int timeout = quinoaConfig.getDevServerTimeout();
             if (timeout < 1000) {
                 throw new ConfigurationException("dev-server-timeout must be greater than 1000ms");
             }
@@ -120,7 +119,7 @@ public class ForwardedDevProcessor {
             dev.set(packageManager.dev(devServerPort, timeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
-                    quinoaConfig.enableDevServerLogs.orElse(false));
+                    quinoaConfig.shouldEnableDevServerLogs());
             LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
                     devServerPort, Instant.now().toEpochMilli() - start);
             final Closeable onClose = new Closeable() {
@@ -150,12 +149,22 @@ public class ForwardedDevProcessor {
             CoreVertxBuildItem vertx,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
+
         if (quinoaConfig.devServerPort.isPresent() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServerPort.getAsInt());
-            resumeOn404.produce(new ResumeOn404BuildItem());
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", VertxHttpRecorder.DEFAULT_ROUTE_ORDER + 2)
-                    .handler(recorder.quinoaProxyDevHandler(vertx.getVertx(), devProxy.get().getPort()))
+            boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
+            final List<String> ignoredPathPrefixes = quinoaConfig.getIgnoredPathPrefixes();
+            routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
+                    .handler(recorder.quinoaProxyDevHandler(vertx.getVertx(), devProxy.get().getPort(), ignoredPathPrefixes))
                     .build());
+            if (enableSPARouting) {
+                resumeOn404.produce(new ResumeOn404BuildItem());
+
+                routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
+                        .handler(recorder.quinoaSPARoutingHandler(ignoredPathPrefixes))
+                        .build());
+
+            }
         }
     }
 

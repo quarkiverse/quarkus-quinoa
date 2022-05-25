@@ -1,8 +1,13 @@
 package io.quarkiverse.quinoa.deployment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
@@ -10,6 +15,9 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 
 @ConfigRoot(phase = ConfigPhase.BUILD_TIME)
 public class QuinoaConfig {
+
+    private static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
+    private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
 
     /**
      * Indicate if the extension should be enabled
@@ -69,11 +77,19 @@ public class QuinoaConfig {
     public Optional<Boolean> alwaysInstall;
 
     /**
-     * Enable SPA (Single Page Application) routing, all unhandled requests will be re-routed to the index.html
+     * Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the index.html
+     * Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic.
      * If not set, it is disabled.
      */
     @ConfigItem
     public Optional<Boolean> enableSPARouting;
+
+    /**
+     * List of path prefixes to be ignored by Quinoa.
+     * If not set, "quarkus.rest.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
+     */
+    @ConfigItem
+    public Optional<List<String>> ignoredPathPrefixes;
 
     /**
      * Enable using an external server for dev (live coding).
@@ -98,6 +114,45 @@ public class QuinoaConfig {
     @ConfigItem
     public Optional<Boolean> enableDevServerLogs;
 
+    public List<String> getIgnoredPathPrefixes() {
+        return ignoredPathPrefixes.orElseGet(() -> {
+            Config config = ConfigProvider.getConfig();
+            List<String> defaultIgnored = new ArrayList<>();
+            config.getOptionalValue("quarkus.resteasy.path", String.class).ifPresent(defaultIgnored::add);
+            config.getOptionalValue("quarkus.rest.path", String.class).ifPresent(defaultIgnored::add);
+            config.getOptionalValue("quarkus.http.non-application-root-path", String.class).ifPresent(defaultIgnored::add);
+            return defaultIgnored;
+        });
+    }
+
+    public String getUIDir() {
+        return uiDir.orElse(DEFAULT_WEB_UI_DIR);
+    }
+
+    public String getBuildDir() {
+        return buildDir.orElse("build");
+    }
+
+    public int getDevServerTimeout() {
+        return devServerTimeout.orElse(DEFAULT_DEV_SERVER_TIMEOUT);
+    }
+
+    public boolean shouldRunTests() {
+        return runTests.orElse(false);
+    }
+
+    public boolean shouldEnableDevServerLogs() {
+        return enableDevServerLogs.orElse(false);
+    }
+
+    public boolean isEnabled() {
+        return enable.orElse(true);
+    }
+
+    public boolean isSPARoutingEnabled() {
+        return enableSPARouting.orElse(false);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -108,13 +163,14 @@ public class QuinoaConfig {
         return enable.equals(that.enable) && uiDir.equals(that.uiDir) && buildDir.equals(that.buildDir) &&
                 packageManager.equals(that.packageManager) && runTests.equals(that.runTests) &&
                 frozenLockfile.equals(that.frozenLockfile) && alwaysInstall.equals(that.alwaysInstall) &&
-                enableSPARouting.equals(that.enableSPARouting) && devServerPort.equals(that.devServerPort) &&
-                devServerTimeout.equals(that.devServerTimeout) && enableDevServerLogs.equals(that.enableDevServerLogs);
+                enableSPARouting.equals(that.enableSPARouting) && ignoredPathPrefixes.equals(that.ignoredPathPrefixes) &&
+                devServerPort.equals(that.devServerPort) && devServerTimeout.equals(that.devServerTimeout) &&
+                enableDevServerLogs.equals(that.enableDevServerLogs);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(enable, uiDir, buildDir, packageManager, runTests, frozenLockfile, alwaysInstall,
-                enableSPARouting, devServerPort, devServerTimeout, enableDevServerLogs);
+                enableSPARouting, ignoredPathPrefixes, devServerPort, devServerTimeout, enableDevServerLogs);
     }
 }
