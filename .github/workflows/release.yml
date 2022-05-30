@@ -56,7 +56,7 @@ jobs:
           gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GPG_PASSPHRASE}}" --output /tmp/maven-settings.xml .github/release/maven-settings.xml.gpg
           git checkout -b release
           mvn -B release:prepare -Prelease -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -s /tmp/maven-settings.xml
-          git commit -am "Update stable version for documentation"
+          git add -u && git diff --staged --quiet || git commit -m "Update stable version for documentation"
           git checkout ${{github.base_ref}}
           git rebase release
           mvn -B release:perform -Darguments=-DperformRelease -Prelease -s maven-settings.xml
@@ -65,7 +65,7 @@ jobs:
         run: |
           git checkout ${{steps.metadata.outputs.current-version}}
           mvn -B clean install -DskipTests -DskipITs
-          git commit -am "Update stable version for documentation"
+          git add -u && git diff --staged --quiet || git commit -m "Update stable version for documentation"
           # Move the tag after inclusion of documentation adjustments
           git tag -f ${{steps.metadata.outputs.current-version}}
           # Go back to main
