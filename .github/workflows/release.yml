@@ -59,7 +59,7 @@ jobs:
           git add -u && git diff --staged --quiet || git commit -m "Update stable version for documentation"
           git checkout ${{github.base_ref}}
           git rebase release
-          mvn -B release:perform -Darguments=-DperformRelease -Prelease -s maven-settings.xml
+          mvn -B release:perform -Darguments=-DperformRelease -Prelease -s /tmp/maven-settings.xml
 
       - name: Adjust tag for documentation changes
         run: |
