@@ -88,7 +88,7 @@ $ quarkus dev
 2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa generated resource: '/simple-greeting.js'
 ----
 
-WARNING: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. *If you have conflicting files in `META-INF/resources`, they will have priority over Quinoa.*
+WARNING: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. *If you have conflicting files with `META-INF/resources`, Quinoa will have priority over them.*
 
 [#how-to]
 == How to use the extension.

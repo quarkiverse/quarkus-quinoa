@@ -1,5 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -114,15 +116,21 @@ public class QuinoaConfig {
     @ConfigItem
     public Optional<Boolean> enableDevServerLogs;
 
-    public List<String> getIgnoredPathPrefixes() {
+    public List<String> getNormalizedIgnoredPathPrefixes() {
         return ignoredPathPrefixes.orElseGet(() -> {
             Config config = ConfigProvider.getConfig();
             List<String> defaultIgnored = new ArrayList<>();
-            config.getOptionalValue("quarkus.resteasy.path", String.class).ifPresent(defaultIgnored::add);
-            config.getOptionalValue("quarkus.rest.path", String.class).ifPresent(defaultIgnored::add);
-            config.getOptionalValue("quarkus.http.non-application-root-path", String.class).ifPresent(defaultIgnored::add);
+            readExternalConfigPath(config, "quarkus.resteasy.path").ifPresent(defaultIgnored::add);
+            readExternalConfigPath(config, "quarkus.rest.path").ifPresent(defaultIgnored::add);
+            readExternalConfigPath(config, "quarkus.http.non-application-root-path").ifPresent(defaultIgnored::add);
             return defaultIgnored;
-        });
+        }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
+    }
+
+    private Optional<String> readExternalConfigPath(Config config, String key) {
+        return config.getOptionalValue(key, String.class)
+                .filter(s -> !Objects.equals(s, "/"))
+                .map(s -> s.endsWith("/") ? s : s + "/");
     }
 
     public String getUIDir() {

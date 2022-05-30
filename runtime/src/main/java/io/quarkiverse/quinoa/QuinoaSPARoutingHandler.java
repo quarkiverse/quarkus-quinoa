@@ -1,7 +1,9 @@
 package io.quarkiverse.quinoa;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
+import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
+import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +25,9 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {
+        if (!shouldHandleMethod(ctx)) {
+            next(currentClassLoader, ctx);
+        }
         String path = resolvePath(ctx);
         if (!Objects.equals(path, "/") && !isIgnored(path, ignoredPathPrefixes)) {
             if (LOG.isDebugEnabled()) {
@@ -30,13 +35,7 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
             }
             ctx.reroute("/");
         } else {
-            next(ctx);
+            next(currentClassLoader, ctx);
         }
-    }
-
-    private void next(RoutingContext ctx) {
-        // make sure we don't lose the correct TCCL to Vert.x...
-        Thread.currentThread().setContextClassLoader(currentClassLoader);
-        ctx.next();
     }
 }
