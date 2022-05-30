@@ -75,8 +75,17 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-sp
 
 [.description]
 --
-Enable SPA (Single Page Application) routing, all unhandled requests will be re-routed to the index.html If not set, it is disabled.
+Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the index.html Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. If not set, it is disabled.
 --|boolean 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes]]`link:#quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes[quarkus.quinoa.ignored-path-prefixes]`
+
+[.description]
+--
+List of path prefixes to be ignored by Quinoa. If not set, "quarkus.rest.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
+--|list of string 
 |
 
 

@@ -88,7 +88,7 @@ $ quarkus dev
 2022-03-28 09:24:46,741 INFO  [io.qua.qui.dep.QuinoaProcessor] (build-25) Quinoa generated resource: '/simple-greeting.js'
 ----
 
-NOTE: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. If you have conflicting files in `META-INF/resources`, they will have priority over Quinoa.
+WARNING: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. *If you have conflicting files in `META-INF/resources`, they will have priority over Quinoa.*
 
 [#how-to]
 == How to use the extension.
@@ -197,12 +197,37 @@ Edit the karma.conf.js:
 
 Client-side/Browser/SPA routing is the internal handling of a route from the javascript in the browser. It uses the https://developer.mozilla.org/en-US/docs/Web/API/History[HTML5 History API]
 
-When enabled, to allow SPA routing, all unhandled requests will be internally re-routed to index.html, this way the javascript can take care of the route inside the web-application.
+When enabled, to allow SPA routing, all relevant requests will be internally re-routed to index.html, this way the javascript can take care of the route inside the web-application.
 
 To enable Single Page application routing:
 [source,properties]
 ----
 quarkus.quinoa.enable-spa-routing=true
+----
+
+NOTE: By default, Quinoa will ignore `quarkus.rest.path`, `quarkus.resteasy.path` and `quarkus.http.non-application-root-path` path prefixes. You can specify different path prefixes to ignore using `quarkus.quinoa.ignored-path-prefixes`.
+
+WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. Instead, you may use a workaround (if your app has all the rest resources under the same path prefix):
+[source,java]
+----
+@ApplicationScoped
+public class SPARouting {
+    private static final String[] PATH_PREFIXES = { "/api/", "/q/" };
+    private static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(".*[.][a-zA-Z\\d]+").asMatchPredicate();
+
+    public void init(@Observes Router router) {
+        router.get("/*").handler(rc -> {
+            final String path = rc.normalizedPath();
+            if (!path.equals("/")
+                    && Stream.of(PATH_PREFIXES).noneMatch(path::startsWith)
+                    && !FILE_NAME_PREDICATE.test(path)) {
+                rc.reroute("/");
+            } else {
+                rc.next();
+            }
+        });
+    }
+}
 ----
 
 [#headers]

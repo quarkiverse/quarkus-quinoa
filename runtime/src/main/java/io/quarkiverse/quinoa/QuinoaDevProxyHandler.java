@@ -1,5 +1,10 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
+import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
+
+import java.util.List;
+
 import org.jboss.logging.Logger;
 
 import io.vertx.core.AsyncResult;
@@ -14,18 +19,25 @@ import io.vertx.ext.web.client.WebClient;
 class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
 
-    private final Integer port;
+    private final int port;
     private final WebClient client;
+    private final List<String> ignoredPathPrefixes;
     private final ClassLoader currentClassLoader;
 
-    QuinoaDevProxyHandler(Vertx vertx, Integer port) {
+    QuinoaDevProxyHandler(final Vertx vertx, int port, final List<String> ignoredPathPrefixes) {
         this.port = port;
         this.client = WebClient.create(vertx);
+        this.ignoredPathPrefixes = ignoredPathPrefixes;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
     public void handle(final RoutingContext ctx) {
+        String path = resolvePath(ctx);
+        if (isIgnored(path, ignoredPathPrefixes)) {
+            next(ctx);
+            return;
+        }
         final HttpServerRequest request = ctx.request();
         client.request(request.method(), port, request.localAddress().host(), request.uri())
                 .send(new Handler<AsyncResult<HttpResponse<Buffer>>>() {
@@ -40,9 +52,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                                 ctx.response().headers().addAll(event.result().headers());
                                 ctx.response().send(event.result().body());
                             } else if (statusCode == 404) {
-                                // make sure we don't lose the correct TCCL to Vert.x...
-                                Thread.currentThread().setContextClassLoader(currentClassLoader);
-                                ctx.next();
+                                next(ctx);
                             } else {
                                 ctx.response().setStatusCode(statusCode).send(event.result().body());
                             }
@@ -54,5 +64,11 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
 
                     }
                 });
+    }
+
+    private void next(RoutingContext ctx) {
+        // make sure we don't lose the correct TCCL to Vert.x...
+        Thread.currentThread().setContextClassLoader(currentClassLoader);
+        ctx.next();
     }
 }
