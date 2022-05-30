@@ -53,12 +53,23 @@ jobs:
 
       - name: Maven release ${{steps.metadata.outputs.current-version}}
         run: |
-          gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GPG_PASSPHRASE}}" --output /tmp/maven-settings.xml .github/release/maven-settings.xml.gpg
+          gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.GPG_PASSPHRASE}}" --output maven-settings.xml .github/release/maven-settings.xml.gpg
           git checkout -b release
-          mvn -B release:prepare -Prelease -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -s /tmp/maven-settings.xml
+          mvn -B release:prepare -Prelease -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -s maven-settings.xml
+          git commit -am "Update stable version for documentation"
           git checkout ${{github.base_ref}}
           git rebase release
-          mvn -B release:perform -Darguments=-DperformRelease -DperformRelease -Prelease -s /tmp/maven-settings.xml
+          mvn -B release:perform -Darguments=-DperformRelease -Prelease -s maven-settings.xml
+
+      - name: Adjust tag for documentation changes
+        run: |
+          git checkout ${{steps.metadata.outputs.current-version}}
+          mvn -B clean install -DskipTests -DskipITs
+          git commit -am "Update stable version for documentation"
+          # Move the tag after inclusion of documentation adjustments
+          git tag -f ${{steps.metadata.outputs.current-version}}
+          # Go back to main
+          git checkout main
 
       - name: Push changes to ${{github.base_ref}}
         uses: ad-m/github-push-action@v0.6.0
@@ -70,5 +81,5 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tags: true
           branch: ${{github.base_ref}}
+          tags: true
