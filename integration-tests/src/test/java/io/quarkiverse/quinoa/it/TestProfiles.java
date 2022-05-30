@@ -32,6 +32,13 @@ public class TestProfiles {
         }
     }
 
+    public static class RootPathTests extends QuinoaTestProfiles.Enable {
+        @Override
+        public String getConfigProfile() {
+            return "root-path";
+        }
+    }
+
     public static class VueTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {

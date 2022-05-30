@@ -153,17 +153,15 @@ public class ForwardedDevProcessor {
         if (quinoaConfig.devServerPort.isPresent() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServerPort.getAsInt());
             boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
-            final List<String> ignoredPathPrefixes = quinoaConfig.getIgnoredPathPrefixes();
+            final List<String> ignoredPathPrefixes = quinoaConfig.getNormalizedIgnoredPathPrefixes();
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(vertx.getVertx(), devProxy.get().getPort(), ignoredPathPrefixes))
                     .build());
             if (enableSPARouting) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
-
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(ignoredPathPrefixes))
                         .build());
-
             }
         }
     }

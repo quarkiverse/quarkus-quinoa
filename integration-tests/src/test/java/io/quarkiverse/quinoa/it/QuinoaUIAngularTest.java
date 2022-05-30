@@ -1,5 +1,8 @@
 package io.quarkiverse.quinoa.it;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
+
 import java.net.URL;
 
 import org.junit.jupiter.api.Assertions;
@@ -29,6 +32,12 @@ public class QuinoaUIAngularTest {
     @TestHTTPResource("/some-route")
     URL someRoute;
 
+    @TestHTTPResource("/bar/foo/not-found")
+    URL url404;
+
+    @TestHTTPResource("/bar/foo/api/quinoa")
+    URL api;
+
     @Test
     public void testUIIndex() {
         checkUrl(index);
@@ -51,5 +60,22 @@ public class QuinoaUIAngularTest {
 
         String greeting = page.innerText(".quinoa");
         Assertions.assertEquals("Hello Quinoa", greeting);
+    }
+
+    @Test
+    public void test404Endpoint() {
+        given()
+                .when().get(url404)
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testHelloEndpoint() {
+        given()
+                .when().get(api)
+                .then()
+                .statusCode(200)
+                .body(is("Hello Quinoa"));
     }
 }

@@ -13,7 +13,7 @@ export class AppComponent {
   constructor(private http:HttpClient) { }
 
   ngOnInit():void {
-    this.http.get("/api/quinoa", {responseType: 'text'}).subscribe(data => {
+    this.http.get("/bar/foo/api/quinoa", {responseType: 'text'}).subscribe(data => {
       this.message = data as string
     })
   }

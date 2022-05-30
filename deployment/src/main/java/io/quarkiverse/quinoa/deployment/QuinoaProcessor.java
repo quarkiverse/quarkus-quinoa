@@ -188,7 +188,7 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final List<String> ignoredPathPrefixes = quinoaConfig.getIgnoredPathPrefixes();
+            final List<String> ignoredPathPrefixes = quinoaConfig.getNormalizedIgnoredPathPrefixes();
             final boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
             resumeOn404.produce(new ResumeOn404BuildItem());
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)

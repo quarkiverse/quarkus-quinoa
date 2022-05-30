@@ -1,6 +1,9 @@
 package io.quarkiverse.quinoa;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
+import static io.quarkiverse.quinoa.QuinoaRecorder.next;
+import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
+import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 import static io.vertx.ext.web.handler.StaticHandler.DEFAULT_INDEX_PAGE;
 
 import java.util.List;
@@ -31,15 +34,17 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {
-        String path = QuinoaRecorder.resolvePath(ctx);
+        if (!shouldHandleMethod(ctx)) {
+            next(currentClassLoader, ctx);
+        }
+        String path = resolvePath(ctx);
         if (!isIgnored(path, ignoredPathPrefixes) && isUIResource(path)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debugf("Quinoa is serving: '%s'", path);
             }
             staticHandler.handle(ctx);
         } else {
-            Thread.currentThread().setContextClassLoader(currentClassLoader);
-            ctx.next();
+            next(currentClassLoader, ctx);
         }
 
     }
