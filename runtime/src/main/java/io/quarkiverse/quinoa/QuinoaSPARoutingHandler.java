@@ -27,6 +27,7 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext ctx) {
         if (!shouldHandleMethod(ctx)) {
             next(currentClassLoader, ctx);
+            return;
         }
         String path = resolvePath(ctx);
         if (!Objects.equals(path, "/") && !isIgnored(path, ignoredPathPrefixes)) {
