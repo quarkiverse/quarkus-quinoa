@@ -253,11 +253,12 @@ quarkus.http.filter.static.order=1
 By default, the Web UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the Web UI build.
 
 Quinoa features a testing library to make it easier to test your Web UI:
-[source,xml]
+[source,xml,subs=attributes+]
 ----
 <dependency>
     <groupId>io.quarkiverse.quinoa</groupId>
     <artifactId>quarkus-quinoa-testing</artifactId>
+    <version>{quarkus-quinoa-version}</version>
     <scope>test</scope>
 </dependency>
 ----
@@ -266,13 +267,13 @@ In order to enable the Web UI (build and serve) in a particular test, you can us
 
 [source,java]
 ----
-    @QuarkusTest
-    @TestProfile(QuinoaTestProfiles.Enable.class)
-    public class MyWebUITest {
-        @Test
-        public void someTest() {
-        }
+@QuarkusTest
+@TestProfile(QuinoaTestProfiles.Enable.class)
+public class MyWebUITest {
+    @Test
+    public void someTest() {
     }
+}
 ----
 
 If you also want to run the tests included in your Web UI (i.e npm test) alongside this class, you can use the `EnableAndRunTests` test profile:
@@ -280,32 +281,46 @@ If you also want to run the tests included in your Web UI (i.e npm test) alongsi
 The library also brings a very elegant way to do e2e testing using https://github.com/microsoft/playwright-java[Playright]:
 [source,java]
 ----
-    @QuarkusTest
-    @TestProfile(QuinoaTestProfiles.Enable.class)
-    @QuarkusTestResource(QuarkusPlaywrightManager.class)
-    public class MyWebUITest {
-        @PlaywrightManager.InjectPlaywright
-        BrowserContext context;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Response;
+import io.quarkiverse.quinoa.testing.QuarkusPlaywrightManager;
+import io.quarkiverse.quinoa.testing.QuinoaTestProfiles;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-        @TestHTTPResource("/")
-        URL url;
+import java.net.URL;
 
-        @Test
-        void name() {
-            final Page page = context.newPage();
-            Response response = page.navigate(url.toString());
-            Assertions.assertEquals("OK", response.statusText());
+@QuarkusTest
+@TestProfile(QuinoaTestProfiles.Enable.class)
+@QuarkusTestResource(QuarkusPlaywrightManager.class)
+public class MyWebUITest {
+    @QuarkusPlaywrightManager.InjectPlaywright
+    BrowserContext context;
 
-            page.waitForLoadState();
+    @TestHTTPResource("/")
+    URL url;
 
-            String title = page.title();
-            Assertions.assertEquals("My App", title);
+    @Test
+    void name() {
+        final Page page = context.newPage();
+        Response response = page.navigate(url.toString());
+        Assertions.assertEquals("OK", response.statusText());
 
-            // Make sure the app content is ok
-            String greeting = page.innerText(".quinoa");
-            Assertions.assertEquals("Hello World", greeting);
-        }
+        page.waitForLoadState();
+
+        String title = page.title();
+        Assertions.assertEquals("My App", title);
+
+        // Make sure the app content is ok
+        String greeting = page.innerText(".quinoa");
+        Assertions.assertEquals("Hello World", greeting);
     }
+}
 ----
 
 === CI
