@@ -17,6 +17,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
+import io.restassured.http.ContentType;
 
 @QuarkusTest
 @TestProfile(TestProfiles.ReactTests.class)
@@ -66,5 +67,16 @@ public class QuinoaUIReactTest {
                 .then()
                 .statusCode(200)
                 .body(is("Hello Quinoa"));
+    }
+
+    @Test
+    public void testHelloEndpointPost() {
+        given()
+                .body("bowl")
+                .contentType(ContentType.TEXT)
+                .when().post(api)
+                .then()
+                .statusCode(200)
+                .body(is("Hello Quinoa bowl"));
     }
 }

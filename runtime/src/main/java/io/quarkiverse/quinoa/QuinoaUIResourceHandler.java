@@ -36,6 +36,7 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
     public void handle(RoutingContext ctx) {
         if (!shouldHandleMethod(ctx)) {
             next(currentClassLoader, ctx);
+            return;
         }
         String path = resolvePath(ctx);
         if (!isIgnored(path, ignoredPathPrefixes) && isUIResource(path)) {
@@ -46,7 +47,6 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
         } else {
             next(currentClassLoader, ctx);
         }
-
     }
 
     private boolean isUIResource(String path) {
