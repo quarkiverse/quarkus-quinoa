@@ -7,6 +7,62 @@ Quinoa is a Quarkus extension which eases the development, the build and serving
 
 Live code the backend and frontend together with close to no configuration. When enabled in development mode, Quinoa will start the UI live coding server provided by the target framework and forward relevant requests to it. In production mode, Quinoa will run the build and process the generated files to serve them at runtime.
 
+== How it works
+
+=== The Quinoa build (using npm)
+
+[mermaid]
+....
+flowchart LR
+    q-build[quarkus build] -->|Other extensions| target(Jar or Binary )
+    q-build --> quinoa[Quinoa]
+    quinoa -->|npm run build| generated-web-resources(Generated web resources: html, js, css, images)
+    generated-web-resources -->|copy as generated Web Resources| target
+....
+
+NOTE: packages are installed by Quinoa before the build when needed (i.e `npm install`). See link:#install-packages[Packages installation]. Quinoa is pre-configured to work with your favorite link:#package-manager[package manager] (npm, yarn or pnpm).
+
+=== Runtime for production mode
+
+[mermaid]
+....
+flowchart LR
+    run[run - jar or binary] --> vertx(Vert.x routes)
+    vertx -->|GET /something| quinoa{is this a Quinoa Web Resources?}
+    quinoa -->|yes| handle[Serve]
+    quinoa -->|no| static-resources{is this a META-INF/resources?}
+    static-resources -->|yes| handle[Serve]
+    static-resources -->|no| rest{is this a REST resource?}
+    rest -->|yes| handle[Handle]
+    rest -->|no| 404[404]
+....
+
+=== Runtime for full Quarkus live-coding
+
+Quinoa (using Quarkus live-coding watch feature) will watch the Web UI directory and trigger a new build on changes. It works the same as the production mode. This option is perfect for small/fast builds.
+
+NOTE: You can differentiate the build for link:#build-mode[dev mode]. e.g to disable minification.
+
+=== Runtime for proxied live-coding (e.g on port 3000)
+
+[mermaid]
+....
+flowchart LR
+    dev[quarkus dev] --> vertx(Vert.x routes)
+    vertx -->|GET /something| quinoa{try /something on port 3000?}
+    quinoa -->|200| forward[Forward Response]
+    quinoa -->|error| forward-error[Forward Error]
+    quinoa -->|404| static-resources{is this a META-INF/resources?}
+    static-resources -->|yes| handle[Serve]
+    static-resources -->|no| rest{is this a REST resource?}
+    rest -->|yes| handle[Handle]
+    rest -->|no| 404[404]
+....
+
+NOTE: Quarkus live-coding will keep watching for the backend changes as usual.
+
+See link:#dev-server[Enable the proxied live coding].
+
 == Prerequisite
 
 * Install NodeJS (https://nodejs.org/)
@@ -104,6 +160,7 @@ Add a `build` script in the `package.json` to generate your web application inde
   },
 ----
 
+[#build-mode]
 You can differentiate dev from production builds using the `MODE` environment variable (`dev`, `prod`, `test`):
 [source,json]
 ----
@@ -122,7 +179,7 @@ It is not necessary (but possible) to configure the package manager (NPM, Yarn o
 * Else if `pnpm-lock.yaml` then *PNPM*
 * Else *NPM*
 
-NOTE: Quinoa is aware of the command to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
+NOTE: Quinoa is configured with the commands to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
 
 [#install-packages]
 === Node packages installation (node_modules)
@@ -135,7 +192,7 @@ You may force a new installation using `-Dquarkus.quinoa.always-install=true`.
 NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
 
 [#dev-server]
-=== UI live-coding dev server
+=== UI live-coding dev server (proxy mode)
 
 To enable the UI live-coding dev server, set a `start` script and set the port in the app config. Quinoa will transparently proxy relevant requests to the given port:
 [source,properties]
