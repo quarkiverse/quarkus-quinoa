@@ -11,7 +11,7 @@ Live code the backend and frontend together with close to no configuration. When
 
 === The Quinoa build (using npm)
 
-image::images/quarkus-build.svg[Quinoa Build]
+image::quarkus-build.svg[Quinoa Build]
 
 NOTE: packages are installed by Quinoa before the build when needed (i.e `npm install`). See link:#install-packages[Packages installation]. Quinoa is pre-configured to work with your favorite link:#package-manager[package manager] (npm, yarn or pnpm).
 
