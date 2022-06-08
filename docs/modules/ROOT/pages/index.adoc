@@ -36,13 +36,14 @@ Quinoa (using Quarkus live-coding watch feature) will watch the Web UI directory
 
 NOTE: You can differentiate the build for link:#build-mode[dev mode]. e.g to disable minification.
 
+[#how-dev-server]
 === Runtime for proxied live-coding (e.g on port 3000)
 
 [mermaid]
 ....
 flowchart LR
     dev[quarkus dev] --> vertx(Vert.x routes)
-    vertx -->|GET /something| quinoa{try /something on port 3000?}
+    vertx -->|GET /something| quinoa{if not ignored, try /something on port 3000?}
     quinoa -->|200| forward[Forward Response]
     quinoa -->|error| forward-error[Forward Error]
     quinoa -->|404| static-resources{is this a META-INF/resources?}
@@ -192,6 +193,8 @@ To enable the UI live-coding dev server, set a `start` script and set the port i
 ----
 quarkus.quinoa.dev-server-port=3000
 ----
+
+NOTE: Quinoa relies on the dev server returning a 404 when the file is not found (See link:#how-dev-server[How it works]). This is not the case on some dev servers configured with SPA routing. Make sure it is disabled in the dev server configuration (for React Create App, see https://github.com/quarkiverse/quarkus-quinoa/issues/91[#91]). Another option, when possible, is to use <<quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes>>.
 
 [#react]
 === React
