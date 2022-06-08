@@ -70,7 +70,6 @@ Always install packages before building. If not set, it will install packages on
 --|boolean 
 |
 
-
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-spa-routing]]`link:#quarkus-quinoa_quarkus.quinoa.enable-spa-routing[quarkus.quinoa.enable-spa-routing]`
 
 [.description]
@@ -93,7 +92,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 
 [.description]
 --
-Enable using an external server for dev (live coding). The dev server process (i.e npm start) is managed like a dev service by Quarkus. This defines the port of the server to forward requests to.
+Enable external server for dev (live coding). The dev server process (i.e npm start) is managed like a dev service by Quarkus. This defines the port of the server to forward requests to. If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
 --|int 
 |
 

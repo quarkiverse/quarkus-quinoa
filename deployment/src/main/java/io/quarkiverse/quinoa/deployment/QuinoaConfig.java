@@ -94,9 +94,10 @@ public class QuinoaConfig {
     public Optional<List<String>> ignoredPathPrefixes;
 
     /**
-     * Enable using an external server for dev (live coding).
+     * Enable external server for dev (live coding).
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
      * This defines the port of the server to forward requests to.
+     * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
      */
     @ConfigItem
     public OptionalInt devServerPort;
