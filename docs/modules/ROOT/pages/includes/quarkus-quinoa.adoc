@@ -70,6 +70,7 @@ Always install packages before building. If not set, it will install packages on
 --|boolean 
 |
 
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-spa-routing]]`link:#quarkus-quinoa_quarkus.quinoa.enable-spa-routing[quarkus.quinoa.enable-spa-routing]`
 
 [.description]

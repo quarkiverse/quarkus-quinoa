@@ -11,6 +11,7 @@ import org.jboss.logging.Logger;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -55,7 +56,13 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         if (query != null) {
             uri += "?" + query;
         }
+        final MultiMap headers = request.headers();
+        // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
+        // See https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
+        // When no Accept header is provided, the historyApiFallback is disabled
+        headers.remove("Accept");
         client.request(request.method(), port, request.localAddress().host(), uri)
+                .putHeaders(headers)
                 .send(new Handler<AsyncResult<HttpResponse<Buffer>>>() {
                     @Override
                     public void handle(AsyncResult<HttpResponse<Buffer>> event) {
