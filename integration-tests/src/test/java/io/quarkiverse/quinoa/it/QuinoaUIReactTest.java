@@ -27,7 +27,7 @@ public class QuinoaUIReactTest {
     @QuarkusPlaywrightManager.InjectPlaywright
     BrowserContext context;
 
-    @TestHTTPResource("/")
+    @TestHTTPResource("/index.html")
     URL url;
 
     @TestHTTPResource("/something")

@@ -3,9 +3,6 @@ package io.quarkiverse.quinoa;
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
-import static io.vertx.ext.web.handler.StaticHandler.DEFAULT_INDEX_PAGE;
-
-import java.util.List;
 
 import org.jboss.logging.Logger;
 
@@ -23,24 +20,22 @@ import io.vertx.ext.web.client.WebClient;
 class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
 
-    private final Vertx vertx;
     private final int port;
     private final WebClient client;
-    private final List<String> ignoredPathPrefixes;
     private final ClassLoader currentClassLoader;
+    private final QuinoaHandlerConfig config;
 
-    QuinoaDevProxyHandler(final Vertx vertx, int port, final List<String> ignoredPathPrefixes) {
-        this.vertx = vertx;
+    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, int port) {
         this.port = port;
         this.client = WebClient.create(vertx);
-        this.ignoredPathPrefixes = ignoredPathPrefixes;
+        this.config = config;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
     @Override
     public void handle(final RoutingContext ctx) {
         String path = resolvePath(ctx);
-        if (isIgnored(path, ignoredPathPrefixes)) {
+        if (isIgnored(path, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
             return;
         }
@@ -50,7 +45,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         if (uri.endsWith("/")) {
             // We directly check the index because some NodeJS servers have a directory listing on root paths when there is no index.
             // This way if the index is found, we return it, else we can continue with other Quarkus routes (e.g: META-INF/resources/index.html).
-            uri += DEFAULT_INDEX_PAGE;
+            uri += config.indexPage;
         }
         final String query = request.query();
         if (query != null) {

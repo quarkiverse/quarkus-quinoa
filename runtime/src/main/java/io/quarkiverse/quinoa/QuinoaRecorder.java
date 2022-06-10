@@ -23,20 +23,20 @@ public class QuinoaRecorder {
     public static final int QUINOA_SPA_ROUTE_ORDER = DEFAULT_ROUTE_ORDER + 10_100;
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
-    public Handler<RoutingContext> quinoaProxyDevHandler(Supplier<Vertx> vertx, int port,
-            final List<String> ignoredPathPrefixes) {
-        logIgnoredPathPrefixes(ignoredPathPrefixes);
-        return new QuinoaDevProxyHandler(vertx.get(), port, ignoredPathPrefixes);
+    public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaHandlerConfig handlerConfig, Supplier<Vertx> vertx,
+            int port) {
+        logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
+        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), port);
     }
 
-    public Handler<RoutingContext> quinoaSPARoutingHandler(final List<String> ignoredPathPrefixes) throws IOException {
-        return new QuinoaSPARoutingHandler(ignoredPathPrefixes);
+    public Handler<RoutingContext> quinoaSPARoutingHandler(final QuinoaHandlerConfig handlerConfig) throws IOException {
+        return new QuinoaSPARoutingHandler(handlerConfig);
     }
 
-    public Handler<RoutingContext> quinoaHandler(final String directory, final Set<String> uiResources,
-            final List<String> ignoredPathPrefixes) throws IOException {
-        logIgnoredPathPrefixes(ignoredPathPrefixes);
-        return new QuinoaUIResourceHandler(directory, uiResources, ignoredPathPrefixes);
+    public Handler<RoutingContext> quinoaHandler(final QuinoaHandlerConfig handlerConfig, final String directory,
+            final Set<String> uiResources) {
+        logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
+        return new QuinoaUIResourceHandler(handlerConfig, directory, uiResources);
     }
 
     static String resolvePath(RoutingContext ctx) {

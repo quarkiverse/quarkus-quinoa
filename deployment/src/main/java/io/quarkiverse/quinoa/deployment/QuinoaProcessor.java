@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.builder.BuildException;
@@ -188,16 +189,16 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final List<String> ignoredPathPrefixes = quinoaConfig.getNormalizedIgnoredPathPrefixes();
+            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
             final boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
             resumeOn404.produce(new ResumeOn404BuildItem());
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaHandler(directory,
-                            uiResources.get().getNames(), ignoredPathPrefixes))
+                    .handler(recorder.quinoaHandler(handlerConfig, directory,
+                            uiResources.get().getNames()))
                     .build());
             if (enableSPARouting) {
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder.quinoaSPARoutingHandler(ignoredPathPrefixes))
+                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
                         .build());
             }
         }

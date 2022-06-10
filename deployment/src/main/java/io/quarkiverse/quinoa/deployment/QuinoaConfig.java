@@ -11,6 +11,7 @@ import java.util.OptionalInt;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
@@ -20,6 +21,7 @@ public class QuinoaConfig {
 
     private static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
     private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
+    private static final String DEFAULT_INDEX_PAGE = "index.html";
 
     /**
      * Indicate if the extension should be enabled
@@ -54,6 +56,13 @@ public class QuinoaConfig {
      */
     @ConfigItem
     public Optional<String> packageManager;
+
+    /**
+     * Name of the index page.
+     * If not set, "index.html" will be used.
+     */
+    @ConfigItem
+    public Optional<String> indexPage;
 
     /**
      * Indicate if the Web UI should also be tested during the build phase (i.e: npm test)
@@ -126,6 +135,14 @@ public class QuinoaConfig {
             readExternalConfigPath(config, "quarkus.http.non-application-root-path").ifPresent(defaultIgnored::add);
             return defaultIgnored;
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
+    }
+
+    public String getIndexPage() {
+        return indexPage.orElse(DEFAULT_INDEX_PAGE);
+    }
+
+    public QuinoaHandlerConfig toHandlerConfig() {
+        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), getIndexPage());
     }
 
     private Optional<String> readExternalConfigPath(Config config, String key) {

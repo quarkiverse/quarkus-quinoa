@@ -23,7 +23,7 @@ public class QuinoaUILitTest {
     @QuarkusPlaywrightManager.InjectPlaywright
     BrowserContext context;
 
-    @TestHTTPResource("index.html")
+    @TestHTTPResource("/")
     URL url;
 
     @Test

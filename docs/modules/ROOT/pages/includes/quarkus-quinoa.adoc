@@ -44,6 +44,15 @@ Name of the package manager binary. If not set, it will be auto-detected dependi
 |
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.index-page]]`link:#quarkus-quinoa_quarkus.quinoa.index-page[quarkus.quinoa.index-page]`
+
+[.description]
+--
+Name of the index page. If not set, "index.html" will be used.
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.run-tests]]`link:#quarkus-quinoa_quarkus.quinoa.run-tests[quarkus.quinoa.run-tests]`
 
 [.description]
