@@ -26,6 +26,7 @@ import java.util.function.UnaryOperator;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -153,14 +154,14 @@ public class ForwardedDevProcessor {
         if (quinoaConfig.devServerPort.isPresent() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServerPort.getAsInt());
             boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
-            final List<String> ignoredPathPrefixes = quinoaConfig.getNormalizedIgnoredPathPrefixes();
+            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(vertx.getVertx(), devProxy.get().getPort(), ignoredPathPrefixes))
+                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort()))
                     .build());
             if (enableSPARouting) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder.quinoaSPARoutingHandler(ignoredPathPrefixes))
+                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
                         .build());
             }
         }
