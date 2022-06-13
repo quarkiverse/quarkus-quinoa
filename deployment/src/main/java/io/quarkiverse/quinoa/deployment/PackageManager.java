@@ -127,15 +127,23 @@ public class PackageManager {
     }
 
     public static PackageManager autoDetectPackageManager(Optional<String> binary, Path directory) {
-        String resolved = binary.orElse("npm");
-        if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
-            resolved = "yarn";
-        }
-        if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
-            resolved = "pnpm";
+        String resolved = null;
+        if (binary.isEmpty()) {
+            if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
+                resolved = "yarn";
+            } else if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
+                resolved = "pnpm";
+            } else {
+                resolved = "npm";
+            }
+            final String os = System.getProperty("os.name");
+            if (os != null && os.startsWith("Windows")) {
+                resolved = resolved + ".cmd";
+            }
+        } else {
+            resolved = binary.get();
         }
         return new PackageManager(resolved, directory);
-
     }
 
     static Commands resolveCommands(String binary) {
