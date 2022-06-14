@@ -6,6 +6,34 @@
   "commit": false,
   "contributors": [
     {
+      "login": "ia3andy",
+      "name": "Andy Damevin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2223984?v=4",
+      "profile": "https://github.com/ia3andy",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "phillip-kruger",
+      "name": "Phillip Krüger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6836179?v=4",
+      "profile": "http://www.phillip-kruger.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "fblan",
+      "name": "Blanc Frederic",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13745480?v=4",
+      "profile": "https://github.com/fblan",
+     "contributions": [
+        "code"
+      ]
+    },
+    {
       "login": "andyhan",
       "name": "andyhan",
       "avatar_url": "https://avatars.githubusercontent.com/u/142950?v=4",
