@@ -32,7 +32,16 @@
      "contributions": [
         "code"
       ]
-    } 
+    },
+    {
+      "login": "andyhan",
+      "name": "andyhan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142950?v=4",
+      "profile": "https://github.com/andyhan",
+      "contributions": [
+        "code"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "projectName": "quarkus-quinoa",
