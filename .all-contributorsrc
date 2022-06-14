@@ -6,6 +6,16 @@
   "commit": false,
   "contributors": [
     {
+      "login": "ia3andy",
+      "name": "Andy Damevin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2223984?v=4",
+      "profile": "https://github.com/ia3andy",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
       "login": "phillip-kruger",
       "name": "Phillip Krüger",
       "avatar_url": "https://avatars.githubusercontent.com/u/6836179?v=4",
