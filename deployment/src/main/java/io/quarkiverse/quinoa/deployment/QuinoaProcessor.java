@@ -213,7 +213,7 @@ public class QuinoaProcessor {
         final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
         LOG.infof("Quinoa target directory: '%s'", targetDir);
         for (Path file : files) {
-            final String name = "/" + targetDir.relativize(file);
+            final String name = "/" + targetDir.relativize(file).toString().replace('\\', '/');
             LOG.infof("Quinoa generated resource: '%s'", name);
             generatedResources.produce(new GeneratedResourceBuildItem(META_INF_WEB_UI + name, Files.readAllBytes(file), true));
             if (nativeImageResources != null) {
