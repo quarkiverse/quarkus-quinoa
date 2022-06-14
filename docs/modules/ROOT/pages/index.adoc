@@ -144,7 +144,7 @@ WARNING: With Quinoa, you don't need to manually copy the files to `META-INF/res
 == How to use the extension.
 
 === Configure the build
-Add a `build` script in the `package.json` to generate your web application index.html, scripts and media (styles, images, ...) in the `./build` directory (can be changed in the config):
+Add a `build` script in the `package.json` to generate your web application index.html, scripts and assets (styles, images, ...) in some `build` directory (configurable <<quarkus-quinoa_quarkus.quinoa.build-dir>>.
 [source,json]
 ----
  "scripts": {
@@ -153,6 +153,8 @@ Add a `build` script in the `package.json` to generate your web application inde
     "test": "[test the Web UI]"
   },
 ----
+
+NOTE: The build directory will automatically be *moved* by Quinoa to `target/quinoa-build` when using Maven (`build/quinoa-build` with Gradle) in order to be served.
 
 [#build-mode]
 You can differentiate dev from production builds using the `MODE` environment variable (`dev`, `prod`, `test`):
