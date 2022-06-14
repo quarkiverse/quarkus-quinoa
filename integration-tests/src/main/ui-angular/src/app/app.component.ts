@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AppComponent {
   title = 'quinoa-app';
-  message = 'loading...'
+  message?: string = undefined;
 
   constructor(private http:HttpClient) { }
 

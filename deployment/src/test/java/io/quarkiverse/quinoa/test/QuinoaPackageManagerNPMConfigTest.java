@@ -7,17 +7,13 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaPackageManagerNPMConfigTest {
     @RegisterExtension
-    static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .setAllowTestClassOutsideDeployment(true)
-            .setBeforeAllCustomizer(QuinoaPrepareWebUI::prepare)
-            .setAfterAllCustomizer(QuinoaPrepareWebUI::clean)
-            .overrideConfigKey("quarkus.quinoa.ui-dir", "src/test/webui")
+    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.always-install", "true")
-            .setLogRecordPredicate(log -> true)
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
                     assertThat(s.getMessage()).isEqualTo("Running Quinoa package manager build command: %s");

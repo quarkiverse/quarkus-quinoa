@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
@@ -58,7 +59,8 @@ public class QuinoaUIAngularTest {
         String button = page.innerText(".content span");
         Assertions.assertEquals("quinoa-app app is running!", button);
 
-        String greeting = page.innerText(".quinoa");
+        final ElementHandle quinoaEl = page.waitForSelector(".quinoa");
+        String greeting = quinoaEl.innerText();
         Assertions.assertEquals("Hello Quinoa", greeting);
     }
 
