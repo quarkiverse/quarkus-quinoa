@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
@@ -48,7 +49,8 @@ public class QuinoaUIReactTest {
         Assertions.assertEquals("React App", title);
 
         // Make sure the component loaded and hits the backend
-        String greeting = page.innerText(".quinoa");
+        final ElementHandle quinoaEl = page.waitForSelector(".quinoa.loaded");
+        String greeting = quinoaEl.innerText();
         Assertions.assertEquals("Hello Quinoa", greeting);
     }
 

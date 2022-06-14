@@ -5,16 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaNoDirTest {
 
     @RegisterExtension
-    static final QuarkusUnitTest config = new QuarkusUnitTest()
-            .setAllowTestClassOutsideDeployment(true)
-            .setBeforeAllCustomizer(QuinoaPrepareWebUI::prepare)
-            .setAfterAllCustomizer(QuinoaPrepareWebUI::clean)
-            .setLogRecordPredicate(log -> true)
+    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ui-dir", "src/test/no-webui")
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
