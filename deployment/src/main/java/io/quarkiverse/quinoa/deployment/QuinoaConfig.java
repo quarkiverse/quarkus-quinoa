@@ -42,7 +42,7 @@ public class QuinoaConfig {
     /**
      * Path of the directory which contains the Web UI built files (generated during the build).
      * After the build, Quinoa will take the files from this directory,
-     * copy them to the right location and serve them at runtime.
+     * move them to target/quinoa-build (or build/quinoa-build with Gradle) and serve them at runtime.
      * The path is relative to the Web UI path
      * If not set "build/" will be used
      */
