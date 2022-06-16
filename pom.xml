@@ -23,16 +23,16 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>2.9.2.Final</quarkus.version>
+    <quarkus.version>2.10.0.Final</quarkus.version>
     <playright.version>1.22.0</playright.version>
     <assertj.version>3.23.1</assertj.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.quarkus.platform</groupId>
+        <groupId>io.quarkus</groupId>
         <artifactId>quarkus-bom</artifactId>
-        <version>2.9.2.Final</version>
+        <version>${quarkus.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

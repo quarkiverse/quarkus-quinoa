@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkus.test.QuarkusDevModeTest;
 import io.restassured.RestAssured;
 
-@Disabled // See https://github.com/quarkusio/quarkus/pull/25504
 public class ClassicDevModeTest {
     @RegisterExtension
     final static QuarkusDevModeTest test = new QuarkusDevModeTest()
