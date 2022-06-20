@@ -92,7 +92,7 @@ public class QuinoaProcessor {
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
-        if (quinoaConfig.alwaysInstall.orElse(!alreadyInstalled || packageFileModified)) {
+        if (quinoaConfig.forceInstall.orElse(!alreadyInstalled || packageFileModified)) {
             final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
             packageManager.install(frozenLockfile);
         }
@@ -112,7 +112,7 @@ public class QuinoaProcessor {
 
         final PackageManager packageManager = quinoaDir.get().getPackageManager();
         final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
-        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.devServerPort.isPresent()) {
+        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.devServer.port.isPresent()) {
             return null;
         }
         if (liveReload.isLiveReload()
@@ -167,7 +167,7 @@ public class QuinoaProcessor {
             QuinoaConfig quinoaConfig,
             Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (!quinoaDir.isPresent() || quinoaConfig.devServerPort.isPresent()) {
+        if (!quinoaDir.isPresent() || quinoaConfig.devServer.port.isPresent()) {
             return;
         }
         scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);

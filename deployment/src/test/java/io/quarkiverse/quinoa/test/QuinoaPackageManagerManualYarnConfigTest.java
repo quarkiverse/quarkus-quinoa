@@ -14,7 +14,7 @@ public class QuinoaPackageManagerManualYarnConfigTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.quinoa.always-install", "true")
+            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .overrideConfigKey("quarkus.quinoa.package-manager", "yarn")
             .overrideConfigKey("quarkus.quinoa.frozen-lockfile", "false")
             .assertLogRecords(l -> {

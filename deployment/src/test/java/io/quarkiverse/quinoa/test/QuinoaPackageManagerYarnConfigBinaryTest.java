@@ -16,7 +16,7 @@ public class QuinoaPackageManagerYarnConfigBinaryTest {
             .initialLockFile(YARN)
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager", "yarn.binary")
-            .overrideConfigKey("quarkus.quinoa.always-install", "true")
+            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertException(e -> {
                 assertThat(e).hasMessage("Input/Output error while executing command.");
                 assertThat(e.getCause()).hasMessageContaining("yarn.binary");

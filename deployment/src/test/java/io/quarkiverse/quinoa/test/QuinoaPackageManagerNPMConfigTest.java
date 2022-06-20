@@ -13,7 +13,7 @@ import io.quarkus.test.QuarkusUnitTest;
 public class QuinoaPackageManagerNPMConfigTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.quinoa.always-install", "true")
+            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
                     assertThat(s.getMessage()).isEqualTo("Running Quinoa package manager build command: %s");

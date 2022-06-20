@@ -16,7 +16,7 @@ public class QuinoaPackageManagerPNPMConfigBinaryOnWindowsTest {
             .initialLockFile(PNPM)
             .osName("Windows One")
             .toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.quinoa.always-install", "true")
+            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
                     assertThat(s.getMessage()).isEqualTo("Running Quinoa package manager install command: %s");

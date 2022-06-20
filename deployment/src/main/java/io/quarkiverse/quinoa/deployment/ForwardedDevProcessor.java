@@ -74,13 +74,13 @@ public class ForwardedDevProcessor {
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
-                if (quinoaConfig.devServerPort.isEmpty()) {
+                if (quinoaConfig.devServer.port.isEmpty()) {
                     throw new IllegalStateException(
-                            "Quinoa package manager live coding shouldn't running with an empty the dev-server-port");
+                            "Quinoa package manager live coding shouldn't running with an empty the dev-server.port");
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(quinoaConfig.devServerPort.getAsInt());
+                return new ForwardedDevServerBuildItem(quinoaConfig.devServer.port.getAsInt());
             }
             shutdownDevService();
         }
@@ -98,7 +98,7 @@ public class ForwardedDevProcessor {
             shutdown.addCloseTask(closeTask, true);
         }
 
-        if (quinoaConfig.devServerPort.isEmpty()) {
+        if (quinoaConfig.devServer.port.isEmpty()) {
             return null;
         }
 
@@ -111,18 +111,21 @@ public class ForwardedDevProcessor {
         PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, quinoaDir.get().getDirectory());
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
-            final int devServerPort = quinoaConfig.devServerPort.getAsInt();
-            final int timeout = quinoaConfig.getDevServerTimeout();
-            if (timeout < 1000) {
-                throw new ConfigurationException("dev-server-timeout must be greater than 1000ms");
+            final int devServerPort = quinoaConfig.devServer.port.getAsInt();
+            final int checkTimeout = quinoaConfig.devServer.checkTimeout();
+            if (checkTimeout < 1000) {
+                throw new ConfigurationException("quarkus.quinoa.dev-server.check-timeout must be greater than 1000ms");
             }
             final long start = Instant.now().toEpochMilli();
-            dev.set(packageManager.dev(devServerPort, timeout));
+            final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
+            dev.set(packageManager.dev(devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
-                    quinoaConfig.shouldEnableDevServerLogs());
-            LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
-                    devServerPort, Instant.now().toEpochMilli() - start);
+                    quinoaConfig.devServer.isLogsEnabled());
+            if (checkPath != null) {
+                LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
+                        devServerPort, Instant.now().toEpochMilli() - start);
+            }
             final Closeable onClose = new Closeable() {
                 @Override
                 public void close() throws IOException {
@@ -151,8 +154,8 @@ public class ForwardedDevProcessor {
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
 
-        if (quinoaConfig.devServerPort.isPresent() && devProxy.isPresent()) {
-            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServerPort.getAsInt());
+        if (quinoaConfig.devServer.port.isPresent() && devProxy.isPresent()) {
+            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
             boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
