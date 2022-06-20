@@ -182,7 +182,7 @@ NOTE: Quinoa is configured with the commands to call depending on the chosen pac
 
 By default, Quinoa will call the appropriate package manager install command (before building or starting) *only if* the `node_modules` directory doesn't exist.
 
-You may force a new installation using `-Dquarkus.quinoa.always-install=true`.
+You may force a new installation using `-Dquarkus.quinoa.force-install=true`.
 
 [#frozen-lockfile]
 NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
@@ -193,7 +193,7 @@ NOTE: Quinoa will use the appropriate package manager frozen-lockfile command wh
 To enable the UI live-coding dev server, set a `start` script and set the port in the app config. Quinoa will transparently proxy relevant requests to the given port:
 [source,properties]
 ----
-quarkus.quinoa.dev-server-port=3000
+quarkus.quinoa.dev-server.port=3000
 ----
 
 NOTE: Quinoa relies on the dev server returning a 404 when the file is not found (See link:#how-dev-server[How it works]). This is not the case on some dev servers configured with SPA routing. Make sure it is disabled in the dev server configuration (for React Create App, see https://github.com/quarkiverse/quarkus-quinoa/issues/91[#91]). Another option, when possible, is to use <<quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes>>.
@@ -206,7 +206,7 @@ App created by Create React App (https://create-react-app.dev/docs/getting-start
 To enable React live coding server:
 [source,properties]
 ----
-quarkus.quinoa.dev-server-port=3000
+quarkus.quinoa.dev-server.port=3000
 ----
 
 [#angular]
@@ -221,7 +221,7 @@ quarkus.quinoa.build-dir=dist/[your-app-name]
 To enable Angular live coding server, you need to edit the package.json start script with `ng serve --host 0.0.0.0 --no-live-reload`, then add this configuration:
 [source,properties]
 ----
-quarkus.quinoa.dev-server-port=4200
+quarkus.quinoa.dev-server.port=4200
 ----
 
 If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):

@@ -96,7 +96,7 @@ public class PackageManager {
 
     }
 
-    public Process dev(int checkPort, int timeout) {
+    public Process dev(int checkPort, String checkPath, int checkTimeout) {
         final Command dev = commands.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable(packageManagerBinary));
         Process p = process(dev);
@@ -105,14 +105,18 @@ public class PackageManager {
                 stopDev(p);
             }
         });
+        if (checkPath == null) {
+            LOG.infof("Quinoa is configured to continue without check if the live coding server is up");
+            return p;
+        }
         try {
             int i = 0;
-            while (!isDevServerUp(checkPort)) {
-                if (++i >= timeout / 500) {
+            while (!isDevServerUp(checkPath, checkPort)) {
+                if (++i >= checkTimeout / 500) {
                     stopDev(p);
                     throw new RuntimeException(
                             "Quinoa package manager live coding port " + checkPort
-                                    + " is still not listening after the timeout.");
+                                    + " is still not listening after the checkTimeout.");
                 }
                 Thread.sleep(500);
             }
@@ -311,9 +315,10 @@ public class PackageManager {
         }
     }
 
-    private static boolean isDevServerUp(int port) {
+    private static boolean isDevServerUp(String path, int port) {
         try {
-            URL url = new URL("http://localhost:" + port);
+            final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
+            URL url = new URL("http://localhost:" + port + normalizedPath);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(200);

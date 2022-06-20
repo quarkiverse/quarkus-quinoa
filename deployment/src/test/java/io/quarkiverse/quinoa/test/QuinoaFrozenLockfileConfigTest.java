@@ -18,7 +18,7 @@ public class QuinoaFrozenLockfileConfigTest {
             .initialLockFile(YARN)
             .ci(null)
             .toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.quinoa.always-install", "true")
+            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .overrideConfigKey("quarkus.quinoa.frozen-lockfile", "true")
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
