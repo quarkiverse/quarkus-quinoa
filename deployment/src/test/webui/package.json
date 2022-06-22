@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir -p build && echo $MODE > build/index.html && cp src/some-page.html build/",
+    "build": "mkdir -p build && echo $MODE > build/index.html && cp -R public/* build/",
     "start": "MODE=live-coding npm run build && node server.js",
     "postinstall": "echo \"hello\" > node_modules/installed"
   },

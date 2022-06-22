@@ -303,6 +303,15 @@ quarkus.http.filter.static.methods=GET
 quarkus.http.filter.static.order=1
 ----
 
+[#http-compression]
+=== Http Compression
+
+To enable server Http compression:
+[source,properties]
+----
+quarkus.http.enable-compression=true
+----
+
 === Testing
 
 By default, the Web UI is not build/served in `@QuarkusTest`. The goal is to be able to test your api without having to wait for the Web UI build.

@@ -44,6 +44,7 @@ import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
 public class ForwardedDevProcessor {
 
@@ -144,19 +145,19 @@ public class ForwardedDevProcessor {
         }
     }
 
-    @BuildStep
+    @BuildStep(onlyIf = IsDevelopment.class)
     @Record(RUNTIME_INIT)
     public void runtimeInit(
             QuinoaConfig quinoaConfig,
             QuinoaRecorder recorder,
+            HttpBuildTimeConfig httpBuildTimeConfig,
             Optional<ForwardedDevServerBuildItem> devProxy,
             CoreVertxBuildItem vertx,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
-
         if (quinoaConfig.devServer.port.isPresent() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
-            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
+            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort()))
                     .build());

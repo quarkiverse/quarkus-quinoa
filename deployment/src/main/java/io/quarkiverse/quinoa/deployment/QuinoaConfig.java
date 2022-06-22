@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
@@ -14,6 +15,7 @@ import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
 @ConfigRoot(phase = ConfigPhase.BUILD_TIME)
 public class QuinoaConfig {
@@ -118,8 +120,10 @@ public class QuinoaConfig {
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
     }
 
-    public QuinoaHandlerConfig toHandlerConfig() {
-        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), indexPage);
+    public QuinoaHandlerConfig toHandlerConfig(boolean prodMode, final HttpBuildTimeConfig httpBuildTimeConfig) {
+        final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
+        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), indexPage, prodMode,
+                httpBuildTimeConfig.enableCompression, compressMediaTypes);
     }
 
     private Optional<String> readExternalConfigPath(Config config, String key) {
