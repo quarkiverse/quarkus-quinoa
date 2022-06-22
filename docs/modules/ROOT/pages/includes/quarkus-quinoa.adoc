@@ -14,7 +14,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa]]`link:#q
 --
 Indicate if the extension should be enabled. Default is true if the Web UI directory exists and dev and prod mode. Default is false in test mode (to avoid building the Web UI during backend tests).
 --|boolean 
-|
+|`disabled in test mode`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`link:#quarkus-quinoa_quarkus.quinoa.ui-dir[quarkus.quinoa.ui-dir]`
@@ -23,7 +23,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`
 --
 Path to the Web UI (node) root directory. If not set $++{++project.root++}++/src/main/webui/ will be used. otherwise the path will be considered relative to the project root.
 --|string 
-|`src/main/webui/`
+|`src/main/webui`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir]]`link:#quarkus-quinoa_quarkus.quinoa.build-dir[quarkus.quinoa.build-dir]`
@@ -41,7 +41,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 --
 Name of the package manager binary. If not set, it will be auto-detected depending on the lockfile falling back to "npm". Only npm, pnpm and yarn are supported for the moment.
 --|string 
-|
+|`auto-detected with lockfile`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.index-page]]`link:#quarkus-quinoa_quarkus.quinoa.index-page[quarkus.quinoa.index-page]`
@@ -68,14 +68,14 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.frozen-lo
 --
 Install the packages using a frozen lockfile. Don’t generate a lockfile and fail if an update is needed (useful in CI). If not set it is true if environment CI=true, else it is false.
 --|boolean 
-|
+|`true if environment CI=true`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.force-install]]`link:#quarkus-quinoa_quarkus.quinoa.force-install[quarkus.quinoa.force-install]`
 
 [.description]
 --
-Force install packages before building. If not set, it will install packages only if the node_modules directory is absent.
+Force install packages before building. If not set, it will install packages only if the node_modules directory is absent or when the package.json is modified in dev-mode.
 --|boolean 
 |`false`
 
@@ -131,6 +131,6 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 --
 Enable external dev server live coding logs. This is not enabled by default because most dev servers display compilation errors directly in the browser. False if not set.
 --|boolean 
-|
+|`false`
 
 |===

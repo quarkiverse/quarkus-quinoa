@@ -75,7 +75,7 @@ public class QuinoaProcessor {
             LOG.warn("Quinoa is disabled by default in tests.");
             return null;
         }
-        final String configuredDir = quinoaConfig.getUIDir();
+        final String configuredDir = quinoaConfig.uiDir;
         final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(configuredDir, outputTarget);
         if (uiDirEntry == null) {
             LOG.warnf(
@@ -92,7 +92,7 @@ public class QuinoaProcessor {
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
-        if (quinoaConfig.forceInstall.orElse(!alreadyInstalled || packageFileModified)) {
+        if (quinoaConfig.forceInstall || !alreadyInstalled || packageFileModified) {
             final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
             packageManager.install(frozenLockfile);
         }
@@ -121,11 +121,11 @@ public class QuinoaProcessor {
                 && contextObject != null) {
             return new TargetDirBuildItem(contextObject.getLocation());
         }
-        if (quinoaConfig.shouldRunTests()) {
+        if (quinoaConfig.runTests) {
             packageManager.test();
         }
         packageManager.build(launchMode.getLaunchMode());
-        final String configuredBuildDir = quinoaConfig.getBuildDir();
+        final String configuredBuildDir = quinoaConfig.buildDir;
         final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
             throw new ConfigurationException("Quinoa build directory not found: '" + configuredBuildDir + "'",
@@ -190,13 +190,12 @@ public class QuinoaProcessor {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
-            final boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
             resumeOn404.produce(new ResumeOn404BuildItem());
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaHandler(handlerConfig, directory,
                             uiResources.get().getNames()))
                     .build());
-            if (enableSPARouting) {
+            if (quinoaConfig.enableSPARouting) {
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
                         .build());
