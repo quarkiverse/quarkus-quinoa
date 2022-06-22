@@ -12,7 +12,9 @@ import org.jboss.logging.Logger;
 import io.quarkus.runtime.annotations.Recorder;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.impl.MimeMapping;
 import io.vertx.ext.web.RoutingContext;
 
 @Recorder
@@ -54,6 +56,22 @@ public class QuinoaRecorder {
             return true;
         }
         return false;
+    }
+
+    static void compressIfNeeded(QuinoaHandlerConfig config, RoutingContext ctx, String path) {
+        if (config.enableCompression && isCompressed(config, path)) {
+            // VertxHttpRecorder is adding "Content-Encoding: identity" to all requests if compression is enabled.
+            // Handlers can remove the "Content-Encoding: identity" header to enable compression.
+            ctx.response().headers().remove(HttpHeaders.CONTENT_ENCODING);
+        }
+    }
+
+    private static boolean isCompressed(QuinoaHandlerConfig config, String path) {
+        if (config.compressMediaTypes.isEmpty()) {
+            return false;
+        }
+        String contentType = MimeMapping.getMimeTypeForFilename(path);
+        return contentType != null && config.compressMediaTypes.contains(contentType);
     }
 
     static void logIgnoredPathPrefixes(final List<String> ignoredPathPrefixes) {

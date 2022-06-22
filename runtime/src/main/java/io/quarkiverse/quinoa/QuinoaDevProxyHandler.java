@@ -1,8 +1,11 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaRecorder.compressIfNeeded;
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
+
+import java.util.List;
 
 import org.jboss.logging.Logger;
 
@@ -11,6 +14,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
@@ -19,7 +23,11 @@ import io.vertx.ext.web.client.WebClient;
 
 class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
-
+    private final List<String> HEADERS_TO_FORWARD = List.of(
+            HttpHeaders.ACCEPT_RANGES.toString(),
+            HttpHeaders.CONTENT_RANGE.toString(),
+            HttpHeaders.CONTENT_LENGTH.toString(),
+            HttpHeaders.CONTENT_TYPE.toString());
     private final int port;
     private final WebClient client;
     private final ClassLoader currentClassLoader;
@@ -40,22 +48,19 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             return;
         }
         final HttpServerRequest request = ctx.request();
-        // FIXME: path might need to be encoded
-        String uri = path;
-        if (uri.endsWith("/")) {
-            // We directly check the index because some NodeJS servers have a directory listing on root paths when there is no index.
-            // This way if the index is found, we return it, else we can continue with other Quarkus routes (e.g: META-INF/resources/index.html).
-            uri += config.indexPage;
+        final String resourcePath = path.endsWith("/") ? path + config.indexPage : path;
+        if (isIgnored(resourcePath, config.ignoredPathPrefixes)) {
+            next(currentClassLoader, ctx);
+            return;
         }
-        final String query = request.query();
-        if (query != null) {
-            uri += "?" + query;
-        }
+        final String uri = computeURI(resourcePath, request);
         final MultiMap headers = request.headers();
         // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
         // See https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
         // When no Accept header is provided, the historyApiFallback is disabled
         headers.remove("Accept");
+        // Disable compression in the forwarded request
+        headers.remove("Accept-Encoding");
         client.request(request.method(), port, request.localAddress().host(), uri)
                 .putHeaders(headers)
                 .send(new Handler<AsyncResult<HttpResponse<Buffer>>>() {
@@ -64,7 +69,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         if (event.succeeded()) {
                             final int statusCode = event.result().statusCode();
                             if (statusCode == 200) {
-                                forwardResponse(event, request, ctx);
+                                forwardResponse(event, request, ctx, resourcePath);
                             } else if (statusCode == 404) {
                                 next(currentClassLoader, ctx);
                             } else {
@@ -77,6 +82,15 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                 });
     }
 
+    private String computeURI(String path, HttpServerRequest request) {
+        String uri = path;
+        final String query = request.query();
+        if (query != null) {
+            uri += "?" + query;
+        }
+        return uri;
+    }
+
     private void forwardError(AsyncResult<HttpResponse<Buffer>> event, int statusCode, RoutingContext ctx) {
         final Buffer body = event.result().body();
         final HttpServerResponse response = ctx.response().setStatusCode(statusCode);
@@ -87,18 +101,23 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         }
     }
 
-    private void forwardResponse(AsyncResult<HttpResponse<Buffer>> event, HttpServerRequest request, RoutingContext ctx) {
+    private void forwardResponse(AsyncResult<HttpResponse<Buffer>> event, HttpServerRequest request, RoutingContext ctx,
+            String resourcePath) {
         if (LOG.isDebugEnabled()) {
             LOG.debugf("Quinoa is forwarding: '%s'", request.uri());
         }
         final HttpServerResponse response = ctx.response();
-        response.headers().addAll(event.result().headers());
+        for (String header : HEADERS_TO_FORWARD) {
+            response.headers().add(header, event.result().headers().getAll(header));
+        }
+        compressIfNeeded(config, ctx, resourcePath);
         final Buffer body = event.result().body();
         if (body != null) {
             response.send(body);
         } else {
             response.send();
         }
+
     }
 
     private void error(AsyncResult<HttpResponse<Buffer>> event, RoutingContext ctx) {

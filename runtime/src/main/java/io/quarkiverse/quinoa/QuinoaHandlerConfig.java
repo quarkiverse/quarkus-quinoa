@@ -2,17 +2,25 @@ package io.quarkiverse.quinoa;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import io.quarkus.runtime.annotations.RecordableConstructor;
 
 public class QuinoaHandlerConfig {
     public final List<String> ignoredPathPrefixes;
     public final String indexPage;
+    public final boolean prodMode;
+    public final boolean enableCompression;
+    public final Set<String> compressMediaTypes;
 
     @RecordableConstructor
-    public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage) {
+    public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode, boolean enableCompression,
+            Set<String> compressMediaTypes) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
         this.indexPage = indexPage;
+        this.prodMode = prodMode;
+        this.enableCompression = enableCompression;
+        this.compressMediaTypes = compressMediaTypes;
     }
 
     @Override

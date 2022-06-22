@@ -46,6 +46,7 @@ import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.DefaultRouteBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
 public class QuinoaProcessor {
 
@@ -177,6 +178,8 @@ public class QuinoaProcessor {
     @Record(RUNTIME_INIT)
     public void runtimeInit(
             QuinoaConfig quinoaConfig,
+            HttpBuildTimeConfig httpBuildTimeConfig,
+            LaunchModeBuildItem launchMode,
             Optional<BuiltResourcesBuildItem> uiResources,
             QuinoaRecorder recorder,
             CoreVertxBuildItem vertx,
@@ -189,7 +192,9 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
+            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(
+                    !launchMode.getLaunchMode().isDevOrTest(),
+                    httpBuildTimeConfig);
             resumeOn404.produce(new ResumeOn404BuildItem());
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaHandler(handlerConfig, directory,

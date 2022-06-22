@@ -1,10 +1,12 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaRecorder.compressIfNeeded;
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
 import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
@@ -35,25 +37,29 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
             next(currentClassLoader, ctx);
             return;
         }
-        String path = resolvePath(ctx);
-        if (!isIgnored(path, config.ignoredPathPrefixes) && isUIResource(path)) {
+        final String path = resolvePath(ctx);
+        if (isIgnored(path, config.ignoredPathPrefixes)) {
+            next(currentClassLoader, ctx);
+            return;
+        }
+        final String resourcePath = path.endsWith("/") ? path + config.indexPage : path;
+        if (!isIgnored(resourcePath, config.ignoredPathPrefixes) && uiResources.contains(resourcePath)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debugf("Quinoa is serving: '%s'", path);
+                LOG.debugf("Quinoa is serving: '%s'", resourcePath);
             }
             handler.handle(ctx);
+            compressIfNeeded(config, ctx, resourcePath);
         } else {
             next(currentClassLoader, ctx);
         }
     }
 
-    private boolean isUIResource(String path) {
-        return uiResources.contains(path) || (path.endsWith("/") && uiResources.contains(path + config.indexPage));
-    }
-
     private static Handler<RoutingContext> createStaticHandler(QuinoaHandlerConfig config, String directory) {
         final StaticHandler staticHandler = directory != null ? StaticHandler.create(FileSystemAccess.ROOT, directory)
                 : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
+        staticHandler.setDefaultContentEncoding(StandardCharsets.UTF_8.name());
         staticHandler.setIndexPage(config.indexPage);
+        staticHandler.setCachingEnabled(config.prodMode);
         return staticHandler;
     }
 
