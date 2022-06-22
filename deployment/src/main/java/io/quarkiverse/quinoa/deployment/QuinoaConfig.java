@@ -26,7 +26,7 @@ public class QuinoaConfig {
      * Default is true if the Web UI directory exists and dev and prod mode.
      * Default is false in test mode (to avoid building the Web UI during backend tests).
      */
-    @ConfigItem(name = ConfigItem.PARENT)
+    @ConfigItem(name = ConfigItem.PARENT, defaultValueDocumentation = "disabled in test mode")
     Optional<Boolean> enable;
 
     /**
@@ -34,8 +34,8 @@ public class QuinoaConfig {
      * If not set ${project.root}/src/main/webui/ will be used.
      * otherwise the path will be considered relative to the project root.
      */
-    @ConfigItem(defaultValueDocumentation = "src/main/webui/")
-    public Optional<String> uiDir;
+    @ConfigItem(defaultValue = DEFAULT_WEB_UI_DIR)
+    public String uiDir;
 
     /**
      * Path of the directory which contains the Web UI built files (generated during the build).
@@ -44,23 +44,23 @@ public class QuinoaConfig {
      * The path is relative to the Web UI path.
      * If not set "build/" will be used
      */
-    @ConfigItem(defaultValueDocumentation = "build/")
-    public Optional<String> buildDir;
+    @ConfigItem(defaultValue = "build/")
+    public String buildDir;
 
     /**
      * Name of the package manager binary.
      * If not set, it will be auto-detected depending on the lockfile falling back to "npm".
      * Only npm, pnpm and yarn are supported for the moment.
      */
-    @ConfigItem
+    @ConfigItem(defaultValueDocumentation = "auto-detected with lockfile")
     public Optional<String> packageManager;
 
     /**
      * Name of the index page.
      * If not set, "index.html" will be used.
      */
-    @ConfigItem(defaultValueDocumentation = "index.html")
-    public Optional<String> indexPage;
+    @ConfigItem(defaultValue = DEFAULT_INDEX_PAGE)
+    public String indexPage;
 
     /**
      * Indicate if the Web UI should also be tested during the build phase (i.e: npm test).
@@ -68,30 +68,31 @@ public class QuinoaConfig {
      * {@link io.quarkus.test.junit.QuarkusTest}
      * Default is false.
      */
-    @ConfigItem(name = "run-tests", defaultValueDocumentation = "false")
-    Optional<Boolean> runTests;
+    @ConfigItem(name = "run-tests")
+    boolean runTests;
 
     /**
      * Install the packages using a frozen lockfile. Don’t generate a lockfile and fail if an update is needed (useful in CI).
      * If not set it is true if environment CI=true, else it is false.
      */
-    @ConfigItem
+    @ConfigItem(defaultValueDocumentation = "true if environment CI=true")
     public Optional<Boolean> frozenLockfile;
 
     /**
      * Force install packages before building.
-     * If not set, it will install packages only if the node_modules directory is absent.
+     * If not set, it will install packages only if the node_modules directory is absent or when the package.json is modified in
+     * dev-mode.
      */
-    @ConfigItem(defaultValueDocumentation = "false")
-    public Optional<Boolean> forceInstall;
+    @ConfigItem
+    public boolean forceInstall;
 
     /**
      * Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the "index.html".
      * Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic.
      * If not set, it is disabled.
      */
-    @ConfigItem(defaultValueDocumentation = "false")
-    public Optional<Boolean> enableSPARouting;
+    @ConfigItem
+    public boolean enableSPARouting;
 
     /**
      * List of path prefixes to be ignored by Quinoa.
@@ -117,12 +118,8 @@ public class QuinoaConfig {
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
     }
 
-    public String getIndexPage() {
-        return indexPage.orElse(DEFAULT_INDEX_PAGE);
-    }
-
     public QuinoaHandlerConfig toHandlerConfig() {
-        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), getIndexPage());
+        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), indexPage);
     }
 
     private Optional<String> readExternalConfigPath(Config config, String key) {
@@ -131,24 +128,8 @@ public class QuinoaConfig {
                 .map(s -> s.endsWith("/") ? s : s + "/");
     }
 
-    public String getUIDir() {
-        return uiDir.orElse(DEFAULT_WEB_UI_DIR);
-    }
-
-    public String getBuildDir() {
-        return buildDir.orElse("build/");
-    }
-
-    public boolean shouldRunTests() {
-        return runTests.orElse(false);
-    }
-
     public boolean isEnabled() {
         return enable.orElse(true);
-    }
-
-    public boolean isSPARoutingEnabled() {
-        return enableSPARouting.orElse(false);
     }
 
     @Override

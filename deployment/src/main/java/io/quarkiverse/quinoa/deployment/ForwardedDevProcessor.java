@@ -112,7 +112,7 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServer.port.getAsInt();
-            final int checkTimeout = quinoaConfig.devServer.checkTimeout();
+            final int checkTimeout = quinoaConfig.devServer.checkTimeout;
             if (checkTimeout < 1000) {
                 throw new ConfigurationException("quarkus.quinoa.dev-server.check-timeout must be greater than 1000ms");
             }
@@ -121,7 +121,7 @@ public class ForwardedDevProcessor {
             dev.set(packageManager.dev(devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
-                    quinoaConfig.devServer.isLogsEnabled());
+                    quinoaConfig.devServer.logs);
             if (checkPath != null) {
                 LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
                         devServerPort, Instant.now().toEpochMilli() - start);
@@ -156,12 +156,11 @@ public class ForwardedDevProcessor {
 
         if (quinoaConfig.devServer.port.isPresent() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
-            boolean enableSPARouting = quinoaConfig.isSPARoutingEnabled();
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig();
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort()))
                     .build());
-            if (enableSPARouting) {
+            if (quinoaConfig.enableSPARouting) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(handlerConfig))

@@ -10,8 +10,6 @@ import io.quarkus.runtime.annotations.ConfigItem;
 @ConfigGroup
 public class DevServerConfig {
 
-    private static final int DEFAULT_DEV_SERVER_TIMEOUT = 30000;
-
     /**
      * Enable external dev server (live coding).
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
@@ -35,8 +33,8 @@ public class DevServerConfig {
      * Timeout in ms for the dev server to be up and running.
      * If not set the default is ~30000ms
      */
-    @ConfigItem(defaultValueDocumentation = "30000")
-    public OptionalInt checkTimeout;
+    @ConfigItem(defaultValue = "30000")
+    public int checkTimeout;
 
     /**
      * Enable external dev server live coding logs.
@@ -44,15 +42,7 @@ public class DevServerConfig {
      * False if not set.
      */
     @ConfigItem
-    public Optional<Boolean> logs;
-
-    public int checkTimeout() {
-        return checkTimeout.orElse(DEFAULT_DEV_SERVER_TIMEOUT);
-    }
-
-    public boolean isLogsEnabled() {
-        return logs.orElse(false);
-    }
+    public boolean logs;
 
     @Override
     public boolean equals(Object o) {
