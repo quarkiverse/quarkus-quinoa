@@ -47,8 +47,8 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
             if (LOG.isDebugEnabled()) {
                 LOG.debugf("Quinoa is serving: '%s'", resourcePath);
             }
-            handler.handle(ctx);
             compressIfNeeded(config, ctx, resourcePath);
+            handler.handle(ctx);
         } else {
             next(currentClassLoader, ctx);
         }
