@@ -17,18 +17,9 @@ NOTE: packages are installed by Quinoa before the build when needed (i.e `npm in
 
 === Runtime for production mode
 
-[mermaid]
-....
-flowchart LR
-    run[run - jar or binary] --> vertx(Vert.x routes)
-    vertx -->|GET /something| quinoa{is this a Quinoa Web Resources?}
-    quinoa -->|yes| handle[Serve]
-    quinoa -->|no| static-resources{is this a META-INF/resources?}
-    static-resources -->|yes| handle[Serve]
-    static-resources -->|no| rest{is this a REST resource?}
-    rest -->|yes| handle[Handle]
-    rest -->|no| 404[404]
-....
+When running jar or binary in production mode:
+
+image::quinoa-runtime-prod.png[Quinoa Runtime Production]
 
 === Runtime for full Quarkus live-coding
 
@@ -37,21 +28,11 @@ Quinoa (using Quarkus live-coding watch feature) will watch the Web UI directory
 NOTE: You can differentiate the build for link:#build-mode[dev mode]. e.g to disable minification.
 
 [#how-dev-server]
-=== Runtime for proxied live-coding (e.g on port 3000)
+=== Runtime for proxied live-coding
 
-[mermaid]
-....
-flowchart LR
-    dev[quarkus dev] --> vertx(Vert.x routes)
-    vertx -->|GET /something| quinoa{if not ignored, try /something on port 3000?}
-    quinoa -->|200| forward[Forward Response]
-    quinoa -->|error| forward-error[Forward Error]
-    quinoa -->|404| static-resources{is this a META-INF/resources?}
-    static-resources -->|yes| handle[Serve]
-    static-resources -->|no| rest{is this a REST resource?}
-    rest -->|yes| handle[Handle]
-    rest -->|no| 404[404]
-....
+When running dev-mode (e.g with npm on port 3000):
+
+image::quinoa-proxy-dev.png[Quinoa Proxy Dev]
 
 NOTE: Quarkus live-coding will keep watching for the backend changes as usual.
 
@@ -65,8 +46,6 @@ See link:#dev-server[Enable the proxied live coding].
 
 [#installation]
 == Installation
-
-To use this, you need the `io.quarkiverse.quinoa:quarkus-quinoa` extension first.
 
 Create a new Quinoa project (with a base Quinoa starter code):
 
