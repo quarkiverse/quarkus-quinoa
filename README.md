@@ -11,24 +11,40 @@ Quinoa is a Quarkus extension which eases the development, the build and serving
 
 You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
 
-## User Doc
+## Getting started
 
-https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/index.html
+Read the full [Quinoa documentation](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/).
 
-## Setup to contribute
+### Prerequisite
 
-Some setup is needed to compile this project. This extension use node package manager (npm) that 
-needs to be installed.
+* Install NodeJS (https://nodejs.org/)
+* Create or use an existing Quarkus application
+* Add the Quinoa extension
 
-### Fedora
+### Installation
 
-* Install npm:
+Create a new Quinoa project (with a base Quinoa starter code):
 
-`sudo dnf install npm`
+* With [code.quarkus.io](https://code.quarkus.io/?a=quinoa-bowl&j=17&e=io.quarkiverse.quinoa%3Aquarkus-quinoa)
+* With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+```bash
+quarkus create app quinoa-app -x=io.quarkiverse.quinoa:quarkus-quinoa
+```
 
-* Install yarn:
+Then start the live-coding:
+```bash
+quarkus dev
+```
 
-`sudo npm install --global yarn`
+And navigate to http://0.0.0.0:8080/quinoa.html
+
+You could also just add the extension (but you won't get the starter code):
+
+* With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+```bash
+quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
+```
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
