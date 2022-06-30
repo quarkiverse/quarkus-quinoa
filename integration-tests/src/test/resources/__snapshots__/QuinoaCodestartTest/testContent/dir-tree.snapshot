@@ -2,7 +2,7 @@
 package-lock.json
 package.json
 public/
-public/quinoa.gif
+public/quinoa.css
 public/quinoa.html
 src/
 src/index.js
