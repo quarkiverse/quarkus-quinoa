@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.test.devmode;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matchers;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkus.test.QuarkusDevModeTest;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 
 public class ForwardedDevModeTest {
     @RegisterExtension
@@ -27,5 +29,10 @@ public class ForwardedDevModeTest {
                 .statusCode(200)
                 .header("Content-Encoding", Matchers.nullValue())
                 .body(is("live-coding\n"));
+        given()
+                .body("{}")
+                .contentType(ContentType.JSON)
+                .when().post("/api/something").then()
+                .statusCode(404);
     }
 }

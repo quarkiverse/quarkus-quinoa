@@ -4,6 +4,7 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.compressIfNeeded;
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
+import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
 import java.util.List;
 
@@ -42,6 +43,10 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(final RoutingContext ctx) {
+        if (!shouldHandleMethod(ctx)) {
+            next(currentClassLoader, ctx);
+            return;
+        }
         String path = resolvePath(ctx);
         if (isIgnored(path, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
