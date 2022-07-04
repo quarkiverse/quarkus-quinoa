@@ -98,7 +98,8 @@ public class QuinoaConfig {
 
     /**
      * List of path prefixes to be ignored by Quinoa.
-     * If not set, "quarkus.rest.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
+     * If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will
+     * be ignored.
      */
     @ConfigItem
     public Optional<List<String>> ignoredPathPrefixes;
@@ -114,7 +115,7 @@ public class QuinoaConfig {
             Config config = ConfigProvider.getConfig();
             List<String> defaultIgnore = new ArrayList<>();
             readExternalConfigPath(config, "quarkus.resteasy.path").ifPresent(defaultIgnore::add);
-            readExternalConfigPath(config, "quarkus.rest.path").ifPresent(defaultIgnore::add);
+            readExternalConfigPath(config, "quarkus.resteasy-reactive.path").ifPresent(defaultIgnore::add);
             readExternalConfigPath(config, "quarkus.http.non-application-root-path").ifPresent(defaultIgnore::add);
             return defaultIgnore;
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());

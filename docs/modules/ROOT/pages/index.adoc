@@ -239,7 +239,7 @@ To enable Single Page application routing:
 quarkus.quinoa.enable-spa-routing=true
 ----
 
-NOTE: By default, Quinoa will ignore `quarkus.rest.path`, `quarkus.resteasy.path` and `quarkus.http.non-application-root-path` path prefixes. You can specify different path prefixes to ignore using `quarkus.quinoa.ignored-path-prefixes`.
+NOTE: By default, Quinoa will ignore `quarkus.resteasy-reactive.path`, `quarkus.resteasy.path` and `quarkus.http.non-application-root-path` path prefixes. You can specify different path prefixes to ignore using `quarkus.quinoa.ignored-path-prefixes`.
 
 WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. Instead, you may use a workaround (if your app has all the rest resources under the same path prefix):
 [source,java]

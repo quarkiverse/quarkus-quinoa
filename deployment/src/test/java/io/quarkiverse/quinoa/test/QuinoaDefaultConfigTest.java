@@ -15,7 +15,7 @@ public class QuinoaDefaultConfigTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create()
             .toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.rest.path", "/foo/bar")
+            .overrideConfigKey("quarkus.resteasy-reactive.path", "/foo/bar")
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
                     assertThat(s.getMessage()).isEqualTo("Quinoa is ignoring paths starting with: /foo/bar/, /q/");
