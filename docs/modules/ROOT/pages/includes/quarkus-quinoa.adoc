@@ -93,7 +93,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ignored-p
 
 [.description]
 --
-List of path prefixes to be ignored by Quinoa. If not set, "quarkus.rest.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
+List of path prefixes to be ignored by Quinoa. If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
 --|list of string 
 |
 
