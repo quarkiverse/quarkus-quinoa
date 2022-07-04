@@ -71,6 +71,15 @@ Install the packages using a frozen lockfile. Don’t generate a lockfile and fa
 |`true if environment CI=true`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.install-arguments]]`link:#quarkus-quinoa_quarkus.quinoa.install-arguments[quarkus.quinoa.install-arguments]`
+
+[.description]
+--
+
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.force-install]]`link:#quarkus-quinoa_quarkus.quinoa.force-install[quarkus.quinoa.force-install]`
 
 [.description]

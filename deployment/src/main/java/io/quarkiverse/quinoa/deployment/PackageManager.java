@@ -12,9 +12,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -43,8 +41,8 @@ public class PackageManager {
         return directory;
     }
 
-    public void install(boolean frozenLockfile) {
-        final Command install = commands.install(frozenLockfile);
+    public void install(boolean frozenLockfile, List<String> arguments) {
+        final Command install = commands.install(frozenLockfile, arguments);
         final String printable = install.printable(packageManagerBinary);
         LOG.infof("Running Quinoa package manager install command: %s", printable);
         if (!exec(install)) {
@@ -231,7 +229,7 @@ public class PackageManager {
     }
 
     interface Commands {
-        Command install(boolean frozenLockfile);
+        Command install(boolean frozenLockfile, List<String> arguments);
 
         default Command build(LaunchMode mode) {
             // MODE=dev/test/normal to be able to build differently depending on the mode
@@ -252,11 +250,15 @@ public class PackageManager {
     private static class NPMCommands implements Commands {
 
         @Override
-        public Command install(boolean frozenLockfile) {
+        public Command install(boolean frozenLockfile, List<String> arguments) {
+            List<String> args = new ArrayList<>();
             if (frozenLockfile) {
-                return new Command("ci");
+                args.add("ci");
+            } else {
+                args.add("install");
             }
-            return new Command("install");
+            args.addAll(arguments);
+            return new Command(args.toArray(new String[0]));
         }
 
     }
@@ -264,7 +266,7 @@ public class PackageManager {
     private static class PNPMCommands implements Commands {
 
         @Override
-        public Command install(boolean frozenLockfile) {
+        public Command install(boolean frozenLockfile, List<String> arguments) {
             if (frozenLockfile) {
                 return new Command("install", "--frozen-lockfile");
             }
@@ -275,7 +277,7 @@ public class PackageManager {
     private static class YarnCommands implements Commands {
 
         @Override
-        public Command install(boolean frozenLockfile) {
+        public Command install(boolean frozenLockfile, List<String> arguments) {
             if (frozenLockfile) {
                 return new Command("install", "--frozen-lockfile");
             }

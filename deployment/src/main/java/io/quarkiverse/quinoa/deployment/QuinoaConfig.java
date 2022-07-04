@@ -81,6 +81,11 @@ public class QuinoaConfig {
     public Optional<Boolean> frozenLockfile;
 
     /**
+     * Extra arguments to use when installing packets.
+     */
+    public Optional<String> installArguments;
+
+    /**
      * Force install packages before building.
      * If not set, it will install packages only if the node_modules directory is absent or when the package.json is modified in
      * dev-mode.

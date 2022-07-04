@@ -5,20 +5,14 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
+import static java.util.Collections.emptyList;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,7 +89,9 @@ public class QuinoaProcessor {
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
         if (quinoaConfig.forceInstall || !alreadyInstalled || packageFileModified) {
             final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
-            packageManager.install(frozenLockfile);
+            List<String> installArguments = quinoaConfig.installArguments.map(ia -> Arrays.asList(ia.split(" ")))
+                    .orElse(emptyList());
+            packageManager.install(frozenLockfile, installArguments);
         }
         return new QuinoaDirectoryBuildItem(packageManager);
     }
