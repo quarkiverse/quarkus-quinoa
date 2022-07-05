@@ -51,4 +51,4 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Build with Maven
-        run: mvn -B formatter:validate verify --file pom.xml
+        run: mvn -B formatter:validate install --file pom.xml
