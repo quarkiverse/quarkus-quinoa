@@ -110,6 +110,12 @@ public class QuinoaConfig {
     @ConfigItem
     public DevServerConfig devServer;
 
+    /**
+     * Configuration for overriding build commands
+     */
+    @ConfigItem
+    public PackageManagerCommandsConfig packageManagerCommands;
+
     public List<String> getNormalizedIgnoredPathPrefixes() {
         return ignoredPathPrefixes.orElseGet(() -> {
             Config config = ConfigProvider.getConfig();
@@ -150,12 +156,13 @@ public class QuinoaConfig {
                 && Objects.equals(frozenLockfile, that.frozenLockfile) && Objects.equals(forceInstall, that.forceInstall)
                 && Objects.equals(enableSPARouting, that.enableSPARouting)
                 && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes)
-                && Objects.equals(devServer, that.devServer);
+                && Objects.equals(devServer, that.devServer)
+                && Objects.equals(packageManagerCommands, that.packageManagerCommands);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(enable, uiDir, buildDir, packageManager, indexPage, runTests, frozenLockfile, forceInstall,
-                enableSPARouting, ignoredPathPrefixes, devServer);
+                enableSPARouting, ignoredPathPrefixes, devServer, packageManagerCommands);
     }
 }

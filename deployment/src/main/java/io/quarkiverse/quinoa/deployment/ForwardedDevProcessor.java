@@ -109,7 +109,8 @@ public class ForwardedDevProcessor {
                 loggingSetup,
                 PROCESS_THREAD_PREDICATE);
 
-        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, quinoaDir.get().getDirectory());
+        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager,
+                quinoaConfig.packageManagerCommands, quinoaDir.get().getDirectory());
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServer.port.getAsInt();

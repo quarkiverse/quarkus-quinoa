@@ -89,7 +89,8 @@ public class QuinoaProcessor {
             throw new ConfigurationException(
                     "No package.json found in Web UI directory: '" + configuredDir + "'");
         }
-        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager, uiDirEntry.getKey());
+        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager,
+                quinoaConfig.packageManagerCommands, uiDirEntry.getKey());
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jboss.logging.Logger;
 
@@ -33,10 +34,10 @@ public class PackageManager {
     private final Path directory;
     private final Commands commands;
 
-    private PackageManager(String packageManagerBinary, Path directory) {
+    private PackageManager(String packageManagerBinary, Path directory, Commands commands) {
         this.packageManagerBinary = packageManagerBinary;
         this.directory = directory;
-        this.commands = resolveCommands(packageManagerBinary);
+        this.commands = commands;
     }
 
     public Path getDirectory() {
@@ -130,7 +131,8 @@ public class PackageManager {
         return p;
     }
 
-    public static PackageManager autoDetectPackageManager(Optional<String> binary, Path directory) {
+    public static PackageManager autoDetectPackageManager(Optional<String> binary,
+            PackageManagerCommandsConfig packageManagerCommands, Path directory) {
         String resolved = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
@@ -147,18 +149,18 @@ public class PackageManager {
         } else {
             resolved = binary.get();
         }
-        return new PackageManager(resolved, directory);
+        return new PackageManager(resolved, directory, resolveCommands(resolved, packageManagerCommands));
     }
 
-    static Commands resolveCommands(String binary) {
+    static Commands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
         if (binary.contains("pnpm")) {
-            return PNPM;
+            return new ConfiguredCommands(PNPM, packageManagerCommands);
         }
         if (binary.contains("npm")) {
-            return NPM;
+            return new ConfiguredCommands(NPM, packageManagerCommands);
         }
         if (binary.contains("yarn")) {
-            return YARN;
+            return new ConfiguredCommands(YARN, packageManagerCommands);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
     }
@@ -280,6 +282,57 @@ public class PackageManager {
                 return new Command("install", "--frozen-lockfile");
             }
             return new Command("install");
+        }
+    }
+
+    private static class ConfiguredCommands implements Commands {
+        private final Commands detectedCommands;
+        private final PackageManagerCommandsConfig commandsConfig;
+
+        private ConfiguredCommands(Commands detectedCommands, PackageManagerCommandsConfig commandsConfig) {
+            this.detectedCommands = detectedCommands;
+            this.commandsConfig = commandsConfig;
+        }
+
+        @Override
+        public Command install(boolean frozenLockfile) {
+            Command c = detectedCommands.install(frozenLockfile);
+            return new Command(
+                    commandsConfig.installEnv.orElse(c.envs),
+                    mapToArray(commandsConfig.install).orElse(c.args));
+        }
+
+        @Override
+        public Command build(LaunchMode mode) {
+            Command c = detectedCommands.build(mode);
+            return new Command(
+                    commandsConfig.buildEnv.orElse(c.envs),
+                    mapToArray(commandsConfig.build).orElse(c.args));
+        }
+
+        @Override
+        public Command test() {
+            Command c = detectedCommands.test();
+            return new Command(
+                    commandsConfig.testEnv.orElse(c.envs),
+                    mapToArray(commandsConfig.test).orElse(c.args));
+        }
+
+        @Override
+        public Command dev() {
+            Command c = detectedCommands.dev();
+            return new Command(
+                    commandsConfig.devEnv.orElse(c.envs),
+                    mapToArray(commandsConfig.dev).orElse(c.args));
+        }
+
+        private Optional<String[]> mapToArray(Optional<String> command) {
+            return command.map(new Function<String, String[]>() {
+                @Override
+                public String[] apply(String s) {
+                    return s.split(" ");
+                }
+            });
         }
     }
 
