@@ -26,9 +26,6 @@ import io.quarkus.runtime.LaunchMode;
 
 public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
-    private static final Commands NPM = new NPMCommands();
-    private static final Commands YARN = new YarnCommands();
-    private static final Commands PNPM = new PNPMCommands();
 
     private final Path directory;
     private final Commands commands;
@@ -152,13 +149,13 @@ public class PackageManager {
 
     static Commands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
         if (binary.contains(PNPMCommands.pnpm)) {
-            return new ConfiguredCommands(PNPM, packageManagerCommands);
+            return new ConfiguredCommands(new PNPMCommands(binary), packageManagerCommands);
         }
         if (binary.contains(NPMCommands.npm)) {
-            return new ConfiguredCommands(NPM, packageManagerCommands);
+            return new ConfiguredCommands(new NPMCommands(binary), packageManagerCommands);
         }
         if (binary.contains(YarnCommands.yarn)) {
-            return new ConfiguredCommands(YARN, packageManagerCommands);
+            return new ConfiguredCommands(new YarnCommands(binary), packageManagerCommands);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
     }
@@ -216,7 +213,7 @@ public class PackageManager {
         }
 
         public String printable() {
-            return String.join(" ", args) + (envs.isEmpty() ? "" : ", with environment: " + envs);
+            return String.join(" ", args);
         }
     }
 
@@ -243,10 +240,15 @@ public class PackageManager {
 
     private static class NPMCommands implements Commands {
         static final String npm = "npm";
+        private final String binary;
+
+        public NPMCommands(String binary) {
+            this.binary = binary;
+        }
 
         @Override
         public String binary() {
-            return npm;
+            return binary;
         }
 
         @Override
@@ -262,10 +264,15 @@ public class PackageManager {
     private static class PNPMCommands implements Commands {
 
         static String pnpm = "pnpm";
+        private final String binary;
+
+        public PNPMCommands(String binary) {
+            this.binary = binary;
+        }
 
         @Override
         public String binary() {
-            return pnpm;
+            return binary;
         }
 
         @Override
@@ -279,10 +286,15 @@ public class PackageManager {
 
     private static class YarnCommands implements Commands {
         static final String yarn = "yarn";
+        private final String binary;
+
+        public YarnCommands(String binary) {
+            this.binary = binary;
+        }
 
         @Override
         public String binary() {
-            return yarn;
+            return binary;
         }
 
         @Override
