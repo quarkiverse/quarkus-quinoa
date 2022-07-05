@@ -252,9 +252,9 @@ public class PackageManager {
         @Override
         public Command install(boolean frozenLockfile) {
             if (frozenLockfile) {
-                return new Command("ci");
+                return new Command(binary(), "ci");
             }
-            return new Command("install");
+            return new Command(binary(), "install");
         }
 
     }
@@ -271,9 +271,9 @@ public class PackageManager {
         @Override
         public Command install(boolean frozenLockfile) {
             if (frozenLockfile) {
-                return new Command("install", "--frozen-lockfile");
+                return new Command(binary(), "install", "--frozen-lockfile");
             }
-            return new Command("install");
+            return new Command(binary(), "install");
         }
     }
 
@@ -288,9 +288,9 @@ public class PackageManager {
         @Override
         public Command install(boolean frozenLockfile) {
             if (frozenLockfile) {
-                return new Command("install", "--frozen-lockfile");
+                return new Command(binary(), "install", "--frozen-lockfile");
             }
-            return new Command("install");
+            return new Command(binary(), "install");
         }
     }
 
