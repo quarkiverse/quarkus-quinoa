@@ -216,7 +216,7 @@ public class PackageManager {
         }
 
         public String printable() {
-            return String.join(" ", args) + ", with environment: " + envs;
+            return String.join(" ", args) + (envs.isEmpty() ? "" : ", with environment: " + envs);
         }
     }
 
