@@ -30,12 +30,10 @@ public class PackageManager {
     private static final Commands YARN = new YarnCommands();
     private static final Commands PNPM = new PNPMCommands();
 
-    private final String packageManagerBinary;
     private final Path directory;
     private final Commands commands;
 
-    private PackageManager(String packageManagerBinary, Path directory, Commands commands) {
-        this.packageManagerBinary = packageManagerBinary;
+    private PackageManager(Path directory, Commands commands) {
         this.directory = directory;
         this.commands = commands;
     }
@@ -46,7 +44,7 @@ public class PackageManager {
 
     public void install(boolean frozenLockfile) {
         final Command install = commands.install(frozenLockfile);
-        final String printable = install.printable(packageManagerBinary);
+        final String printable = install.printable();
         LOG.infof("Running Quinoa package manager install command: %s", printable);
         if (!exec(install)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager install command: %s", printable));
@@ -55,7 +53,7 @@ public class PackageManager {
 
     public void build(LaunchMode mode) {
         final Command build = commands.build(mode);
-        final String printable = build.printable(packageManagerBinary);
+        final String printable = build.printable();
         LOG.infof("Running Quinoa package manager build command: %s", printable);
         if (!exec(build)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager build command: %s", printable));
@@ -64,7 +62,7 @@ public class PackageManager {
 
     public void test() {
         final Command test = commands.test();
-        final String printable = test.printable(packageManagerBinary);
+        final String printable = test.printable();
         LOG.infof("Running Quinoa package manager test command: %s", printable);
         if (!exec(test)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager test command: %s", printable));
@@ -99,7 +97,7 @@ public class PackageManager {
 
     public Process dev(int checkPort, String checkPath, int checkTimeout) {
         final Command dev = commands.dev();
-        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable(packageManagerBinary));
+        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable());
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -136,11 +134,11 @@ public class PackageManager {
         String resolved = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
-                resolved = "yarn";
+                resolved = YarnCommands.yarn;
             } else if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
-                resolved = "pnpm";
+                resolved = PNPMCommands.pnpm;
             } else {
-                resolved = "npm";
+                resolved = NPMCommands.npm;
             }
             final String os = System.getProperty("os.name");
             if (os != null && os.startsWith("Windows")) {
@@ -149,17 +147,17 @@ public class PackageManager {
         } else {
             resolved = binary.get();
         }
-        return new PackageManager(resolved, directory, resolveCommands(resolved, packageManagerCommands));
+        return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands));
     }
 
     static Commands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
-        if (binary.contains("pnpm")) {
+        if (binary.contains(PNPMCommands.pnpm)) {
             return new ConfiguredCommands(PNPM, packageManagerCommands);
         }
-        if (binary.contains("npm")) {
+        if (binary.contains(NPMCommands.npm)) {
             return new ConfiguredCommands(NPM, packageManagerCommands);
         }
-        if (binary.contains("yarn")) {
+        if (binary.contains(YarnCommands.yarn)) {
             return new ConfiguredCommands(YARN, packageManagerCommands);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
@@ -167,14 +165,9 @@ public class PackageManager {
 
     private Process process(Command command) {
         Process process = null;
-        String[] cmd = new String[command.args.length + 1];
-        cmd[0] = packageManagerBinary;
-        if (command.args.length > 0) {
-            System.arraycopy(command.args, 0, cmd, 1, command.args.length);
-        }
         final ProcessBuilder builder = new ProcessBuilder()
                 .directory(directory.toFile())
-                .command(cmd);
+                .command(command.args);
         if (!command.envs.isEmpty()) {
             builder.environment().putAll(command.envs);
         }
@@ -189,18 +182,13 @@ public class PackageManager {
     private boolean exec(Command command) {
         Process process = null;
         try {
-            String[] cmd = new String[command.args.length + 1];
-            cmd[0] = packageManagerBinary;
-            if (command.args.length > 0) {
-                System.arraycopy(command.args, 0, cmd, 1, command.args.length);
-            }
             final ProcessBuilder processBuilder = new ProcessBuilder();
             if (!command.envs.isEmpty()) {
                 processBuilder.environment().putAll(command.envs);
             }
             process = processBuilder
                     .directory(directory.toFile())
-                    .command(cmd)
+                    .command(command.args)
                     .redirectErrorStream(true)
                     .start();
             new HandleOutput(process.getInputStream()).run();
@@ -227,31 +215,39 @@ public class PackageManager {
             this.args = args;
         }
 
-        public String printable(String binary) {
-            return binary + " " + String.join(" ", args);
+        public String printable() {
+            return String.join(" ", args) + ", with environment: " + envs;
         }
     }
 
     interface Commands {
         Command install(boolean frozenLockfile);
 
+        String binary();
+
         default Command build(LaunchMode mode) {
             // MODE=dev/test/normal to be able to build differently depending on the mode
-            return new Command(Collections.singletonMap("MODE", mode.getDefaultProfile()), "run", "build");
+            return new Command(Collections.singletonMap("MODE", mode.getDefaultProfile()), binary(), "run", "build");
         }
 
         default Command test() {
             // CI=true to avoid watch mode on Angular
-            return new Command(Collections.singletonMap("CI", "true"), "test");
+            return new Command(Collections.singletonMap("CI", "true"), binary(), "test");
         }
 
         default Command dev() {
             // BROWSER=NONE so the browser is not automatically opened with React
-            return new Command(Collections.singletonMap("BROWSER", "none"), "start");
+            return new Command(Collections.singletonMap("BROWSER", "none"), binary(), "start");
         }
     }
 
     private static class NPMCommands implements Commands {
+        static final String npm = "npm";
+
+        @Override
+        public String binary() {
+            return npm;
+        }
 
         @Override
         public Command install(boolean frozenLockfile) {
@@ -265,6 +261,13 @@ public class PackageManager {
 
     private static class PNPMCommands implements Commands {
 
+        static String pnpm = "pnpm";
+
+        @Override
+        public String binary() {
+            return pnpm;
+        }
+
         @Override
         public Command install(boolean frozenLockfile) {
             if (frozenLockfile) {
@@ -275,6 +278,12 @@ public class PackageManager {
     }
 
     private static class YarnCommands implements Commands {
+        static final String yarn = "yarn";
+
+        @Override
+        public String binary() {
+            return yarn;
+        }
 
         @Override
         public Command install(boolean frozenLockfile) {
@@ -298,15 +307,20 @@ public class PackageManager {
         public Command install(boolean frozenLockfile) {
             Command c = detectedCommands.install(frozenLockfile);
             return new Command(
-                    commandsConfig.installEnv.orElse(c.envs),
+                    commandsConfig.installEnv.isEmpty() ? c.envs : commandsConfig.installEnv,
                     mapToArray(commandsConfig.install).orElse(c.args));
+        }
+
+        @Override
+        public String binary() {
+            return detectedCommands.binary();
         }
 
         @Override
         public Command build(LaunchMode mode) {
             Command c = detectedCommands.build(mode);
             return new Command(
-                    commandsConfig.buildEnv.orElse(c.envs),
+                    commandsConfig.buildEnv.isEmpty() ? c.envs : commandsConfig.buildEnv,
                     mapToArray(commandsConfig.build).orElse(c.args));
         }
 
@@ -314,7 +328,7 @@ public class PackageManager {
         public Command test() {
             Command c = detectedCommands.test();
             return new Command(
-                    commandsConfig.testEnv.orElse(c.envs),
+                    commandsConfig.testEnv.isEmpty() ? c.envs : commandsConfig.testEnv,
                     mapToArray(commandsConfig.test).orElse(c.args));
         }
 
@@ -322,7 +336,7 @@ public class PackageManager {
         public Command dev() {
             Command c = detectedCommands.dev();
             return new Command(
-                    commandsConfig.devEnv.orElse(c.envs),
+                    commandsConfig.devEnv.isEmpty() ? c.envs : commandsConfig.devEnv,
                     mapToArray(commandsConfig.dev).orElse(c.args));
         }
 

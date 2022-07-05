@@ -143,29 +143,11 @@ Custom command for installing all dependencies. e.g. «npm ci --cache $CACHE_DIR
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.install-env[quarkus.quinoa.package-manager-commands.install-env]`
-
-[.description]
---
-Environment variables for install command execution.
---|string 
-|
-
-
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.build]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.build[quarkus.quinoa.package-manager-commands.build]`
 
 [.description]
 --
 Custom command for building the application.
---|string 
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.build-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.build-env[quarkus.quinoa.package-manager-commands.build-env]`
-
-[.description]
---
-Environment variables for build command execution.
 --|string 
 |
 
@@ -179,15 +161,6 @@ Custom command for running tests for the application.
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.test-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.test-env[quarkus.quinoa.package-manager-commands.test-env]`
-
-[.description]
---
-Environment variables for test command execution.
---|string 
-|
-
-
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev[quarkus.quinoa.package-manager-commands.dev]`
 
 [.description]
@@ -197,12 +170,39 @@ Custom command for starting the application in development mode.
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev-env[quarkus.quinoa.package-manager-commands.dev-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.install-env-install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.install-env-install-env[quarkus.quinoa.package-manager-commands.install-env]`
 
 [.description]
 --
-Environment variables for development command execution.
---|string 
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.build-env-build-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.build-env-build-env[quarkus.quinoa.package-manager-commands.build-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.test-env-test-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.test-env-test-env[quarkus.quinoa.package-manager-commands.test-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev-env-dev-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-commands.dev-env-dev-env[quarkus.quinoa.package-manager-commands.dev-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
 |
 
 |===

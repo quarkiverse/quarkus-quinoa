@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigGroup;
 import io.quarkus.runtime.annotations.ConfigItem;
+import io.smallrye.config.ConfigMapping;
 
 @ConfigGroup
 public class PackageManagerCommandsConfig {
@@ -18,8 +19,8 @@ public class PackageManagerCommandsConfig {
     /**
      * Environment variables for install command execution.
      */
-    @ConfigItem
-    Optional<Map<String, String>> installEnv;
+    @ConfigMapping
+    Map<String, String> installEnv;
 
     /**
      * Custom command for building the application.
@@ -30,8 +31,8 @@ public class PackageManagerCommandsConfig {
     /**
      * Environment variables for build command execution.
      */
-    @ConfigItem
-    Optional<Map<String, String>> buildEnv;
+    @ConfigMapping
+    Map<String, String> buildEnv;
 
     /**
      * Custom command for running tests for the application.
@@ -42,8 +43,8 @@ public class PackageManagerCommandsConfig {
     /**
      * Environment variables for test command execution.
      */
-    @ConfigItem
-    Optional<Map<String, String>> testEnv;
+    @ConfigMapping
+    Map<String, String> testEnv;
 
     /**
      * Custom command for starting the application in development mode.
@@ -54,6 +55,6 @@ public class PackageManagerCommandsConfig {
     /**
      * Environment variables for development command execution.
      */
-    @ConfigItem
-    Optional<Map<String, String>> devEnv;
+    @ConfigMapping
+    Map<String, String> devEnv;
 }
