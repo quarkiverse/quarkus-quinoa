@@ -5,6 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "mkdir -p build && echo $MODE > build/index.html && cp -R public/* build/",
+    "build2": "mkdir -p build && echo $BUILD > build/index.html && cp -R public/* build/",
     "start": "MODE=live-coding npm run build && node server.js",
     "postinstall": "echo \"hello\" > node_modules/installed"
   },
