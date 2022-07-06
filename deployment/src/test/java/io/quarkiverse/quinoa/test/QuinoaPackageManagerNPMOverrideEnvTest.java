@@ -1,20 +1,21 @@
 package io.quarkiverse.quinoa.test;
 
-import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
+import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaPackageManagerNPMOverrideEnvTest {
     private static final String MODE = "devolup";
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.force-install", "true")
-            .overrideConfigKey("quarkus.quinoa.package-manager-commands.build-env.MODE", MODE)
+            .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.MODE", MODE)
             .assertLogRecords(l -> {
                 assertThat(l).anySatisfy(s -> {
                     assertThat(s.getMessage()).isEqualTo("Running Quinoa package manager build command: %s");
