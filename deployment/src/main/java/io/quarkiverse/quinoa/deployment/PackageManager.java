@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -319,7 +320,7 @@ public class PackageManager {
         public Command install(boolean frozenLockfile) {
             Command c = detectedCommands.install(frozenLockfile);
             return new Command(
-                    commandsConfig.installEnv.isEmpty() ? c.envs : commandsConfig.installEnv,
+                    environment(c, commandsConfig.installEnv),
                     mapToArray(commandsConfig.install).orElse(c.args));
         }
 
@@ -332,7 +333,7 @@ public class PackageManager {
         public Command build(LaunchMode mode) {
             Command c = detectedCommands.build(mode);
             return new Command(
-                    commandsConfig.buildEnv.isEmpty() ? c.envs : commandsConfig.buildEnv,
+                    environment(c, commandsConfig.buildEnv),
                     mapToArray(commandsConfig.build).orElse(c.args));
         }
 
@@ -340,7 +341,7 @@ public class PackageManager {
         public Command test() {
             Command c = detectedCommands.test();
             return new Command(
-                    commandsConfig.testEnv.isEmpty() ? c.envs : commandsConfig.testEnv,
+                    environment(c, commandsConfig.testEnv),
                     mapToArray(commandsConfig.test).orElse(c.args));
         }
 
@@ -348,8 +349,14 @@ public class PackageManager {
         public Command dev() {
             Command c = detectedCommands.dev();
             return new Command(
-                    commandsConfig.devEnv.isEmpty() ? c.envs : commandsConfig.devEnv,
+                    environment(c, commandsConfig.devEnv),
                     mapToArray(commandsConfig.dev).orElse(c.args));
+        }
+
+        private Map<String, String> environment(Command c, Map<String, String> override) {
+            Map<String, String> environment = new HashMap<>(c.envs);
+            environment.putAll(override);
+            return environment;
         }
 
         private Optional<String[]> mapToArray(Optional<String> command) {
