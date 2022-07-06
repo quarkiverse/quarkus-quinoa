@@ -55,10 +55,10 @@ jobs:
             git add docs/modules/ROOT/pages/includes/attributes.adoc
             git commit -m "Update stable version for documentation"
           fi
-          mvn -B release:prepare -Prelease -DskipTests -DskipITs -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
+          mvn -B -DskipTests -DskipITs release:prepare -Prelease -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
           git checkout ${{github.base_ref}}
           git rebase release
-          mvn -B release:perform -DskipTests -DskipITs -Darguments=-DperformRelease -DperformRelease -Prelease
+          mvn -B -DskipTests -DskipITs release:perform -Darguments=-DperformRelease -DperformRelease -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
