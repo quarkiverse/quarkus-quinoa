@@ -42,7 +42,7 @@ public class PackageManager {
 
     public void install(boolean frozenLockfile) {
         final Command install = commands.install(frozenLockfile);
-        final String printable = install.printable();
+        final String printable = install.asSingleCommand();
         LOG.infof("Running Quinoa package manager install command: %s", printable);
         if (!exec(install)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager install command: %s", printable));
@@ -51,7 +51,7 @@ public class PackageManager {
 
     public void build(LaunchMode mode) {
         final Command build = commands.build(mode);
-        final String printable = build.printable();
+        final String printable = build.asSingleCommand();
         LOG.infof("Running Quinoa package manager build command: %s", printable);
         if (!exec(build)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager build command: %s", printable));
@@ -60,7 +60,7 @@ public class PackageManager {
 
     public void test() {
         final Command test = commands.test();
-        final String printable = test.printable();
+        final String printable = test.asSingleCommand();
         LOG.infof("Running Quinoa package manager test command: %s", printable);
         if (!exec(test)) {
             throw new RuntimeException(format("Error in Quinoa while running package manager test command: %s", printable));
@@ -95,7 +95,7 @@ public class PackageManager {
 
     public Process dev(int checkPort, String checkPath, int checkTimeout) {
         final Command dev = commands.dev();
-        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.printable());
+        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.asSingleCommand());
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -165,7 +165,7 @@ public class PackageManager {
         Process process = null;
         final ProcessBuilder builder = new ProcessBuilder()
                 .directory(directory.toFile())
-                .command(command.args);
+                .command(runner(command));
         if (!command.envs.isEmpty()) {
             builder.environment().putAll(command.envs);
         }
@@ -186,7 +186,7 @@ public class PackageManager {
             }
             process = processBuilder
                     .directory(directory.toFile())
-                    .command(command.args)
+                    .command(runner(command))
                     .redirectErrorStream(true)
                     .start();
             new HandleOutput(process.getInputStream()).run();
@@ -197,6 +197,15 @@ public class PackageManager {
             return false;
         }
         return process != null && process.exitValue() == 0;
+    }
+
+    private String[] runner(Command command) {
+        final String os = System.getProperty("os.name");
+        if (os != null && os.startsWith("Windows")) {
+            return new String[] { "cmd.exe", "/c", command.asSingleCommand() };
+        } else {
+            return new String[] { "sh", "-c", command.asSingleCommand() };
+        }
     }
 
     private static class Command {
@@ -213,7 +222,7 @@ public class PackageManager {
             this.args = args;
         }
 
-        public String printable() {
+        public String asSingleCommand() {
             return String.join(" ", args);
         }
     }
@@ -363,7 +372,7 @@ public class PackageManager {
             return command.map(new Function<String, String[]>() {
                 @Override
                 public String[] apply(String s) {
-                    return s.split(" ");
+                    return new String[] { s };
                 }
             });
         }
