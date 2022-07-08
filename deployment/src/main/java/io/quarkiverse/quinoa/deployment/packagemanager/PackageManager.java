@@ -1,4 +1,4 @@
-package io.quarkiverse.quinoa.deployment;
+package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import static java.lang.String.format;
 
@@ -12,13 +12,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.jboss.logging.Logger;
 
@@ -205,176 +201,6 @@ public class PackageManager {
             return new String[] { "cmd.exe", "/c", command.asSingleCommand() };
         } else {
             return new String[] { "sh", "-c", command.asSingleCommand() };
-        }
-    }
-
-    private static class Command {
-        public final Map<String, String> envs;
-        public final String[] args;
-
-        private Command(String... args) {
-            this.envs = Collections.emptyMap();
-            this.args = args;
-        }
-
-        private Command(Map<String, String> envs, String... args) {
-            this.envs = envs;
-            this.args = args;
-        }
-
-        public String asSingleCommand() {
-            return String.join(" ", args);
-        }
-    }
-
-    interface Commands {
-        Command install(boolean frozenLockfile);
-
-        String binary();
-
-        default Command build(LaunchMode mode) {
-            // MODE=dev/test/normal to be able to build differently depending on the mode
-            return new Command(Collections.singletonMap("MODE", mode.getDefaultProfile()), binary(), "run", "build");
-        }
-
-        default Command test() {
-            // CI=true to avoid watch mode on Angular
-            return new Command(Collections.singletonMap("CI", "true"), binary(), "test");
-        }
-
-        default Command dev() {
-            // BROWSER=NONE so the browser is not automatically opened with React
-            return new Command(Collections.singletonMap("BROWSER", "none"), binary(), "start");
-        }
-    }
-
-    private static class NPMCommands implements Commands {
-        static final String npm = "npm";
-        private final String binary;
-
-        public NPMCommands(String binary) {
-            this.binary = binary;
-        }
-
-        @Override
-        public String binary() {
-            return binary;
-        }
-
-        @Override
-        public Command install(boolean frozenLockfile) {
-            if (frozenLockfile) {
-                return new Command(binary(), "ci");
-            }
-            return new Command(binary(), "install");
-        }
-
-    }
-
-    private static class PNPMCommands implements Commands {
-
-        static String pnpm = "pnpm";
-        private final String binary;
-
-        public PNPMCommands(String binary) {
-            this.binary = binary;
-        }
-
-        @Override
-        public String binary() {
-            return binary;
-        }
-
-        @Override
-        public Command install(boolean frozenLockfile) {
-            if (frozenLockfile) {
-                return new Command(binary(), "install", "--frozen-lockfile");
-            }
-            return new Command(binary(), "install");
-        }
-    }
-
-    private static class YarnCommands implements Commands {
-        static final String yarn = "yarn";
-        private final String binary;
-
-        public YarnCommands(String binary) {
-            this.binary = binary;
-        }
-
-        @Override
-        public String binary() {
-            return binary;
-        }
-
-        @Override
-        public Command install(boolean frozenLockfile) {
-            if (frozenLockfile) {
-                return new Command(binary(), "install", "--frozen-lockfile");
-            }
-            return new Command(binary(), "install");
-        }
-    }
-
-    private static class ConfiguredCommands implements Commands {
-        private final Commands detectedCommands;
-        private final PackageManagerCommandsConfig commandsConfig;
-
-        private ConfiguredCommands(Commands detectedCommands, PackageManagerCommandsConfig commandsConfig) {
-            this.detectedCommands = detectedCommands;
-            this.commandsConfig = commandsConfig;
-        }
-
-        @Override
-        public Command install(boolean frozenLockfile) {
-            Command c = detectedCommands.install(frozenLockfile);
-            return new Command(
-                    environment(c, commandsConfig.installEnv),
-                    mapToArray(commandsConfig.install).orElse(c.args));
-        }
-
-        @Override
-        public String binary() {
-            return detectedCommands.binary();
-        }
-
-        @Override
-        public Command build(LaunchMode mode) {
-            Command c = detectedCommands.build(mode);
-            return new Command(
-                    environment(c, commandsConfig.buildEnv),
-                    mapToArray(commandsConfig.build).orElse(c.args));
-        }
-
-        @Override
-        public Command test() {
-            Command c = detectedCommands.test();
-            return new Command(
-                    environment(c, commandsConfig.testEnv),
-                    mapToArray(commandsConfig.test).orElse(c.args));
-        }
-
-        @Override
-        public Command dev() {
-            Command c = detectedCommands.dev();
-            return new Command(
-                    environment(c, commandsConfig.devEnv),
-                    mapToArray(commandsConfig.dev).orElse(c.args));
-        }
-
-        private Map<String, String> environment(Command c, Map<String, String> override) {
-            Map<String, String> environment = new HashMap<>(c.envs);
-            environment.putAll(override);
-            return environment;
-        }
-
-        private Optional<String[]> mapToArray(Optional<String> command) {
-            return command.map(new Function<String, String[]>() {
-                @Override
-                public String[] apply(String s) {
-                    return new String[] { s };
-                }
-            });
         }
     }
 

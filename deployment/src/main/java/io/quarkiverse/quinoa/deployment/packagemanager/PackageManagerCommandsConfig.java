@@ -1,4 +1,4 @@
-package io.quarkiverse.quinoa.deployment;
+package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.util.Map;
 import java.util.Optional;

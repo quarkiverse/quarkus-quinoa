@@ -12,6 +12,7 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerCommandsConfig;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;

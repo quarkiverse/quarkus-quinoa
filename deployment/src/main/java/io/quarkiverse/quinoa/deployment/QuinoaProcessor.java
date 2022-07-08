@@ -3,7 +3,7 @@ package io.quarkiverse.quinoa.deployment;
 import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.PackageManager.autoDetectPackageManager;
+import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.File;
@@ -26,6 +26,7 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.builder.BuildException;
 import io.quarkus.deployment.IsNormal;
