@@ -5,18 +5,18 @@ import java.util.Map;
 
 import io.quarkus.runtime.LaunchMode;
 
-class ConfiguredCommands implements Commands {
-    private final Commands detectedCommands;
+class EffectiveCommands implements PackageManagerCommands {
+    private final PackageManagerCommands defaultCommands;
     private final PackageManagerCommandsConfig commandsConfig;
 
-    ConfiguredCommands(Commands detectedCommands, PackageManagerCommandsConfig commandsConfig) {
-        this.detectedCommands = detectedCommands;
+    EffectiveCommands(PackageManagerCommands defaultCommands, PackageManagerCommandsConfig commandsConfig) {
+        this.defaultCommands = defaultCommands;
         this.commandsConfig = commandsConfig;
     }
 
     @Override
     public Command install(boolean frozenLockfile) {
-        Command c = detectedCommands.install(frozenLockfile);
+        Command c = defaultCommands.install(frozenLockfile);
         return new Command(
                 environment(c, commandsConfig.installEnv),
                 commandsConfig.install.orElse(c.commandWithArguments));
@@ -24,12 +24,12 @@ class ConfiguredCommands implements Commands {
 
     @Override
     public String binary() {
-        return detectedCommands.binary();
+        return defaultCommands.binary();
     }
 
     @Override
     public Command build(LaunchMode mode) {
-        Command c = detectedCommands.build(mode);
+        Command c = defaultCommands.build(mode);
         return new Command(
                 environment(c, commandsConfig.buildEnv),
                 commandsConfig.build.orElse(c.commandWithArguments));
@@ -37,7 +37,7 @@ class ConfiguredCommands implements Commands {
 
     @Override
     public Command test() {
-        Command c = detectedCommands.test();
+        Command c = defaultCommands.test();
         return new Command(
                 environment(c, commandsConfig.testEnv),
                 commandsConfig.test.orElse(c.commandWithArguments));
@@ -45,7 +45,7 @@ class ConfiguredCommands implements Commands {
 
     @Override
     public Command dev() {
-        Command c = detectedCommands.dev();
+        Command c = defaultCommands.dev();
         return new Command(
                 environment(c, commandsConfig.devEnv),
                 commandsConfig.dev.orElse(c.commandWithArguments));

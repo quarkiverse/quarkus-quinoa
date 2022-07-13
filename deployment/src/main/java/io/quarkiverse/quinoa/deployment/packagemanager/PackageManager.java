@@ -25,11 +25,11 @@ public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
 
     private final Path directory;
-    private final Commands commands;
+    private final PackageManagerCommands packageManagerCommands;
 
-    private PackageManager(Path directory, Commands commands) {
+    private PackageManager(Path directory, PackageManagerCommands packageManagerCommands) {
         this.directory = directory;
-        this.commands = commands;
+        this.packageManagerCommands = packageManagerCommands;
     }
 
     public Path getDirectory() {
@@ -37,7 +37,7 @@ public class PackageManager {
     }
 
     public void install(boolean frozenLockfile) {
-        final Command install = commands.install(frozenLockfile);
+        final Command install = packageManagerCommands.install(frozenLockfile);
         LOG.infof("Running Quinoa package manager install command: %s", install.commandWithArguments);
         if (!exec(install)) {
             throw new RuntimeException(
@@ -46,7 +46,7 @@ public class PackageManager {
     }
 
     public void build(LaunchMode mode) {
-        final Command build = commands.build(mode);
+        final Command build = packageManagerCommands.build(mode);
         LOG.infof("Running Quinoa package manager build command: %s", build.commandWithArguments);
         if (!exec(build)) {
             throw new RuntimeException(
@@ -55,7 +55,7 @@ public class PackageManager {
     }
 
     public void test() {
-        final Command test = commands.test();
+        final Command test = packageManagerCommands.test();
         LOG.infof("Running Quinoa package manager test command: %s", test.commandWithArguments);
         if (!exec(test)) {
             throw new RuntimeException(
@@ -90,7 +90,7 @@ public class PackageManager {
     }
 
     public Process dev(int checkPort, String checkPath, int checkTimeout) {
-        final Command dev = commands.dev();
+        final Command dev = packageManagerCommands.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -128,11 +128,11 @@ public class PackageManager {
         String resolved = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
-                resolved = YarnCommands.yarn;
+                resolved = YarnPackageManagerCommands.yarn;
             } else if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
-                resolved = PNPMCommands.pnpm;
+                resolved = PNPMPackageManagerCommands.pnpm;
             } else {
-                resolved = NPMCommands.npm;
+                resolved = NPMPackageManagerCommands.npm;
             }
             final String os = System.getProperty("os.name");
             if (os != null && os.startsWith("Windows")) {
@@ -144,15 +144,15 @@ public class PackageManager {
         return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands));
     }
 
-    static Commands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
-        if (binary.contains(PNPMCommands.pnpm)) {
-            return new ConfiguredCommands(new PNPMCommands(binary), packageManagerCommands);
+    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
+        if (binary.contains(PNPMPackageManagerCommands.pnpm)) {
+            return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands);
         }
-        if (binary.contains(NPMCommands.npm)) {
-            return new ConfiguredCommands(new NPMCommands(binary), packageManagerCommands);
+        if (binary.contains(NPMPackageManagerCommands.npm)) {
+            return new EffectiveCommands(new NPMPackageManagerCommands(binary), packageManagerCommands);
         }
-        if (binary.contains(YarnCommands.yarn)) {
-            return new ConfiguredCommands(new YarnCommands(binary), packageManagerCommands);
+        if (binary.contains(YarnPackageManagerCommands.yarn)) {
+            return new EffectiveCommands(new YarnPackageManagerCommands(binary), packageManagerCommands);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
     }

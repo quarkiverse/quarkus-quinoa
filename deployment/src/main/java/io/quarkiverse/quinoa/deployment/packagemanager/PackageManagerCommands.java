@@ -4,7 +4,7 @@ import java.util.Collections;
 
 import io.quarkus.runtime.LaunchMode;
 
-interface Commands {
+interface PackageManagerCommands {
     Command install(boolean frozenLockfile);
 
     String binary();

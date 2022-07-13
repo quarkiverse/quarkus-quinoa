@@ -1,10 +1,10 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
-class YarnCommands implements Commands {
+class YarnPackageManagerCommands implements PackageManagerCommands {
     static final String yarn = "yarn";
     private final String binary;
 
-    public YarnCommands(String binary) {
+    public YarnPackageManagerCommands(String binary) {
         this.binary = binary;
     }
 
