@@ -16,9 +16,9 @@ class NPMCommands implements Commands {
     @Override
     public Command install(boolean frozenLockfile) {
         if (frozenLockfile) {
-            return new Command(binary(), "ci");
+            return new Command(binary() + " ci");
         }
-        return new Command(binary(), "install");
+        return new Command(binary() + " install");
     }
 
 }

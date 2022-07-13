@@ -38,28 +38,28 @@ public class PackageManager {
 
     public void install(boolean frozenLockfile) {
         final Command install = commands.install(frozenLockfile);
-        final String printable = install.asSingleCommand();
-        LOG.infof("Running Quinoa package manager install command: %s", printable);
+        LOG.infof("Running Quinoa package manager install command: %s", install.commandWithArguments);
         if (!exec(install)) {
-            throw new RuntimeException(format("Error in Quinoa while running package manager install command: %s", printable));
+            throw new RuntimeException(
+                    format("Error in Quinoa while running package manager install command: %s", install.commandWithArguments));
         }
     }
 
     public void build(LaunchMode mode) {
         final Command build = commands.build(mode);
-        final String printable = build.asSingleCommand();
-        LOG.infof("Running Quinoa package manager build command: %s", printable);
+        LOG.infof("Running Quinoa package manager build command: %s", build.commandWithArguments);
         if (!exec(build)) {
-            throw new RuntimeException(format("Error in Quinoa while running package manager build command: %s", printable));
+            throw new RuntimeException(
+                    format("Error in Quinoa while running package manager build command: %s", build.commandWithArguments));
         }
     }
 
     public void test() {
         final Command test = commands.test();
-        final String printable = test.asSingleCommand();
-        LOG.infof("Running Quinoa package manager test command: %s", printable);
+        LOG.infof("Running Quinoa package manager test command: %s", test.commandWithArguments);
         if (!exec(test)) {
-            throw new RuntimeException(format("Error in Quinoa while running package manager test command: %s", printable));
+            throw new RuntimeException(
+                    format("Error in Quinoa while running package manager test command: %s", test.commandWithArguments));
         }
     }
 
@@ -91,7 +91,7 @@ public class PackageManager {
 
     public Process dev(int checkPort, String checkPath, int checkTimeout) {
         final Command dev = commands.dev();
-        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.asSingleCommand());
+        LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -198,9 +198,9 @@ public class PackageManager {
     private String[] runner(Command command) {
         final String os = System.getProperty("os.name");
         if (os != null && os.startsWith("Windows")) {
-            return new String[] { "cmd.exe", "/c", command.asSingleCommand() };
+            return new String[] { "cmd.exe", "/c", command.commandWithArguments };
         } else {
-            return new String[] { "sh", "-c", command.asSingleCommand() };
+            return new String[] { "sh", "-c", command.commandWithArguments };
         }
     }
 

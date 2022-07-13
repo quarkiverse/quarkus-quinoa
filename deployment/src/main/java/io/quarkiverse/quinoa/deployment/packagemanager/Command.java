@@ -5,19 +5,15 @@ import java.util.Map;
 
 class Command {
     public final Map<String, String> envs;
-    public final String[] args;
+    public final String commandWithArguments;
 
-    Command(String... args) {
+    Command(String commandWithArguments) {
         this.envs = Collections.emptyMap();
-        this.args = args;
+        this.commandWithArguments = commandWithArguments;
     }
 
-    Command(Map<String, String> envs, String... args) {
+    Command(Map<String, String> envs, String commandWithArguments) {
         this.envs = envs;
-        this.args = args;
-    }
-
-    public String asSingleCommand() {
-        return String.join(" ", args);
+        this.commandWithArguments = commandWithArguments;
     }
 }

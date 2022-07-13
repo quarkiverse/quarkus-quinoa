@@ -2,8 +2,6 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 
 import io.quarkus.runtime.LaunchMode;
 
@@ -21,7 +19,7 @@ class ConfiguredCommands implements Commands {
         Command c = detectedCommands.install(frozenLockfile);
         return new Command(
                 environment(c, commandsConfig.installEnv),
-                mapToArray(commandsConfig.install).orElse(c.args));
+                commandsConfig.install.orElse(c.commandWithArguments));
     }
 
     @Override
@@ -34,7 +32,7 @@ class ConfiguredCommands implements Commands {
         Command c = detectedCommands.build(mode);
         return new Command(
                 environment(c, commandsConfig.buildEnv),
-                mapToArray(commandsConfig.build).orElse(c.args));
+                commandsConfig.build.orElse(c.commandWithArguments));
     }
 
     @Override
@@ -42,7 +40,7 @@ class ConfiguredCommands implements Commands {
         Command c = detectedCommands.test();
         return new Command(
                 environment(c, commandsConfig.testEnv),
-                mapToArray(commandsConfig.test).orElse(c.args));
+                commandsConfig.test.orElse(c.commandWithArguments));
     }
 
     @Override
@@ -50,21 +48,12 @@ class ConfiguredCommands implements Commands {
         Command c = detectedCommands.dev();
         return new Command(
                 environment(c, commandsConfig.devEnv),
-                mapToArray(commandsConfig.dev).orElse(c.args));
+                commandsConfig.dev.orElse(c.commandWithArguments));
     }
 
     private Map<String, String> environment(Command c, Map<String, String> override) {
         Map<String, String> environment = new HashMap<>(c.envs);
         environment.putAll(override);
         return environment;
-    }
-
-    private Optional<String[]> mapToArray(Optional<String> command) {
-        return command.map(new Function<String, String[]>() {
-            @Override
-            public String[] apply(String s) {
-                return new String[] { s };
-            }
-        });
     }
 }

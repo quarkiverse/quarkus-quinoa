@@ -2,7 +2,7 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 class PNPMCommands implements Commands {
 
-    static String pnpm = "pnpm";
+    static final String pnpm = "pnpm";
     private final String binary;
 
     public PNPMCommands(String binary) {
@@ -17,8 +17,8 @@ class PNPMCommands implements Commands {
     @Override
     public Command install(boolean frozenLockfile) {
         if (frozenLockfile) {
-            return new Command(binary(), "install", "--frozen-lockfile");
+            return new Command(binary() + " install --frozen-lockfile");
         }
-        return new Command(binary(), "install");
+        return new Command(binary() + " install");
     }
 }
