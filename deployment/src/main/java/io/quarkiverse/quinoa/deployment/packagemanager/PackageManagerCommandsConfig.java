@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigGroup;
@@ -57,4 +58,17 @@ public class PackageManagerCommandsConfig {
      */
     @ConfigMapping
     Map<String, String> devEnv;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PackageManagerCommandsConfig that = (PackageManagerCommandsConfig) o;
+        return Objects.equals(install, that.install) && Objects.equals(installEnv, that.installEnv) && Objects.equals(build, that.build) && Objects.equals(buildEnv, that.buildEnv) && Objects.equals(test, that.test) && Objects.equals(testEnv, that.testEnv) && Objects.equals(dev, that.dev) && Objects.equals(devEnv, that.devEnv);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(install, installEnv, build, buildEnv, test, testEnv, dev, devEnv);
+    }
 }
