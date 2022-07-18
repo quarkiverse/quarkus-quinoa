@@ -3,7 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "build": "if [[ $MODE == \"dev\" ]]; then webpack --mode=development; else webpack --mode=production; fi",
+        "build:prod": "webpack --mode=production",
+        "build:dev": "webpack --mode=development",
+        "build:auto": "echo $FOO; if [[ $MODE == \"dev\" ]]; then npm run build:dev; else npm run build:prod; fi",
         "test": ""
     },
     "dependencies": {

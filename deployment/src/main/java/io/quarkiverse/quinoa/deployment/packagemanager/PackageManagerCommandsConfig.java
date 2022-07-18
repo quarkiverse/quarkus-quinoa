@@ -10,6 +10,7 @@ import io.smallrye.config.ConfigMapping;
 
 @ConfigGroup
 public class PackageManagerCommandsConfig {
+
     /**
      * Custom command for installing all dependencies.
      * e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»

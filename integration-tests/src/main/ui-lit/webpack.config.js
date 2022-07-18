@@ -1,3 +1,4 @@
+const { EnvironmentPlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
             patterns: [
                 { from: 'public' }
             ]
-        })
+        }),
+        new EnvironmentPlugin(['FOO'])
     ]
 };

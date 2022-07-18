@@ -17,7 +17,7 @@ export class SimpleGreeting extends LitElement {
         xmlHttp.open( "GET", "/api/quinoa", false );
         xmlHttp.send( null );
         const response = xmlHttp.responseText;
-        return html`<p class="greeting">${response} and ${this.name}</p>`;
+        return html`<p class="greeting">${response} and ${this.name} and ${process.env.FOO}</p>`;
     }
 }
 customElements.define('simple-greeting', SimpleGreeting);
