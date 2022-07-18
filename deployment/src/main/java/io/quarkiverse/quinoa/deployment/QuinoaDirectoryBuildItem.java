@@ -2,6 +2,7 @@ package io.quarkiverse.quinoa.deployment;
 
 import java.nio.file.Path;
 
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkus.builder.item.SimpleBuildItem;
 
 public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {

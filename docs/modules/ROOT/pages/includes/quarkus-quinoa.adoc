@@ -133,4 +133,76 @@ Enable external dev server live coding logs. This is not enabled by default beca
 --|boolean 
 |`false`
 
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install[quarkus.quinoa.package-manager-command.install]`
+
+[.description]
+--
+Custom command for installing all dependencies. e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.build]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.build[quarkus.quinoa.package-manager-command.build]`
+
+[.description]
+--
+Custom command for building the application.
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.test]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.test[quarkus.quinoa.package-manager-command.test]`
+
+[.description]
+--
+Custom command for running tests for the application.
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.dev]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.dev[quarkus.quinoa.package-manager-command.dev]`
+
+[.description]
+--
+Custom command for starting the application in development mode.
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env[quarkus.quinoa.package-manager-command.install-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.build-env-build-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.build-env-build-env[quarkus.quinoa.package-manager-command.build-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.test-env-test-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.test-env-test-env[quarkus.quinoa.package-manager-command.test-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.dev-env-dev-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.dev-env-dev-env[quarkus.quinoa.package-manager-command.dev-env]`
+
+[.description]
+--
+
+--|`Map<String,String>` 
+|
+
 |===

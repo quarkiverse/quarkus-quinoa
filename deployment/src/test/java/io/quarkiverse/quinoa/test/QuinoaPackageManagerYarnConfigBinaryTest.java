@@ -18,8 +18,7 @@ public class QuinoaPackageManagerYarnConfigBinaryTest {
             .overrideConfigKey("quarkus.quinoa.package-manager", "yarn.binary")
             .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertException(e -> {
-                assertThat(e).hasMessage("Input/Output error while executing command.");
-                assertThat(e.getCause()).hasMessageContaining("yarn.binary");
+                assertThat(e).hasMessage("Error in Quinoa while running package manager install command: yarn.binary install");
             });
 
     @Test

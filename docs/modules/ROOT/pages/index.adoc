@@ -166,6 +166,41 @@ You may force a new installation using `-Dquarkus.quinoa.force-install=true`.
 [#frozen-lockfile]
 NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
 
+[#package-manager-commands]
+=== Package manager commands build in
+
+The following commands and environment variables are used in the different faces for each of the supported package managers.
+
+=== Install
+NPM: `npm install`, `npm ci` if `quarkus.quinoa.frozen-lockfile=true`.
+PNPM: `pnpm install`, `npm install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`.
+Yarn: `pnpm install`, `npm install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`.
+
+=== Build
+`(npm|pnpm|yarn) run build`, with environment `MODE=${mode}` (https://quarkus.io/guides/lifecycle#launch-modes[`dev`, `test` or `prod`])
+
+=== Test
+`(npm|pnpm|yarn) test`, with environment `CI=true`
+
+=== Dev
+`(npm|pnpm|yarn) start`, with environment `BROWSER=none`
+
+[#override-commands]
+=== Override package manager commands
+
+Quinoa uses quite standard commands when executing the different phases, `install`, `build`, `test`, `dev`.
+This is possible to override with config, both the command and environment variables that are set:
+[source,properties]
+----
+quarkus.quinoa.package-manager-command.install=npm ci --cache $CACHE_DIR/.npm --prefer-offline
+quarkus.quinoa.package-manager-command.build-env.BUILD=value
+----
+
+This makes `npm ci --cache $CACHE_DIR/.npm --prefer-offline` the command executen in the `install` phase.
+(overriding `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile=true`).
+This config also set environment variable `BUILD` with value `value`.
+Enviroment variables set in config is added to the variables listed in link:#package-manager-commands.
+
 [#dev-server]
 === UI live-coding dev server (proxy mode)
 
