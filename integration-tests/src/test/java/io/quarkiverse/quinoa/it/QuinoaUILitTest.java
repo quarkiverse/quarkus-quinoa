@@ -41,6 +41,6 @@ public class QuinoaUILitTest {
         // Make sure the component loaded and hits the backend
         final ElementHandle quinoaEl = page.waitForSelector(".greeting");
         String greeting = quinoaEl.innerText();
-        Assertions.assertEquals("Hello Quinoa and World", greeting);
+        Assertions.assertEquals("Hello Quinoa and World and bar", greeting);
     }
 }
