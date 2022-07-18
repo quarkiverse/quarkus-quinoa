@@ -33,7 +33,7 @@ public class QuinoaUIAngularTest {
     @TestHTTPResource("/some-route")
     URL someRoute;
 
-    @TestHTTPResource("/bar/foo/not-found")
+    @TestHTTPResource("/bar/foo/baz/not-found")
     URL url404;
 
     @TestHTTPResource("/bar/foo/api/quinoa")

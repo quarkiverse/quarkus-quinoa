@@ -22,7 +22,7 @@ public class QuinoaRecorder {
     private static final Logger LOG = Logger.getLogger(QuinoaRecorder.class);
     public static final String META_INF_WEB_UI = "META-INF/webui";
     public static final int QUINOA_ROUTE_ORDER = 1100;
-    public static final int QUINOA_SPA_ROUTE_ORDER = DEFAULT_ROUTE_ORDER + 10_100;
+    public static final int QUINOA_SPA_ROUTE_ORDER = DEFAULT_ROUTE_ORDER + 30_000;
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
     public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaHandlerConfig handlerConfig, Supplier<Vertx> vertx,
