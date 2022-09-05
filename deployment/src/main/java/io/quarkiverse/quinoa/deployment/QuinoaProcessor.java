@@ -115,7 +115,7 @@ public class QuinoaProcessor {
 
         final PackageManager packageManager = quinoaDir.get().getPackageManager();
         final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
-        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.devServer.port.isPresent()) {
+        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.isDevServerMode()) {
             return null;
         }
         if (liveReload.isLiveReload()
@@ -170,7 +170,7 @@ public class QuinoaProcessor {
             QuinoaConfig quinoaConfig,
             Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (!quinoaDir.isPresent() || quinoaConfig.devServer.port.isPresent()) {
+        if (!quinoaDir.isPresent() || quinoaConfig.isDevServerMode()) {
             return;
         }
         scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);

@@ -12,8 +12,15 @@ public class DevServerConfig {
 
     /**
      * Enable external dev server (live coding).
+     * The "dev-server.port" config is required to communicate with the dev server.
+     * If not set the default is true.
+     */
+    @ConfigItem(name = ConfigItem.PARENT, defaultValue = "true")
+    public boolean enabled;
+
+    /**
+     * Port of the server to forward requests to.
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
-     * This defines the port of the server to forward requests to.
      * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
      */
     @ConfigItem
@@ -31,7 +38,7 @@ public class DevServerConfig {
 
     /**
      * Timeout in ms for the dev server to be up and running.
-     * If not set the default is ~30000ms
+     * If not set the default is ~30000ms.
      */
     @ConfigItem(defaultValue = "30000")
     public int checkTimeout;
@@ -51,12 +58,12 @@ public class DevServerConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         DevServerConfig that = (DevServerConfig) o;
-        return Objects.equals(port, that.port) && Objects.equals(checkPath, that.checkPath)
-                && Objects.equals(checkTimeout, that.checkTimeout) && Objects.equals(logs, that.logs);
+        return checkTimeout == that.checkTimeout && logs == that.logs && Objects.equals(enabled, that.enabled)
+                && Objects.equals(port, that.port) && Objects.equals(checkPath, that.checkPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(port, checkPath, checkTimeout, logs);
+        return Objects.hash(enabled, port, checkPath, checkTimeout, logs);
     }
 }

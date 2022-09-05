@@ -100,7 +100,7 @@ public class ForwardedDevProcessor {
             shutdown.addCloseTask(closeTask, true);
         }
 
-        if (quinoaConfig.devServer.port.isEmpty()) {
+        if (!quinoaConfig.isDevServerMode()) {
             return null;
         }
 
@@ -157,7 +157,7 @@ public class ForwardedDevProcessor {
             CoreVertxBuildItem vertx,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
-        if (quinoaConfig.devServer.port.isPresent() && devProxy.isPresent()) {
+        if (quinoaConfig.isDevServerMode() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
