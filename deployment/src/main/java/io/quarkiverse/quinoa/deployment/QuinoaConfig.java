@@ -117,6 +117,10 @@ public class QuinoaConfig {
     @ConfigItem
     public PackageManagerCommandsConfig packageManagerCommand;
 
+    public boolean isDevServerMode() {
+        return devServer.enabled && devServer.port.isPresent();
+    }
+
     public List<String> getNormalizedIgnoredPathPrefixes() {
         return ignoredPathPrefixes.orElseGet(() -> {
             Config config = ConfigProvider.getConfig();
