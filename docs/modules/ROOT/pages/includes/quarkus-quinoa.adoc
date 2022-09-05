@@ -1,3 +1,5 @@
+
+:summaryTableId: quarkus-quinoa
 [.configuration-legend]
 icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
 [.configuration-reference.searchable, cols="80,.^10,.^10"]
@@ -13,6 +15,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa]]`link:#q
 [.description]
 --
 Indicate if the extension should be enabled. Default is true if the Web UI directory exists and dev and prod mode. Default is false in test mode (to avoid building the Web UI during backend tests).
+
+Environment variable: `+++QUARKUS_QUINOA+++`
 --|boolean 
 |`disabled in test mode`
 
@@ -22,6 +26,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`
 [.description]
 --
 Path to the Web UI (node) root directory. If not set $++{++project.root++}++/src/main/webui/ will be used. otherwise the path will be considered relative to the project root.
+
+Environment variable: `+++QUARKUS_QUINOA_UI_DIR+++`
 --|string 
 |`src/main/webui`
 
@@ -31,6 +37,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir
 [.description]
 --
 Path of the directory which contains the Web UI built files (generated during the build). After the build, Quinoa will take the files from this directory, move them to target/quinoa-build (or build/quinoa-build with Gradle) and serve them at runtime. The path is relative to the Web UI path. If not set "build/" will be used
+
+Environment variable: `+++QUARKUS_QUINOA_BUILD_DIR+++`
 --|string 
 |`build/`
 
@@ -40,6 +48,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 [.description]
 --
 Name of the package manager binary. If not set, it will be auto-detected depending on the lockfile falling back to "npm". Only npm, pnpm and yarn are supported for the moment.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER+++`
 --|string 
 |`auto-detected with lockfile`
 
@@ -49,6 +59,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.index-pag
 [.description]
 --
 Name of the index page. If not set, "index.html" will be used.
+
+Environment variable: `+++QUARKUS_QUINOA_INDEX_PAGE+++`
 --|string 
 |`index.html`
 
@@ -58,6 +70,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.run-tests
 [.description]
 --
 Indicate if the Web UI should also be tested during the build phase (i.e: npm test). To be used in a `io.quarkus.test.junit.QuarkusTestProfile` to have Web UI test running during a `io.quarkus.test.junit.QuarkusTest` Default is false.
+
+Environment variable: `+++QUARKUS_QUINOA_RUN_TESTS+++`
 --|boolean 
 |`false`
 
@@ -67,6 +81,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.frozen-lo
 [.description]
 --
 Install the packages using a frozen lockfile. Don’t generate a lockfile and fail if an update is needed (useful in CI). If not set it is true if environment CI=true, else it is false.
+
+Environment variable: `+++QUARKUS_QUINOA_FROZEN_LOCKFILE+++`
 --|boolean 
 |`true if environment CI=true`
 
@@ -76,6 +92,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.force-ins
 [.description]
 --
 Force install packages before building. If not set, it will install packages only if the node_modules directory is absent or when the package.json is modified in dev-mode.
+
+Environment variable: `+++QUARKUS_QUINOA_FORCE_INSTALL+++`
 --|boolean 
 |`false`
 
@@ -85,6 +103,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-sp
 [.description]
 --
 Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the "index.html". Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. If not set, it is disabled.
+
+Environment variable: `+++QUARKUS_QUINOA_ENABLE_SPA_ROUTING+++`
 --|boolean 
 |`false`
 
@@ -94,15 +114,30 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ignored-p
 [.description]
 --
 List of path prefixes to be ignored by Quinoa. If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will be ignored.
+
+Environment variable: `+++QUARKUS_QUINOA_IGNORED_PATH_PREFIXES+++`
 --|list of string 
 |
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server[quarkus.quinoa.dev-server]`
+
+[.description]
+--
+Enable external dev server (live coding). The "dev-server.port" config is required to communicate with the dev server. If not set the default is true.
+
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER+++`
+--|boolean 
+|`true`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.port]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.port[quarkus.quinoa.dev-server.port]`
 
 [.description]
 --
-Enable external dev server (live coding). The dev server process (i.e npm start) is managed like a dev service by Quarkus. This defines the port of the server to forward requests to. If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
+Port of the server to forward requests to. The dev server process (i.e npm start) is managed like a dev service by Quarkus. If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
+
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_PORT+++`
 --|int 
 |
 
@@ -112,6 +147,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 [.description]
 --
 After start, Quinoa wait for the external dev server. by sending GET requests to this path waiting for a 200 status. If not set the default is "/". If empty string "", Quinoa will not check if the dev server is up.
+
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_CHECK_PATH+++`
 --|string 
 |`/`
 
@@ -120,7 +157,9 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 
 [.description]
 --
-Timeout in ms for the dev server to be up and running. If not set the default is ~30000ms
+Timeout in ms for the dev server to be up and running. If not set the default is ~30000ms.
+
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_CHECK_TIMEOUT+++`
 --|int 
 |`30000`
 
@@ -130,6 +169,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-serve
 [.description]
 --
 Enable external dev server live coding logs. This is not enabled by default because most dev servers display compilation errors directly in the browser. False if not set.
+
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_LOGS+++`
 --|boolean 
 |`false`
 
@@ -139,6 +180,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 [.description]
 --
 Custom command for installing all dependencies. e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL+++`
 --|string 
 |
 
@@ -148,6 +191,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 [.description]
 --
 Custom command for building the application.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD+++`
 --|string 
 |
 
@@ -157,6 +202,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 [.description]
 --
 Custom command for running tests for the application.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST+++`
 --|string 
 |
 
@@ -166,6 +213,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 [.description]
 --
 Custom command for starting the application in development mode.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV+++`
 --|string 
 |
 
@@ -174,7 +223,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV+++`
 --|`Map<String,String>` 
 |
 
@@ -183,7 +232,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD_ENV+++`
 --|`Map<String,String>` 
 |
 
@@ -192,7 +241,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST_ENV+++`
 --|`Map<String,String>` 
 |
 
@@ -201,7 +250,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV_ENV+++`
 --|`Map<String,String>` 
 |
 
