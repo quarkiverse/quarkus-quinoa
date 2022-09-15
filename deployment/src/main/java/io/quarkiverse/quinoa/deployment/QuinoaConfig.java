@@ -12,7 +12,8 @@ import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerCommandsConfig;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerCommandConfig;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstallConfig;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
@@ -57,6 +58,18 @@ public class QuinoaConfig {
      */
     @ConfigItem(defaultValueDocumentation = "auto-detected with lockfile")
     public Optional<String> packageManager;
+
+    /**
+     * Configuration for installing the package manager
+     */
+    @ConfigItem
+    public PackageManagerInstallConfig packageManagerInstall;
+
+    /**
+     * Configuration for overriding build commands
+     */
+    @ConfigItem
+    public PackageManagerCommandConfig packageManagerCommand;
 
     /**
      * Name of the index page.
@@ -111,12 +124,6 @@ public class QuinoaConfig {
     @ConfigItem
     public DevServerConfig devServer;
 
-    /**
-     * Configuration for overriding build commands
-     */
-    @ConfigItem
-    public PackageManagerCommandsConfig packageManagerCommand;
-
     public boolean isDevServerMode() {
         return devServer.enabled && devServer.port.isPresent();
     }
@@ -155,19 +162,18 @@ public class QuinoaConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         QuinoaConfig that = (QuinoaConfig) o;
-        return Objects.equals(enable, that.enable) && Objects.equals(uiDir, that.uiDir)
+        return runTests == that.runTests && forceInstall == that.forceInstall && enableSPARouting == that.enableSPARouting
+                && Objects.equals(enable, that.enable) && Objects.equals(uiDir, that.uiDir)
                 && Objects.equals(buildDir, that.buildDir) && Objects.equals(packageManager, that.packageManager)
-                && Objects.equals(indexPage, that.indexPage) && Objects.equals(runTests, that.runTests)
-                && Objects.equals(frozenLockfile, that.frozenLockfile) && Objects.equals(forceInstall, that.forceInstall)
-                && Objects.equals(enableSPARouting, that.enableSPARouting)
-                && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes)
-                && Objects.equals(devServer, that.devServer)
-                && Objects.equals(packageManagerCommand, that.packageManagerCommand);
+                && Objects.equals(packageManagerInstall, that.packageManagerInstall)
+                && Objects.equals(packageManagerCommand, that.packageManagerCommand)
+                && Objects.equals(indexPage, that.indexPage) && Objects.equals(frozenLockfile, that.frozenLockfile)
+                && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(devServer, that.devServer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enable, uiDir, buildDir, packageManager, indexPage, runTests, frozenLockfile, forceInstall,
-                enableSPARouting, ignoredPathPrefixes, devServer, packageManagerCommand);
+        return Objects.hash(enable, uiDir, buildDir, packageManager, packageManagerInstall, packageManagerCommand, indexPage,
+                runTests, frozenLockfile, forceInstall, enableSPARouting, ignoredPathPrefixes, devServer);
     }
 }

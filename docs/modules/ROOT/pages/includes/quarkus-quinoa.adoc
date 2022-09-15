@@ -54,6 +54,127 @@ Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER+++`
 |`auto-detected with lockfile`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install[quarkus.quinoa.package-manager-install]`
+
+[.description]
+--
+Enable Package Manager Installation. This will override "package-manager" config. Set "quarkus.quinoa.package-manager-command.prepend-binary=true" when using with custom commands
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL+++`
+--|boolean 
+|`false`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.install-dir]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.install-dir[quarkus.quinoa.package-manager-install.install-dir]`
+
+[.description]
+--
+The directory where NodeJS should be installed, it will be installed in a node/ sub-directory. Default is $++{++project.root++}++
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_INSTALL_DIR+++`
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.node-version]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.node-version[quarkus.quinoa.package-manager-install.node-version]`
+
+[.description]
+--
+The NodeJS Version to install locally to the project. Required when package-manager-install is enabled.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_NODE_VERSION+++`
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.node-download-root]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.node-download-root[quarkus.quinoa.package-manager-install.node-download-root]`
+
+[.description]
+--
+Where to download NodeJS from.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_NODE_DOWNLOAD_ROOT+++`
+--|string 
+|`https://nodejs.org/dist/`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.npm-version]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.npm-version[quarkus.quinoa.package-manager-install.npm-version]`
+
+[.description]
+--
+The NPM version to install. By default, the version is provided by NodeJS.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_NPM_VERSION+++`
+--|string 
+|`provided`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.npm-download-root]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.npm-download-root[quarkus.quinoa.package-manager-install.npm-download-root]`
+
+[.description]
+--
+Where to download NPM from.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_NPM_DOWNLOAD_ROOT+++`
+--|string 
+|`https://registry.npmjs.org/npm/-/`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.prepend-binary]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.prepend-binary[quarkus.quinoa.package-manager-command.prepend-binary]`
+
+[.description]
+--
+If true, the package manager binary will be prepended by Quinoa (Only configure the arguments in the different commands as the binary will be prepended). e.g. «quarkus.quinoa.package-manager-command.install=ci --cache $CACHE_DIR/.npm --prefer-offline» Else, the command should also contain the binary.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_PREPEND_BINARY+++`
+--|boolean 
+|`false`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install[quarkus.quinoa.package-manager-command.install]`
+
+[.description]
+--
+Custom command for installing all dependencies. e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL+++`
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.build]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.build[quarkus.quinoa.package-manager-command.build]`
+
+[.description]
+--
+Custom command for building the application.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD+++`
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.test]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.test[quarkus.quinoa.package-manager-command.test]`
+
+[.description]
+--
+Custom command for running tests for the application.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST+++`
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.dev]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.dev[quarkus.quinoa.package-manager-command.dev]`
+
+[.description]
+--
+Custom command for starting the application in development mode.
+
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV+++`
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.index-page]]`link:#quarkus-quinoa_quarkus.quinoa.index-page[quarkus.quinoa.index-page]`
 
 [.description]
@@ -173,50 +294,6 @@ Enable external dev server live coding logs. This is not enabled by default beca
 Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_LOGS+++`
 --|boolean 
 |`false`
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install[quarkus.quinoa.package-manager-command.install]`
-
-[.description]
---
-Custom command for installing all dependencies. e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»
-
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL+++`
---|string 
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.build]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.build[quarkus.quinoa.package-manager-command.build]`
-
-[.description]
---
-Custom command for building the application.
-
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD+++`
---|string 
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.test]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.test[quarkus.quinoa.package-manager-command.test]`
-
-[.description]
---
-Custom command for running tests for the application.
-
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST+++`
---|string 
-|
-
-
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.dev]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.dev[quarkus.quinoa.package-manager-command.dev]`
-
-[.description]
---
-Custom command for starting the application in development mode.
-
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV+++`
---|string 
-|
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env[quarkus.quinoa.package-manager-command.install-env]`

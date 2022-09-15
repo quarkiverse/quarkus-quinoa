@@ -9,9 +9,10 @@ import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaNoPackageJsonTest {
+    private static final String NAME = "no-package-json";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create().toQuarkusUnitTest()
+    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ui-dir", "src/test/empty-webui")
             .assertException(e -> {
                 assertThat(e).hasMessage("No package.json found in Web UI directory: 'src/test/empty-webui'");

@@ -23,6 +23,8 @@ import io.quarkus.runtime.LaunchMode;
 
 public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
+    private static final String OS_NAME = System.getProperty("os.name");
+    private static final boolean IS_WINDOWS = OS_NAME != null && OS_NAME.startsWith("Windows");
 
     private final Path directory;
     private final PackageManagerCommands packageManagerCommands;
@@ -124,7 +126,7 @@ public class PackageManager {
     }
 
     public static PackageManager autoDetectPackageManager(Optional<String> binary,
-            PackageManagerCommandsConfig packageManagerCommands, Path directory) {
+            PackageManagerCommandConfig packageManagerCommands, Path directory) {
         String resolved = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
@@ -134,8 +136,7 @@ public class PackageManager {
             } else {
                 resolved = NPMPackageManagerCommands.npm;
             }
-            final String os = System.getProperty("os.name");
-            if (os != null && os.startsWith("Windows")) {
+            if (isWindows()) {
                 resolved = resolved + ".cmd";
             }
         } else {
@@ -144,7 +145,11 @@ public class PackageManager {
         return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands));
     }
 
-    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandsConfig packageManagerCommands) {
+    public static boolean isWindows() {
+        return IS_WINDOWS;
+    }
+
+    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands) {
         if (binary.contains(PNPMPackageManagerCommands.pnpm)) {
             return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands);
         }
