@@ -1,6 +1,6 @@
 package io.quarkiverse.quinoa.test.devmode;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.containsString;
 
 import org.hamcrest.Matchers;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -27,14 +27,14 @@ public class ForwardedDevModeCompressionTest {
         RestAssured.when().get("/").then()
                 .statusCode(200)
                 .header("Content-Encoding", "gzip")
-                .body(is("live-coding\n"));
+                .body(containsString("live-coding"));
         RestAssured.when().get("/some-file.js").then()
                 .statusCode(200)
                 .header("Content-Encoding", "gzip")
-                .body(is("live-coding\n"));
+                .body(containsString("live-coding"));
         RestAssured.when().get("/some-file.svg").then()
                 .statusCode(200)
                 .header("Content-Encoding", Matchers.nullValue())
-                .body(is("live-coding\n"));
+                .body(containsString("live-coding"));
     }
 }

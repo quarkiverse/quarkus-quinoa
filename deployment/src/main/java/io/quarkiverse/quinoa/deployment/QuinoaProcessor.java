@@ -4,6 +4,7 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.autoDetectPackageManager;
+import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.install;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.File;
@@ -90,7 +91,12 @@ public class QuinoaProcessor {
             throw new ConfigurationException(
                     "No package.json found in Web UI directory: '" + configuredDir + "'");
         }
-        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager,
+        Optional<String> packageManagerBinary = quinoaConfig.packageManager;
+        if (quinoaConfig.packageManagerInstall.enabled) {
+            final String result = install(quinoaConfig.packageManagerInstall, uiDirEntry.getValue());
+            packageManagerBinary = Optional.of(result);
+        }
+        PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
                 quinoaConfig.packageManagerCommand, uiDirEntry.getKey());
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
@@ -131,7 +137,7 @@ public class QuinoaProcessor {
         final String configuredBuildDir = quinoaConfig.buildDir;
         final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
-            throw new ConfigurationException("Quinoa build directory not found: '" + configuredBuildDir + "'",
+            throw new ConfigurationException("Quinoa build directory not found: '" + buildDir + "'",
                     Set.of("quarkus.quinoa.build-dir"));
         }
         final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);

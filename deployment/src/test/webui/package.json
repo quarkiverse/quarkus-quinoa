@@ -4,15 +4,20 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mkdir -p build && echo $MODE > build/index.html && cp -R public/* build/",
-    "build2": "mkdir -p build && echo $BUILD > build/index.html && cp -R public/* build/",
-    "start": "MODE=live-coding npm run build && node server.js",
-    "postinstall": "echo \"hello\" > node_modules/installed"
+    "build": "mkdirp build && cross-env-shell \"echo $MODE>build/index.html\" && copyfiles -u 1 public/* build/",
+    "build-something": "mkdirp build && cross-env-shell \"echo $BUILD>build/index.html\" && copyfiles -u 1 public/* build/",
+    "start": "cross-env MODE=live-coding npm run build && node server.js",
+    "postinstall": "echo hello> node_modules/installed"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "cross-env": "7.0.3",
+    "copyfiles": "2.4.1",
+    "mkdirp": "1.0.4"
   }
 }

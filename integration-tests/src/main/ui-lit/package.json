@@ -3,9 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "build:prod": "webpack --mode=production",
-        "build:dev": "webpack --mode=development",
-        "build:auto": "echo $FOO; if [[ $MODE == \"dev\" ]]; then npm run build:dev; else npm run build:prod; fi",
+        "build-per-env:production": "webpack --mode=production",
+        "build-per-env:development": "webpack --mode=development",
+        "build-per-env": "by-node-env",
         "test": ""
     },
     "dependencies": {
@@ -17,6 +17,8 @@
     "devDependencies": {
         "copy-webpack-plugin": "^10.2.4",
         "webpack": "^5.70.0",
-        "webpack-cli": "^4.9.2"
+        "webpack-cli": "^4.9.2",
+        "by-node-env": "^2.0.1",
+        "cross-env": "^7.0.3"
     }
 }

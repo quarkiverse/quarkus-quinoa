@@ -40,9 +40,9 @@ See link:#dev-server[Enable the proxied live coding].
 
 == Prerequisite
 
-* Install NodeJS (https://nodejs.org/)
 * Create or use an existing Quarkus application
 * Add the Quinoa extension
+* Install NodeJS (https://nodejs.org/) or make sure Quinoa is link:#package-manager-install[configured] to install it.
 
 [#installation]
 == Installation
@@ -136,25 +136,43 @@ Add a `build` script in the `package.json` to generate your web application inde
 NOTE: The build directory will automatically be *moved* by Quinoa to `target/quinoa-build` when using Maven (`build/quinoa-build` with Gradle) in order to be served.
 
 [#build-mode]
-You can differentiate dev from production builds using the `MODE` environment variable (`dev`, `prod`, `test`):
+You can differentiate development from production builds using the environment variable `NODE_ENV` (`production`/`development`). https://www.npmjs.com/package/by-node-env[by-node-env] can help you if you have different build commands:
 [source,json]
 ----
- "scripts": {
-        "build": "if [[ $MODE == \"dev\" ]]; then webpack --mode=development; else webpack --mode=production; fi",
-  },
+"scripts": {
+  "build": "by-node-env",
+  "build:development": "...",
+  "build:production": "...",
+},
+"devDependencies": {
+  "by-node-env": "~2.0.1"
+}
 ----
 
 [#package-manager]
 === Package manager
 
-It is not necessary (but possible) to configure the package manager (NPM, Yarn or PNPM), it will be auto-detected depending on the project lockfile, NPM is the fallback:
+[#package-manager-install]
+Quinoa can be configured to install NodeJS and NPM in the project directory:
+[source,properties]
+----
+quarkus.quinoa.package-manager-install=true <1>
+quarkus.quinoa.package-manager-install.node-version=16.17.0 <2>
+----
+
+<1> Enable package manager install
+<2> Define the version of NodeJS to install
+
+NOTE: By default, NodeJS and NPM will be installed in `{project-dir}/node/`. If not specified, it will use the NPM version provided by NodeJS.
+
+If NodeJS and NPM are not installed by Quinoa, it is possible to override the package manager (NPM, Yarn or PNPM), otherwise, it will be auto-detected depending on the project lockfile (NPM is the fallback):
 
 * Use `quarkus.quinoa.package-manager` if present
 * Else if `yarn.lock` then *Yarn*
 * Else if `pnpm-lock.yaml` then *PNPM*
 * Else *NPM*
 
-NOTE: Quinoa is configured with the commands to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
+NOTE: By default, Quinoa is configured with the commands to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
 
 [#install-packages]
 === Node packages installation (node_modules)
@@ -206,6 +224,8 @@ quarkus.quinoa.package-manager-command.build-env.BUILD=value # <2>
 <2> set environment variable `BUILD` with value `value`. Environment variables set in config can be added to the  link:#package-manager-commands[listed commands].
 
 WARNING: Using custom commands will override `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile`.
+
+WARNING: if NodeJS is installed by Quinoa, you need to enable: `quarkus.quinoa.package-manager-command.prepend-binary` and adapt the command to only specify the arguments (the binary to call will be prepended by Quinoa).
 
 [#dev-server]
 === UI live-coding dev server (proxy mode)

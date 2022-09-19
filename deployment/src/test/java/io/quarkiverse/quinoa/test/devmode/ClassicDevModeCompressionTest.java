@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.test.devmode;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matchers;
@@ -26,7 +27,7 @@ public class ClassicDevModeCompressionTest {
         RestAssured.when().get("/").then()
                 .statusCode(200)
                 .header("Content-Encoding", "gzip")
-                .body(is("dev\n"));
+                .body(containsString("dev"));
         RestAssured.when().get("/some-page.html").then()
                 .statusCode(200)
                 .header("Content-Encoding", "gzip")

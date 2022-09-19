@@ -9,56 +9,65 @@ import io.quarkus.runtime.annotations.ConfigItem;
 import io.smallrye.config.ConfigMapping;
 
 @ConfigGroup
-public class PackageManagerCommandsConfig {
+public class PackageManagerCommandConfig {
+
+    /**
+     * If true, the package manager binary will be prepended by Quinoa (Only configure the arguments
+     * in the different commands as the binary will be prepended).
+     * e.g. «quarkus.quinoa.package-manager-command.install=ci --cache $CACHE_DIR/.npm --prefer-offline»
+     * Else, the command should also contain the binary.
+     */
+    @ConfigItem
+    public boolean prependBinary;
 
     /**
      * Custom command for installing all dependencies.
      * e.g. «npm ci --cache $CACHE_DIR/.npm --prefer-offline»
      */
     @ConfigItem
-    Optional<String> install;
+    public Optional<String> install;
 
     /**
      * Environment variables for install command execution.
      */
     @ConfigMapping
-    Map<String, String> installEnv;
+    public Map<String, String> installEnv;
 
     /**
      * Custom command for building the application.
      */
     @ConfigItem
-    Optional<String> build;
+    public Optional<String> build;
 
     /**
      * Environment variables for build command execution.
      */
     @ConfigMapping
-    Map<String, String> buildEnv;
+    public Map<String, String> buildEnv;
 
     /**
      * Custom command for running tests for the application.
      */
     @ConfigItem
-    Optional<String> test;
+    public Optional<String> test;
 
     /**
      * Environment variables for test command execution.
      */
     @ConfigMapping
-    Map<String, String> testEnv;
+    public Map<String, String> testEnv;
 
     /**
      * Custom command for starting the application in development mode.
      */
     @ConfigItem
-    Optional<String> dev;
+    public Optional<String> dev;
 
     /**
      * Environment variables for development command execution.
      */
     @ConfigMapping
-    Map<String, String> devEnv;
+    public Map<String, String> devEnv;
 
     @Override
     public boolean equals(Object o) {
@@ -66,7 +75,7 @@ public class PackageManagerCommandsConfig {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-        PackageManagerCommandsConfig that = (PackageManagerCommandsConfig) o;
+        PackageManagerCommandConfig that = (PackageManagerCommandConfig) o;
         return Objects.equals(install, that.install) && Objects.equals(installEnv, that.installEnv)
                 && Objects.equals(build, that.build) && Objects.equals(buildEnv, that.buildEnv)
                 && Objects.equals(test, that.test) && Objects.equals(testEnv, that.testEnv) && Objects.equals(dev, that.dev)
