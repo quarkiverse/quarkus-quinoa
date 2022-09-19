@@ -19,7 +19,7 @@ metadata:
   guide: https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/index.html
   categories:
     - "web"
-  status: "experimental"
+  status: "preview"
   codestart:
     name: "quinoa"
     languages:
