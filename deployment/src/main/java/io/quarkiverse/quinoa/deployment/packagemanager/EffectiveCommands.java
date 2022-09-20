@@ -2,14 +2,15 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import io.quarkus.runtime.LaunchMode;
 
 class EffectiveCommands implements PackageManagerCommands {
     private final PackageManagerCommands defaultCommands;
-    private final PackageManagerCommandsConfig commandsConfig;
+    private final PackageManagerCommandConfig commandsConfig;
 
-    EffectiveCommands(PackageManagerCommands defaultCommands, PackageManagerCommandsConfig commandsConfig) {
+    EffectiveCommands(PackageManagerCommands defaultCommands, PackageManagerCommandConfig commandsConfig) {
         this.defaultCommands = defaultCommands;
         this.commandsConfig = commandsConfig;
     }
@@ -19,7 +20,8 @@ class EffectiveCommands implements PackageManagerCommands {
         Command c = defaultCommands.install(frozenLockfile);
         return new Command(
                 environment(c, commandsConfig.installEnv),
-                commandsConfig.install.orElse(c.commandWithArguments));
+                getCustomCommandWithArguments(commandsConfig.install)
+                        .orElse(c.commandWithArguments));
     }
 
     @Override
@@ -32,7 +34,8 @@ class EffectiveCommands implements PackageManagerCommands {
         Command c = defaultCommands.build(mode);
         return new Command(
                 environment(c, commandsConfig.buildEnv),
-                commandsConfig.build.orElse(c.commandWithArguments));
+                getCustomCommandWithArguments(commandsConfig.build)
+                        .orElse(c.commandWithArguments));
     }
 
     @Override
@@ -40,7 +43,8 @@ class EffectiveCommands implements PackageManagerCommands {
         Command c = defaultCommands.test();
         return new Command(
                 environment(c, commandsConfig.testEnv),
-                commandsConfig.test.orElse(c.commandWithArguments));
+                getCustomCommandWithArguments(commandsConfig.test)
+                        .orElse(c.commandWithArguments));
     }
 
     @Override
@@ -48,7 +52,13 @@ class EffectiveCommands implements PackageManagerCommands {
         Command c = defaultCommands.dev();
         return new Command(
                 environment(c, commandsConfig.devEnv),
-                commandsConfig.dev.orElse(c.commandWithArguments));
+                getCustomCommandWithArguments(commandsConfig.dev)
+                        .orElse(c.commandWithArguments));
+    }
+
+    private Optional<String> getCustomCommandWithArguments(Optional<String> command) {
+        return command
+                .map(a -> commandsConfig.prependBinary ? defaultCommands.binary() + " " + a : a);
     }
 
     private Map<String, String> environment(Command c, Map<String, String> override) {

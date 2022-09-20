@@ -2,7 +2,6 @@ package io.quarkiverse.quinoa.deployment;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 import static io.quarkus.deployment.dev.testing.MessageFormat.RESET;
 import static java.lang.String.join;
@@ -110,8 +109,7 @@ public class ForwardedDevProcessor {
                 loggingSetup,
                 PROCESS_THREAD_PREDICATE);
 
-        PackageManager packageManager = autoDetectPackageManager(quinoaConfig.packageManager,
-                quinoaConfig.packageManagerCommand, quinoaDir.get().getDirectory());
+        PackageManager packageManager = quinoaDir.get().getPackageManager();
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
             final int devServerPort = quinoaConfig.devServer.port.getAsInt();

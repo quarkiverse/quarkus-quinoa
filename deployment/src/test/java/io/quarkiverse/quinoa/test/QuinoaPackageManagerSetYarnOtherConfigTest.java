@@ -9,14 +9,14 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaPackageManagerYarnConfigBinaryTest {
+public class QuinoaPackageManagerSetYarnOtherConfigTest {
+    private static final String NAME = "package-manager-set-yarn-other";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create()
-            .initialLockFile(YARN)
+    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
+            .initialLockfile(YARN)
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager", "yarn.binary")
-            .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertException(e -> {
                 assertThat(e).hasMessage("Error in Quinoa while running package manager install command: yarn.binary install");
             });

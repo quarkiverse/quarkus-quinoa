@@ -1,4 +1,7 @@
 quarkus:
   quinoa:
+    package-manager-install:
+      ~: true
+      node-version: 16.17.0
     dev-server:
       port: 3000

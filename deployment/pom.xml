@@ -18,6 +18,11 @@
       <artifactId>quarkus-resteasy-reactive-server-spi-deployment</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.eirslett</groupId>
+      <artifactId>frontend-plugin-core</artifactId>
+      <version>${frontend-plugin.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkiverse.quinoa</groupId>
       <artifactId>quarkus-quinoa</artifactId>
       <version>${project.version}</version>
