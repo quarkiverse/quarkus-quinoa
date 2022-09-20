@@ -85,7 +85,7 @@ quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 [#getting-started]
 == Getting Started
 
-Create a Web UI directory in `src/main/webui`. This directory will contain your NodeJS Web application code with a `package.json`. The location is configurable, the directory could be outside the Quarkus project as long as the files are available at build time.
+If not yet created by the tooling, you will need  a Web UI directory in `src/main/webui`. This directory will contain your NodeJS Web application code with a `package.json`. The location is configurable, the directory could be outside the Quarkus project as long as the files are available at build time.
 [source,properties]
 ----
 quarkus.quinoa.ui-dir=../my-webui
