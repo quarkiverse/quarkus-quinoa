@@ -24,7 +24,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>2.12.3.Final</quarkus.version>
-    <playright.version>1.25.0</playright.version>
+    <playright.version>1.26.0</playright.version>
     <assertj.version>3.23.1</assertj.version>
     <frontend-plugin.version>1.12.1</frontend-plugin.version>
   </properties>
