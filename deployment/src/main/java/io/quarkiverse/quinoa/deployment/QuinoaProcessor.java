@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.jboss.logging.Logger;
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.builder.BuildException;
 import io.quarkus.deployment.IsNormal;
@@ -92,12 +94,15 @@ public class QuinoaProcessor {
                     "No package.json found in Web UI directory: '" + configuredDir + "'");
         }
         Optional<String> packageManagerBinary = quinoaConfig.packageManager;
+        List<String> paths = new ArrayList<>();
         if (quinoaConfig.packageManagerInstall.enabled) {
-            final String result = install(quinoaConfig.packageManagerInstall, uiDirEntry.getValue());
-            packageManagerBinary = Optional.of(result);
+            final PackageManagerInstall.Installation result = install(quinoaConfig.packageManagerInstall,
+                    uiDirEntry.getValue());
+            packageManagerBinary = Optional.of(result.getPackageManagerBinary());
+            paths.add(result.getNodePath());
         }
         PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
-                quinoaConfig.packageManagerCommand, uiDirEntry.getKey());
+                quinoaConfig.packageManagerCommand, uiDirEntry.getKey(), paths);
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));

@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -126,7 +127,7 @@ public class PackageManager {
     }
 
     public static PackageManager autoDetectPackageManager(Optional<String> binary,
-            PackageManagerCommandConfig packageManagerCommands, Path directory) {
+            PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths) {
         String resolved = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
@@ -142,22 +143,23 @@ public class PackageManager {
         } else {
             resolved = binary.get();
         }
-        return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands));
+        return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands, paths));
     }
 
     public static boolean isWindows() {
         return IS_WINDOWS;
     }
 
-    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands) {
+    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands,
+            List<String> paths) {
         if (binary.contains(PNPMPackageManagerCommands.pnpm)) {
-            return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands);
+            return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands, paths);
         }
         if (binary.contains(NPMPackageManagerCommands.npm)) {
-            return new EffectiveCommands(new NPMPackageManagerCommands(binary), packageManagerCommands);
+            return new EffectiveCommands(new NPMPackageManagerCommands(binary), packageManagerCommands, paths);
         }
         if (binary.contains(YarnPackageManagerCommands.yarn)) {
-            return new EffectiveCommands(new YarnPackageManagerCommands(binary), packageManagerCommands);
+            return new EffectiveCommands(new YarnPackageManagerCommands(binary), packageManagerCommands, paths);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
     }

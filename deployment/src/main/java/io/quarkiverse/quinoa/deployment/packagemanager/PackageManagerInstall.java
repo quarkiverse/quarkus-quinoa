@@ -13,15 +13,15 @@ import com.github.eirslett.maven.plugins.frontend.lib.ProxyConfig;
 import io.quarkus.runtime.configuration.ConfigurationException;
 
 public final class PackageManagerInstall {
-    private static final String INSTALL_PATH = "node";
-    private static final String NODE_PATH = INSTALL_PATH + "/node";
-    private static final String NPM_PATH = INSTALL_PATH + "/node_modules/npm/bin/npm-cli.js";
+    private static final String INSTALL_SUB_PATH = "node";
+    private static final String NODE_BINARY = PackageManager.isWindows() ? "node.exe" : "node";
+    private static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
 
     private PackageManagerInstall() {
 
     }
 
-    public static String install(PackageManagerInstallConfig config, final Path projectDirectory) {
+    public static Installation install(PackageManagerInstallConfig config, final Path projectDirectory) {
         final Path installDirPath = projectDirectory.resolve(config.installDir.orElse(""));
         final File installDirFile = installDirPath.toFile();
         FrontendPluginFactory factory = new FrontendPluginFactory(installDirFile, installDirFile);
@@ -53,18 +53,36 @@ public final class PackageManagerInstall {
         }
     }
 
-    private static String resolveInstalledNpmBinary(Path installDirectory) {
-        final Path nodePath = installDirectory.resolve(NODE_PATH)
+    private static Installation resolveInstalledNpmBinary(Path installDirectory) {
+        final Path nodeBinPath = installDirectory.resolve(INSTALL_SUB_PATH)
                 .toAbsolutePath();
         final Path npmPath = installDirectory.resolve(NPM_PATH).toAbsolutePath();
-        if (PackageManager.isWindows()) {
-            return convertToWindowsPath(nodePath + ".exe " + npmPath);
-        }
-        return nodePath + " " + npmPath;
+        final String platformNodeBinPath = convertToWindowsPathIfNeeded(nodeBinPath.toString());
+        final String platformNPMPath = convertToWindowsPathIfNeeded(npmPath.toString());
+        final String packageManagerBinary = NODE_BINARY + " " + platformNPMPath;
+        return new Installation(platformNodeBinPath, packageManagerBinary);
     }
 
-    public static String convertToWindowsPath(String path) {
-        return path.replaceAll("/", "\\\\");
+    public static String convertToWindowsPathIfNeeded(String path) {
+        return PackageManager.isWindows() ? path.replaceAll("/", "\\\\") : path;
+    }
+
+    public static class Installation {
+        private final String nodePath;
+        private final String packageManagerBinary;
+
+        public Installation(String nodePath, String packageManagerBinary) {
+            this.nodePath = nodePath;
+            this.packageManagerBinary = packageManagerBinary;
+        }
+
+        public String getNodePath() {
+            return nodePath;
+        }
+
+        public String getPackageManagerBinary() {
+            return packageManagerBinary;
+        }
     }
 
 }
