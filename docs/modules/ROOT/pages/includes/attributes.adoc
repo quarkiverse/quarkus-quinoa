@@ -1,5 +1,5 @@
-:quarkus-version: 2.12.2.Final
-:quarkus-quinoa-version: 1.2.0
+:quarkus-version: 2.12.3.Final
+:quarkus-quinoa-version: 1.2.1
 :maven-version: 3.8.1+
 
 :quarkus-org-url: https://github.com/quarkusio
