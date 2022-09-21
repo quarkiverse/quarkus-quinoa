@@ -1,6 +1,5 @@
 package io.quarkiverse.quinoa.test;
 
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.convertToWindowsPath;
 import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.getWebUITestDirPath;
 import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.isWindows;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,6 +9,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -39,7 +39,7 @@ public class QuinoaPackageManagerInstallPrependBinaryTest {
     }
 
     private static String convertToWindowsPathIfNeeded(String path) {
-        return isWindows() ? convertToWindowsPath(path) : path;
+        return isWindows() ? PackageManagerInstall.convertToWindowsPathIfNeeded(path) : path;
     }
 
 }
