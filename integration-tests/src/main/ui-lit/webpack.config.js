@@ -12,6 +12,6 @@ module.exports = {
                 { from: 'public' }
             ]
         }),
-        new EnvironmentPlugin(['FOO'])
+        new EnvironmentPlugin(['FOO', 'ROOT_PATH'])
     ]
 };

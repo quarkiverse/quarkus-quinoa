@@ -1,5 +1,7 @@
 import {html, css, LitElement} from 'lit';
 
+const ROOT_PATH = process.env.ROOT_PATH;
+
 export class SimpleGreeting extends LitElement {
     static styles = css`p { color: blue }`;
 
@@ -13,8 +15,9 @@ export class SimpleGreeting extends LitElement {
     }
 
     render() {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", "/api/quinoa", false );
+        const xmlHttp = new XMLHttpRequest();
+
+        xmlHttp.open( "GET", `${ROOT_PATH}api/quinoa`, false );
         xmlHttp.send( null );
         const response = xmlHttp.responseText;
         return html`<p class="greeting">${response} and ${this.name} and ${process.env.FOO}</p>`;
