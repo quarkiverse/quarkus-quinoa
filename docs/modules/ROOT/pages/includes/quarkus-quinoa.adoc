@@ -94,7 +94,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-The directory where NodeJS should be installed, it will be installed in a node/ sub-directory. Default is $++{++project.root++}++
+The directory where NodeJS should be installed, it will be installed in a node/ sub-directory. Default is $++{++project.root++}++/.quinoa
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_INSTALL_DIR+++[]
@@ -103,7 +103,7 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_INSTALL_DIR+++`
 endif::add-copy-button-to-env-var[]
 --|string 
-|
+|`.quinoa/`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.node-version]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.node-version[quarkus.quinoa.package-manager-install.node-version]`
