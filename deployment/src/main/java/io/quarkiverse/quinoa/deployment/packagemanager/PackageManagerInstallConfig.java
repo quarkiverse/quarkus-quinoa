@@ -21,10 +21,10 @@ public class PackageManagerInstallConfig {
     /**
      * The directory where NodeJS should be installed,
      * it will be installed in a node/ sub-directory.
-     * Default is ${project.root}
+     * Default is ${project.root}/.quinoa
      */
-    @ConfigItem
-    public Optional<String> installDir;
+    @ConfigItem(defaultValue = ".quinoa/")
+    public String installDir;
 
     /**
      * The NodeJS Version to install locally to the project.

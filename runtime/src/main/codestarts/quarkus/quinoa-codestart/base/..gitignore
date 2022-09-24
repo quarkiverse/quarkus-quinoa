@@ -2,4 +2,4 @@
 node_modules/
 build/
 dist/
-node/
+.quinoa/

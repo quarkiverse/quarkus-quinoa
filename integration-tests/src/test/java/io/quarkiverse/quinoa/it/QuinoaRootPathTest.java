@@ -23,7 +23,7 @@ public class QuinoaRootPathTest {
     @QuarkusPlaywrightManager.InjectPlaywright
     BrowserContext context;
 
-    @TestHTTPResource("/foo/bar/")
+    @TestHTTPResource("/")
     URL url;
 
     @Test

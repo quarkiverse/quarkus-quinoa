@@ -22,9 +22,9 @@ public final class PackageManagerInstall {
     }
 
     public static Installation install(PackageManagerInstallConfig config, final Path projectDirectory) {
-        final Path installDirPath = projectDirectory.resolve(config.installDir.orElse(""));
+        final Path installDirPath = projectDirectory.resolve(config.installDir.trim());
         final File installDirFile = installDirPath.toFile();
-        FrontendPluginFactory factory = new FrontendPluginFactory(installDirFile, installDirFile);
+        FrontendPluginFactory factory = new FrontendPluginFactory(projectDirectory.toFile(), installDirFile);
         if (!config.nodeVersion.isPresent()) {
             throw new ConfigurationException("node-version is required to install package manager",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
