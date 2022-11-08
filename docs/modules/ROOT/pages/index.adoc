@@ -287,6 +287,36 @@ Edit the karma.conf.js:
 },
 ----
 
+[#vite]
+=== Vite
+Any app created with Vite (https://vitejs.dev/guide/) should work with Quinoa after the following changes:
+
+In application.properties add:
+[source,properties]
+----
+quarkus.quinoa.dev-server.port=5173
+quarkus.quinoa.build-dir=dist
+----
+
+Add start script to package.json
+[source,json]
+----
+  "scripts": {
+    ...
+    "start": "vite"
+  },
+----
+
+To make hot module replacement work, add the following to the config object in vite.config.js:
+[source,javascript]
+----
+server: {
+    hmr: {
+        port: 5173
+    }
+}
+----
+
 [#spa-routing]
 === Single Page application routing
 
