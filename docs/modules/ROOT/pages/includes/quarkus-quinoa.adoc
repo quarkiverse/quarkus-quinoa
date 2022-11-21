@@ -26,11 +26,27 @@ endif::add-copy-button-to-env-var[]
 |`disabled in test mode`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.just-build]]`link:#quarkus-quinoa_quarkus.quinoa.just-build[quarkus.quinoa.just-build]`
+
+[.description]
+--
+Indicate if Quinoa should just do the build part. If true, Quinoa will NOT serve the Web UI built resources. This is handy when the output of the build is used to be served via something else (nginx, cdn, ...) Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build with Gradle). Default is false.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_JUST_BUILD+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_JUST_BUILD+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`false`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`link:#quarkus-quinoa_quarkus.quinoa.ui-dir[quarkus.quinoa.ui-dir]`
 
 [.description]
 --
-Path to the Web UI (node) root directory. If not set $++{++project.root++}++/src/main/webui/ will be used. otherwise the path will be considered relative to the project root.
+Path to the Web UI (NodeJS) root directory. If not set $++{++project.root++}++/src/main/webui/ will be used. otherwise the path will be considered relative to the project root.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_UI_DIR+++[]
@@ -46,7 +62,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir
 
 [.description]
 --
-Path of the directory which contains the Web UI built files (generated during the build). After the build, Quinoa will take the files from this directory, move them to target/quinoa-build (or build/quinoa-build with Gradle) and serve them at runtime. The path is relative to the Web UI path. If not set "build/" will be used
+This the Web UI internal build system (webpack, ...) output directory. After the build, Quinoa will take the files from this directory, move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and serve them at runtime. The path is relative to the Web UI path. If not set "build/" will be used
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_BUILD_DIR+++[]
