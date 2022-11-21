@@ -34,7 +34,19 @@ public class QuinoaConfig {
     Optional<Boolean> enable;
 
     /**
-     * Path to the Web UI (node) root directory.
+     * Indicate if Quinoa should just do the build part.
+     * If true, Quinoa will NOT serve the Web UI built resources.
+     * This is handy when the output of the build is used
+     * to be served via something else (nginx, cdn, ...)
+     * Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build with Gradle).
+     *
+     * Default is false.
+     */
+    @ConfigItem
+    public boolean justBuild;
+
+    /**
+     * Path to the Web UI (NodeJS) root directory.
      * If not set ${project.root}/src/main/webui/ will be used.
      * otherwise the path will be considered relative to the project root.
      */
@@ -42,9 +54,9 @@ public class QuinoaConfig {
     public String uiDir;
 
     /**
-     * Path of the directory which contains the Web UI built files (generated during the build).
+     * This the Web UI internal build system (webpack, ...) output directory.
      * After the build, Quinoa will take the files from this directory,
-     * move them to target/quinoa-build (or build/quinoa-build with Gradle) and serve them at runtime.
+     * move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and serve them at runtime.
      * The path is relative to the Web UI path.
      * If not set "build/" will be used
      */

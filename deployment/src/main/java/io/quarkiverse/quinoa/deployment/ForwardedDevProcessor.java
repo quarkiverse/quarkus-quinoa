@@ -155,6 +155,10 @@ public class ForwardedDevProcessor {
             CoreVertxBuildItem vertx,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
+        if (quinoaConfig.justBuild) {
+            LOG.info("Quinoa is in build only mode");
+            return;
+        }
         if (quinoaConfig.isDevServerMode() && devProxy.isPresent()) {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);

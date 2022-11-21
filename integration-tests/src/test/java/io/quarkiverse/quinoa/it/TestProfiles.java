@@ -18,6 +18,13 @@ public class TestProfiles {
         }
     }
 
+    public static class ReactJustBuildTests extends QuinoaTestProfiles.Enable {
+        @Override
+        public String getConfigProfile() {
+            return "react-just-build";
+        }
+    }
+
     public static class AngularTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {

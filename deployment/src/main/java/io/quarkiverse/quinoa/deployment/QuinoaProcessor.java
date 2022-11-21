@@ -200,6 +200,10 @@ public class QuinoaProcessor {
             BuildProducer<DefaultRouteBuildItem> defaultRoutes,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
+        if (quinoaConfig.justBuild) {
+            LOG.info("Quinoa is in build only mode");
+            return;
+        }
         if (uiResources.isPresent() && !uiResources.get().getNames().isEmpty()) {
             String directory = null;
             if (uiResources.get().getDirectory().isPresent()) {
