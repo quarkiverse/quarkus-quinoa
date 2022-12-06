@@ -91,6 +91,8 @@ If not yet created by the tooling, you will need  a Web UI directory in `src/mai
 quarkus.quinoa.ui-dir=../my-webui
 ----
 
+WARNING: Currently, for technical reasons, Quinoa checks for the presence of a `src/main` directory to define which path `quarkus.quinoa.ui-dir` is relative to. If you are introducing Quinoa to an existing web project which has no `src/main` directory, it is recommended to either relocate your web project files to follow Quinoa conventions or add your Quarkus project (that has a `src/main` directory) to a subdirectory of your existing web project.
+
 From here, copy your existing Web UI or generate an application from any existing Node based Web UI framework such as <<react>>, <<angular>>, Lit, Webpack, Rollup, ... or your own. Example:
 
 
