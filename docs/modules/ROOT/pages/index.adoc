@@ -163,7 +163,7 @@ quarkus.quinoa.package-manager-install.node-version=16.17.0 <2>
 <1> Enable package manager install
 <2> Define the version of NodeJS to install
 
-NOTE: By default, NodeJS and NPM will be installed in `{project-dir}/node/`. If not specified, it will use the NPM version provided by NodeJS.
+NOTE: By default, NodeJS and NPM will be installed in `{project-dir}/.quinoa/` (can be link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.install-dir[configured]). If not specified, it will use the NPM version provided by NodeJS.
 
 If NodeJS and NPM are not installed by Quinoa, it is possible to override the package manager (NPM, Yarn or PNPM), otherwise, it will be auto-detected depending on the project lockfile (NPM is the fallback):
 
