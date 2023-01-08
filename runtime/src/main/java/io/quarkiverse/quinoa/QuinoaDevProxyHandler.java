@@ -26,6 +26,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
     private final List<String> HEADERS_TO_FORWARD = List.of(
             HttpHeaders.ACCEPT_RANGES.toString(),
+            HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN.toString(),
             HttpHeaders.CONTENT_RANGE.toString(),
             HttpHeaders.CONTENT_LENGTH.toString(),
             HttpHeaders.CONTENT_TYPE.toString());
