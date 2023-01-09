@@ -26,10 +26,25 @@ public class QuinoaRootPathTest {
     @TestHTTPResource("/")
     URL url;
 
+    @TestHTTPResource("/some-route")
+    URL urlRoute;
+
     @Test
     public void testUIIndex() {
         final Page page = context.newPage();
         Response response = page.navigate(url.toString());
+        Assertions.assertEquals("OK", response.statusText());
+
+        page.waitForLoadState();
+
+        String title = page.title();
+        Assertions.assertEquals("Quinoa Lit App", title);
+    }
+
+    @Test
+    public void testRoute() {
+        final Page page = context.newPage();
+        Response response = page.navigate(urlRoute.toString());
         Assertions.assertEquals("OK", response.statusText());
 
         page.waitForLoadState();
