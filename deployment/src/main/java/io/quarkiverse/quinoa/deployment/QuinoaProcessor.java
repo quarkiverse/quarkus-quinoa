@@ -280,8 +280,10 @@ public class QuinoaProcessor {
     static Path findProjectRoot(Path outputDirectory) {
         Path currentPath = outputDirectory;
         do {
-            Path toCheck = currentPath.resolve(Paths.get("src", "main"));
-            if (toCheck.toFile().exists()) {
+            if (Files.exists(currentPath.resolve(Paths.get("src", "main")))
+                    || Files.exists(currentPath.resolve(Paths.get("config", "application.properties")))
+                    || Files.exists(currentPath.resolve(Paths.get("config", "application.yaml")))
+                    || Files.exists(currentPath.resolve(Paths.get("config", "application.yml")))) {
                 return currentPath;
             }
             if (currentPath.getParent() != null && Files.exists(currentPath.getParent())) {
