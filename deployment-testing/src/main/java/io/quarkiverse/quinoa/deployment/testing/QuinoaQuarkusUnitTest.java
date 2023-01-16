@@ -49,6 +49,10 @@ public class QuinoaQuarkusUnitTest {
         return new QuinoaQuarkusUnitTest(getWebUITestDirPath(name));
     }
 
+    public static QuinoaQuarkusUnitTest create(Path uiDir) {
+        return new QuinoaQuarkusUnitTest(uiDir);
+    }
+
     public QuinoaQuarkusUnitTest initialLockfile(LockFile lockFile) {
         this.initialLockfile = lockFile.getFileName();
         return this;
@@ -108,6 +112,7 @@ public class QuinoaQuarkusUnitTest {
         final Path webUI = Path.of("src/test/webui/");
         try {
             FileUtil.deleteDirectory(testDir);
+            Files.createDirectories(testDir);
             copyDirectory(webUI, testDir);
             if (nodeModules) {
                 Files.createDirectory(testDir.resolve("node_modules"));
