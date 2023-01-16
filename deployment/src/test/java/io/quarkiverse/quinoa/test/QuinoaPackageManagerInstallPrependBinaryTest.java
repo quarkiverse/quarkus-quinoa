@@ -36,6 +36,8 @@ public class QuinoaPackageManagerInstallPrependBinaryTest {
                 .hasContent("yeahhh");
         assertThat(getWebUITestDirPath(NAME).resolve("node_modules/installed")).isRegularFile()
                 .hasContent("hello");
+        assertThat(Path.of("target/node-" + NAME)).isDirectory();
+        assertThat(Path.of("target/node-" + NAME + "/node")).isDirectory();
     }
 
     private static String convertToWindowsPathIfNeeded(String path) {

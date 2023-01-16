@@ -7,17 +7,14 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.aut
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.install;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -81,14 +78,14 @@ public class QuinoaProcessor {
             return null;
         }
         final String configuredDir = quinoaConfig.uiDir;
-        final AbstractMap.SimpleEntry<Path, Path> uiDirEntry = computeUIDir(configuredDir, outputTarget);
-        if (uiDirEntry == null) {
+        final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
+        if (projectDirs == null) {
             LOG.warnf(
                     "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
                     configuredDir);
             return null;
         }
-        final Path packageFile = uiDirEntry.getKey().resolve("package.json");
+        final Path packageFile = projectDirs.uiDir.resolve("package.json");
         if (!Files.isRegularFile(packageFile)) {
             throw new ConfigurationException(
                     "No package.json found in Web UI directory: '" + configuredDir + "'");
@@ -97,12 +94,12 @@ public class QuinoaProcessor {
         List<String> paths = new ArrayList<>();
         if (quinoaConfig.packageManagerInstall.enabled) {
             final PackageManagerInstall.Installation result = install(quinoaConfig.packageManagerInstall,
-                    uiDirEntry.getValue());
+                    projectDirs);
             packageManagerBinary = Optional.of(result.getPackageManagerBinary());
             paths.add(result.getNodePath());
         }
         PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
-                quinoaConfig.packageManagerCommand, uiDirEntry.getKey(), paths);
+                quinoaConfig.packageManagerCommand, projectDirs.getUIDir(), paths);
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
@@ -263,30 +260,29 @@ public class QuinoaProcessor {
         }
     }
 
-    private AbstractMap.SimpleEntry<Path, Path> computeUIDir(String configuredDir,
+    private ProjectDirs resolveProjectDirs(QuinoaConfig config,
             OutputTargetBuildItem outputTarget) {
-        Map.Entry<Path, Path> mainSourcesRoot = findMainSourcesRoot(outputTarget.getOutputDirectory());
-        if (mainSourcesRoot == null) {
+        Path projectRoot = findProjectRoot(outputTarget.getOutputDirectory());
+        Path configuredUIDirPath = Path.of(config.uiDir.trim());
+        if (projectRoot == null || !Files.isDirectory(projectRoot)) {
+            if (configuredUIDirPath.isAbsolute() && Files.isDirectory(configuredUIDirPath)) {
+                return new ProjectDirs(null, configuredUIDirPath);
+            }
             return null;
         }
-        final Path uiRoot = mainSourcesRoot.getValue().resolve(configuredDir);
-        final File file = uiRoot.toFile();
-        if (!file.exists() || !file.isDirectory()) {
+        final Path uiRoot = projectRoot.resolve(configuredUIDirPath);
+        if (!Files.isDirectory(uiRoot)) {
             return null;
         }
-        return new AbstractMap.SimpleEntry<>(uiRoot, mainSourcesRoot.getValue());
+        return new ProjectDirs(projectRoot, uiRoot);
     }
 
-    /**
-     * Return a Map.Entry (which is used as a Tuple) containing the main sources root as the key
-     * and the project root as the value
-     */
-    static AbstractMap.SimpleEntry<Path, Path> findMainSourcesRoot(Path outputDirectory) {
+    static Path findProjectRoot(Path outputDirectory) {
         Path currentPath = outputDirectory;
         do {
             Path toCheck = currentPath.resolve(Paths.get("src", "main"));
             if (toCheck.toFile().exists()) {
-                return new AbstractMap.SimpleEntry<>(toCheck, currentPath);
+                return currentPath;
             }
             if (currentPath.getParent() != null && Files.exists(currentPath.getParent())) {
                 currentPath = currentPath.getParent();
@@ -315,6 +311,24 @@ public class QuinoaProcessor {
 
         public Path getLocation() {
             return location;
+        }
+    }
+
+    public static class ProjectDirs {
+        private final Path projectRootDir;
+        private final Path uiDir;
+
+        public ProjectDirs(Path projectRootDir, Path uiDir) {
+            this.projectRootDir = projectRootDir;
+            this.uiDir = uiDir;
+        }
+
+        public Path getProjectRootDir() {
+            return projectRootDir;
+        }
+
+        public Path getUIDir() {
+            return uiDir;
         }
     }
 

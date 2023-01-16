@@ -1,6 +1,5 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Objects;
@@ -10,6 +9,7 @@ import com.github.eirslett.maven.plugins.frontend.lib.FrontendPluginFactory;
 import com.github.eirslett.maven.plugins.frontend.lib.InstallationException;
 import com.github.eirslett.maven.plugins.frontend.lib.ProxyConfig;
 
+import io.quarkiverse.quinoa.deployment.QuinoaProcessor.ProjectDirs;
 import io.quarkus.runtime.configuration.ConfigurationException;
 
 public final class PackageManagerInstall {
@@ -21,10 +21,10 @@ public final class PackageManagerInstall {
 
     }
 
-    public static Installation install(PackageManagerInstallConfig config, final Path projectDirectory) {
-        final Path installDirPath = projectDirectory.resolve(config.installDir.trim());
-        final File installDirFile = installDirPath.toFile();
-        FrontendPluginFactory factory = new FrontendPluginFactory(projectDirectory.toFile(), installDirFile);
+    public static Installation install(PackageManagerInstallConfig config, final ProjectDirs projectDirs) {
+
+        Path installDir = resolveInstallDir(config, projectDirs);
+        FrontendPluginFactory factory = new FrontendPluginFactory(null, installDir.toFile());
         if (!config.nodeVersion.isPresent()) {
             throw new ConfigurationException("node-version is required to install package manager",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
@@ -47,10 +47,23 @@ public final class PackageManagerInstall {
                         .setNpmDownloadRoot(config.npmDownloadRoot)
                         .install();
             }
-            return resolveInstalledNpmBinary(installDirPath);
+            return resolveInstalledNpmBinary(installDir);
         } catch (InstallationException e) {
             throw new RuntimeException("Error while installing NodeJS", e);
         }
+    }
+
+    private static Path resolveInstallDir(PackageManagerInstallConfig config, ProjectDirs projectDirs) {
+        final Path installPath = Path.of(config.installDir.trim());
+        if (installPath.isAbsolute()) {
+            return installPath;
+        }
+        if (projectDirs.getProjectRootDir() == null) {
+            throw new ConfigurationException(
+                    "Use an absolute package-manager-install.install-dir when the project root directory is not standard",
+                    Set.of("quarkus.quinoa.package-manager-install.install-dir"));
+        }
+        return projectDirs.getProjectRootDir().resolve(installPath);
     }
 
     private static Installation resolveInstalledNpmBinary(Path installDirectory) {

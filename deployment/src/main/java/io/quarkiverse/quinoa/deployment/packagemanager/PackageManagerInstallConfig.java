@@ -9,6 +9,8 @@ import io.quarkus.runtime.annotations.ConfigItem;
 @ConfigGroup
 public class PackageManagerInstallConfig {
 
+    private static final String DEFAULT_INSTALL_DIR = ".quinoa/";
+
     /**
      * Enable Package Manager Installation.
      * This will override "package-manager" config.
@@ -23,7 +25,7 @@ public class PackageManagerInstallConfig {
      * it will be installed in a node/ sub-directory.
      * Default is ${project.root}/.quinoa
      */
-    @ConfigItem(defaultValue = ".quinoa/")
+    @ConfigItem(defaultValue = DEFAULT_INSTALL_DIR)
     public String installDir;
 
     /**
