@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 :quarkus-version: 2.13.0.Final
+=======
+:quarkus-version: 3.0.0.Alpha3
+>>>>>>> Stashed changes
 :quarkus-quinoa-version: 1.2.4
 :maven-version: 3.8.1+
 
