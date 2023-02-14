@@ -406,11 +406,24 @@ In order to enable the Web UI (build and serve) in a particular test, you can us
 public class MyWebUITest {
     @Test
     public void someTest() {
+      // your test logic here
     }
 }
 ----
 
-If you also want to run the tests included in your Web UI (i.e npm test) alongside this class, you can use the `EnableAndRunTests` test profile:
+If you also want to run the tests included in your Web UI (i.e `npm test`) alongside this class, you can use the `EnableAndRunTests` test profile:
+
+[source,java]
+----
+@QuarkusTest
+@TestProfile(QuinoaTestProfiles.EnableAndRunTests.class)
+public class AllWebUITest {
+    @Test
+    public void runTest() {
+        // you don't need anything here, it will run your package.json "test"
+    }
+}
+----
 
 The library also brings a very elegant way to do e2e testing using https://github.com/microsoft/playwright-java[Playright]:
 [source,java]
