@@ -38,7 +38,7 @@ public class QuinoaPackageManagerInstallTest {
     }
 
     private static String convertToWindowsPathIfNeeded(String path) {
-        return isWindows() ? PackageManagerInstall.convertToWindowsPathIfNeeded(path) : path;
+        return isWindows() ? PackageManagerInstall.normalizePath(path) : path;
     }
 
 }

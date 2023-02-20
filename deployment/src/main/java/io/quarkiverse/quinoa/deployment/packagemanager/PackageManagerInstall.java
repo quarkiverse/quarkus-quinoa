@@ -67,14 +67,16 @@ public final class PackageManagerInstall {
         final Path nodeBinPath = installDirectory.resolve(INSTALL_SUB_PATH)
                 .toAbsolutePath();
         final Path npmPath = installDirectory.resolve(NPM_PATH).toAbsolutePath();
-        final String platformNodeBinPath = convertToWindowsPathIfNeeded(nodeBinPath.toString());
-        final String platformNPMPath = convertToWindowsPathIfNeeded(npmPath.toString());
+        final String platformNodeBinPath = normalizePath(nodeBinPath.toString());
+        final String platformNPMPath = normalizePath(npmPath.toString());
         final String packageManagerBinary = NODE_BINARY + " " + platformNPMPath;
         return new Installation(platformNodeBinPath, packageManagerBinary);
     }
 
-    public static String convertToWindowsPathIfNeeded(String path) {
-        return PackageManager.isWindows() ? path.replaceAll("/", "\\\\") : path;
+    public static String normalizePath(String path) {
+        path = PackageManager.isWindows() ? path.replaceAll("/", "\\\\") : path;
+        path = path.contains(" ") ? "\"".concat(path).concat("\"") : path;
+        return path;
     }
 
     public static class Installation {
