@@ -27,8 +27,8 @@ public class QuinoaPackageManagerInstallPrependBinaryTest {
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
                             ((String) s.getParameters()[0])
-                                    .endsWith(convertToWindowsPathIfNeeded(
-                                            NAME + "/node/node_modules/npm/bin/npm-cli.js run build-something"))));
+                                    .endsWith(NAME + convertToWindowsPathIfNeeded("/node/node_modules/npm/bin/npm-cli.js")
+                                            + " run build-something")));
 
     @Test
     public void testQuinoa() {
@@ -41,7 +41,7 @@ public class QuinoaPackageManagerInstallPrependBinaryTest {
     }
 
     private static String convertToWindowsPathIfNeeded(String path) {
-        return isWindows() ? PackageManagerInstall.convertToWindowsPathIfNeeded(path) : path;
+        return isWindows() ? PackageManagerInstall.normalizePath(path) : path;
     }
 
 }
