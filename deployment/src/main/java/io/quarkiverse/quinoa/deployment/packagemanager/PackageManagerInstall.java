@@ -2,7 +2,6 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 
 import com.github.eirslett.maven.plugins.frontend.lib.FrontendPluginFactory;
@@ -40,13 +39,11 @@ public final class PackageManagerInstall {
                     .setNodeDownloadRoot(config.nodeDownloadRoot)
                     .setNpmVersion(config.npmVersion)
                     .install();
-            if (!Objects.equals(config.npmVersion, "provided")) {
-                factory.getNPMInstaller(proxy)
-                        .setNodeVersion("v" + config.nodeVersion.get())
-                        .setNpmVersion(config.npmVersion)
-                        .setNpmDownloadRoot(config.npmDownloadRoot)
-                        .install();
-            }
+            factory.getNPMInstaller(proxy)
+                    .setNodeVersion("v" + config.nodeVersion.get())
+                    .setNpmVersion(config.npmVersion)
+                    .setNpmDownloadRoot(config.npmDownloadRoot)
+                    .install();
             return resolveInstalledNpmBinary(installDir);
         } catch (InstallationException e) {
             throw new RuntimeException("Error while installing NodeJS", e);
