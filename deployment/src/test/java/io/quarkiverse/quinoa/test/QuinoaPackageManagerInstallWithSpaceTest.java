@@ -1,10 +1,7 @@
 package io.quarkiverse.quinoa.test;
 
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.NODE_BINARY;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.NPM_PATH;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.normalizePath;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.quotePathWithSpaces;
 import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.getWebUITestDirPath;
+import static io.quarkiverse.quinoa.test.QuinoaPackageManagerInstallTest.computeBinary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
@@ -15,9 +12,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaPackageManagerInstallTest {
+public class QuinoaPackageManagerInstallWithSpaceTest {
     private static final String NAME = "package-manager-install";
-    public static final String INSTALL_DIR = "target/node-" + NAME;
+    private static final String INSTALL_DIR = "target/node-space- " + NAME;
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
@@ -41,12 +38,6 @@ public class QuinoaPackageManagerInstallTest {
                 .hasContent("hello");
         assertThat(Path.of(INSTALL_DIR)).isDirectory();
         assertThat(Path.of(INSTALL_DIR + "/node")).isDirectory();
-    }
-
-    static String computeBinary(String installDir) {
-        return NODE_BINARY + " "
-                + quotePathWithSpaces(normalizePath(
-                        Path.of(installDir, NPM_PATH).toAbsolutePath().toString()));
     }
 
 }
