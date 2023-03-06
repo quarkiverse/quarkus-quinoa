@@ -13,8 +13,8 @@ import io.quarkus.runtime.configuration.ConfigurationException;
 
 public final class PackageManagerInstall {
     private static final String INSTALL_SUB_PATH = "node";
-    private static final String NODE_BINARY = PackageManager.isWindows() ? "node.exe" : "node";
-    private static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
+    public static final String NODE_BINARY = PackageManager.isWindows() ? "node.exe" : "node";
+    public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
 
     private PackageManagerInstall() {
 
@@ -64,30 +64,34 @@ public final class PackageManagerInstall {
     }
 
     private static Installation resolveInstalledNpmBinary(Path installDirectory) {
-        final Path nodeBinPath = installDirectory.resolve(INSTALL_SUB_PATH)
+        final Path nodeDirPath = installDirectory.resolve(INSTALL_SUB_PATH)
                 .toAbsolutePath();
         final Path npmPath = installDirectory.resolve(NPM_PATH).toAbsolutePath();
-        final String platformNodeBinPath = convertToWindowsPathIfNeeded(nodeBinPath.toString());
-        final String platformNPMPath = convertToWindowsPathIfNeeded(npmPath.toString());
-        final String packageManagerBinary = NODE_BINARY + " " + platformNPMPath;
-        return new Installation(platformNodeBinPath, packageManagerBinary);
+        final String platformNodeDirPath = normalizePath(nodeDirPath.toString());
+        final String platformNPMPath = normalizePath(npmPath.toString());
+        final String packageManagerBinary = NODE_BINARY + " " + quotePathWithSpaces(platformNPMPath);
+        return new Installation(platformNodeDirPath, packageManagerBinary);
     }
 
-    public static String convertToWindowsPathIfNeeded(String path) {
+    public static String normalizePath(String path) {
         return PackageManager.isWindows() ? path.replaceAll("/", "\\\\") : path;
     }
 
+    public static String quotePathWithSpaces(String path) {
+        return path.contains(" ") ? "\"".concat(path).concat("\"") : path;
+    }
+
     public static class Installation {
-        private final String nodePath;
+        private final String nodeDirPath;
         private final String packageManagerBinary;
 
-        public Installation(String nodePath, String packageManagerBinary) {
-            this.nodePath = nodePath;
+        public Installation(String nodeDirPath, String packageManagerBinary) {
+            this.nodeDirPath = nodeDirPath;
             this.packageManagerBinary = packageManagerBinary;
         }
 
-        public String getNodePath() {
-            return nodePath;
+        public String getNodeDirPath() {
+            return nodeDirPath;
         }
 
         public String getPackageManagerBinary() {

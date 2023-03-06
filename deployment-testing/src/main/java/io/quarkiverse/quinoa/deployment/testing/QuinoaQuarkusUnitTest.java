@@ -36,6 +36,7 @@ public class QuinoaQuarkusUnitTest {
 
     private static final String OS_NAME = System.getProperty("os.name");
     private static final String CI = System.getProperty("CI");
+
     private final Path testDir;
     private boolean nodeModules = false;
     private String initialLockfile = "package-lock.json";
