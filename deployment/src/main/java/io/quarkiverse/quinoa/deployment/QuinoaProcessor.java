@@ -96,7 +96,7 @@ public class QuinoaProcessor {
             final PackageManagerInstall.Installation result = install(quinoaConfig.packageManagerInstall,
                     projectDirs);
             packageManagerBinary = Optional.of(result.getPackageManagerBinary());
-            paths.add(result.getNodePath());
+            paths.add(Path.of(result.getNodePath()).getParent().toString());
         }
         PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
                 quinoaConfig.packageManagerCommand, projectDirs.getUIDir(), paths);

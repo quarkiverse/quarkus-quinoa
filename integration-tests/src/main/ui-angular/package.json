@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0 --no-live-reload",
-    "build": "ng build",
+    "build": "npm run something && ng build",
+    "something": "echo \"something\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test -- --no-watch --no-progress --browsers=ChromeHeadlessCI"
   },
