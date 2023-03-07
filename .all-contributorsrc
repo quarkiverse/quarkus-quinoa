@@ -59,6 +59,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "johnaohara",
+      "name": "John O'Hara",
+      "avatar_url": "https://avatars.githubusercontent.com/u/959822?v=4",
+      "profile": "https://github.com/johnaohara",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -66,5 +75,6 @@
   "projectOwner": "quarkiverse",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
