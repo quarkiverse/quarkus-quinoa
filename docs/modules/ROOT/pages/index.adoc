@@ -310,12 +310,17 @@ Add start script to package.json
 To make hot module replacement work, add the following to the config object in vite.config.js:
 [source,javascript]
 ----
-server: {
+  server: {
+    port: 5173,
+    host: '127.0.0.1',
     hmr: {
-        port: 5173
+      port: 5173,
+      host: '127.0.0.1',
     }
-}
+  }
 ----
+
+You do need the host and port in both places to ensure the websocket is constructed and upgraded properly.
 
 [#spa-routing]
 === Single Page application routing
