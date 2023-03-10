@@ -287,6 +287,40 @@ Edit the karma.conf.js:
 },
 ----
 
+
+[#nextjs]
+=== Next.js
+Any app created with Next.js (https://nextjs.org/) should work with Quinoa after the following changes:
+
+In application.properties add:
+[source,properties]
+----
+%dev.quarkus.quinoa.index-page=/
+quarkus.quinoa.build-dir=out
+----
+
+Add these scripts to package.json
+[source,json]
+----
+  "scripts": {
+    ...
+    "start": "next dev",
+    "build": "next build && next export",
+  },
+----
+
+To make hot module replacement work, add the following to the config object in next.config.js:
+[source,javascript]
+----
+module.exports = {
+  reactStrictMode: process.env.NODE_ENV === 'production' ? false : true
+}
+
+----
+
+WARNING: Hot Module Reloading (HMR) is currently not working in DEV mode. See https://github.com/vercel/next.js/discussions/47000[Next.js Discussion] 
+
+
 [#vite]
 === Vite
 Any app created with Vite (https://vitejs.dev/guide/) should work with Quinoa after the following changes:
