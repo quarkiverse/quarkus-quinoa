@@ -19,6 +19,13 @@ public class DevServerConfig {
     public boolean enabled;
 
     /**
+     * When set to true, Quinoa will manage the Web UI dev server
+     * When set to false, the Web UI dev server have to be started before running Quarkus dev
+     */
+    @ConfigItem(defaultValue = "true")
+    public boolean managed;
+
+    /**
      * Port of the server to forward requests to.
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
      * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
@@ -35,6 +42,13 @@ public class DevServerConfig {
      */
     @ConfigItem(defaultValue = "/")
     public Optional<String> checkPath;
+
+    /**
+     * By default, Quinoa will handle request upgrade to websocket and act as proxy with the dev server.
+     * If set to false, Quinoa will pass websocket upgrade request to the next Vert.x route handler.
+     */
+    @ConfigItem(defaultValue = "true")
+    public boolean websocket;
 
     /**
      * Timeout in ms for the dev server to be up and running.
