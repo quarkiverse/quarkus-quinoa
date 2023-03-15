@@ -44,6 +44,7 @@ import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.quarkus.vertx.http.deployment.WebsocketSubProtocolsBuildItem;
 import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
 public class ForwardedDevProcessor {
@@ -103,22 +104,31 @@ public class ForwardedDevProcessor {
             return null;
         }
 
+        PackageManager packageManager = quinoaDir.get().getPackageManager();
+        final int devServerPort = quinoaConfig.devServer.port.getAsInt();
+        final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
+        if (!quinoaConfig.devServer.managed) {
+            if (PackageManager.isDevServerUp(checkPath, devServerPort)) {
+                return new ForwardedDevServerBuildItem(devServerPort);
+            } else {
+                throw new IllegalStateException(
+                        "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + devServerPort);
+            }
+        }
+
         StartupLogCompressor compressor = new StartupLogCompressor(
                 (launchMode.isTest() ? "(test) " : "") + "Quinoa package manager live coding dev service starting:",
                 consoleInstalled,
                 loggingSetup,
                 PROCESS_THREAD_PREDICATE);
-
-        PackageManager packageManager = quinoaDir.get().getPackageManager();
         final AtomicReference<Process> dev = new AtomicReference<>();
         try {
-            final int devServerPort = quinoaConfig.devServer.port.getAsInt();
             final int checkTimeout = quinoaConfig.devServer.checkTimeout;
             if (checkTimeout < 1000) {
                 throw new ConfigurationException("quarkus.quinoa.dev-server.check-timeout must be greater than 1000ms");
             }
             final long start = Instant.now().toEpochMilli();
-            final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
+
             dev.set(packageManager.dev(devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
@@ -154,6 +164,7 @@ public class ForwardedDevProcessor {
             Optional<ForwardedDevServerBuildItem> devProxy,
             CoreVertxBuildItem vertx,
             BuildProducer<RouteBuildItem> routes,
+            BuildProducer<WebsocketSubProtocolsBuildItem> websocketSubProtocols,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
         if (quinoaConfig.justBuild) {
             LOG.info("Quinoa is in build only mode");
@@ -163,8 +174,12 @@ public class ForwardedDevProcessor {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort()))
+                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort(),
+                            quinoaConfig.devServer.websocket))
                     .build());
+            if (quinoaConfig.devServer.websocket) {
+                websocketSubProtocols.produce(new WebsocketSubProtocolsBuildItem("*"));
+            }
             if (quinoaConfig.enableSPARouting) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)

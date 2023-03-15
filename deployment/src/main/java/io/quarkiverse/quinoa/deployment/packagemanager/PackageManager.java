@@ -243,7 +243,7 @@ public class PackageManager {
         }
     }
 
-    private static boolean isDevServerUp(String path, int port) {
+    public static boolean isDevServerUp(String path, int port) {
         try {
             final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
             URL url = new URL("http://localhost:" + port + normalizedPath);
