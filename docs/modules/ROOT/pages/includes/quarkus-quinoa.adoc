@@ -378,6 +378,22 @@ endif::add-copy-button-to-env-var[]
 |`true`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.managed]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.managed[quarkus.quinoa.dev-server.managed]`
+
+[.description]
+--
+When set to true, Quinoa will manage the Web UI dev server When set to false, the Web UI dev server have to be started before running Quarkus dev
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_MANAGED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_MANAGED+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`true`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.port]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.port[quarkus.quinoa.dev-server.port]`
 
 [.description]
@@ -408,6 +424,22 @@ Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_CHECK_PATH+++`
 endif::add-copy-button-to-env-var[]
 --|string 
 |`/`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.websocket]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.websocket[quarkus.quinoa.dev-server.websocket]`
+
+[.description]
+--
+By default, Quinoa will handle request upgrade to websocket and act as proxy with the dev server. If set to false, Quinoa will pass websocket upgrade request to the next Vert.x route handler.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_WEBSOCKET+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_WEBSOCKET+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`true`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.check-timeout]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.check-timeout[quarkus.quinoa.dev-server.check-timeout]`

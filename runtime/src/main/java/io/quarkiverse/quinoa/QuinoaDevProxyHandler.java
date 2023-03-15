@@ -31,12 +31,14 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             HttpHeaders.CONTENT_TYPE.toString());
     private final int port;
     private final WebClient client;
+    private final QuinoaDevWebSocketProxyHandler wsUpgradeHandler;
     private final ClassLoader currentClassLoader;
     private final QuinoaHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, int port) {
+    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, int port, boolean websocket) {
         this.port = port;
         this.client = WebClient.create(vertx);
+        this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, port) : null;
         this.config = config;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -52,14 +54,34 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             next(currentClassLoader, ctx);
             return;
         }
-        final HttpServerRequest request = ctx.request();
+
         final String resourcePath = path.endsWith("/") ? path + config.indexPage : path;
         if (isIgnored(resourcePath, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
             return;
         }
-        final String uri = computeURI(resourcePath, request);
+
+        if (isUpgradeToWebSocket(ctx)) {
+            if (this.wsUpgradeHandler != null) {
+                wsUpgradeHandler.handle(ctx);
+            } else {
+                next(currentClassLoader, ctx);
+            }
+        } else {
+            handleHttpRequest(ctx, resourcePath);
+        }
+    }
+
+    private static boolean isUpgradeToWebSocket(RoutingContext ctx) {
+        return ctx.request().headers().contains("Upgrade")
+                && "websocket".equalsIgnoreCase(ctx.request().headers().get("Upgrade"));
+    }
+
+    private void handleHttpRequest(final RoutingContext ctx, final String resourcePath) {
+        final HttpServerRequest request = ctx.request();
         final MultiMap headers = request.headers();
+        final String uri = computeResourceURI(resourcePath, request);
+
         // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
         // See https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
         // When no Accept header is provided, the historyApiFallback is disabled
@@ -68,26 +90,26 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         headers.remove("Accept-Encoding");
         client.request(request.method(), port, request.localAddress().host(), uri)
                 .putHeaders(headers)
-                .send(new Handler<AsyncResult<HttpResponse<Buffer>>>() {
-                    @Override
-                    public void handle(AsyncResult<HttpResponse<Buffer>> event) {
-                        if (event.succeeded()) {
-                            final int statusCode = event.result().statusCode();
-                            if (statusCode == 200) {
+                .send(event -> {
+                    if (event.succeeded()) {
+                        final int statusCode = event.result().statusCode();
+                        switch (statusCode) {
+                            case 200:
                                 forwardResponse(event, request, ctx, resourcePath);
-                            } else if (statusCode == 404) {
+                                break;
+                            case 404:
                                 next(currentClassLoader, ctx);
-                            } else {
+                                break;
+                            default:
                                 forwardError(event, statusCode, ctx);
-                            }
-                        } else {
-                            error(event, ctx);
                         }
+                    } else {
+                        error(event, ctx);
                     }
                 });
     }
 
-    private String computeURI(String path, HttpServerRequest request) {
+    private String computeResourceURI(String path, HttpServerRequest request) {
         String uri = path;
         final String query = request.query();
         if (query != null) {
@@ -126,8 +148,9 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     }
 
     private void error(AsyncResult<HttpResponse<Buffer>> event, RoutingContext ctx) {
+        final String error = String.format("Quinoa failed to forward request '%s', see logs.", ctx.request().uri());
         ctx.response().setStatusCode(500);
-        ctx.response().send("Quinoa failed to forward request, see logs.");
-        LOG.error("Quinoa failed to forward request, see logs.", event.cause());
+        ctx.response().send(error);
+        LOG.error(error, event.cause());
     }
 }
