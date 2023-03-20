@@ -33,6 +33,6 @@ public class ForwardedDevModeTest {
                 .body("{}")
                 .contentType(ContentType.JSON)
                 .when().post("/api/something").then()
-                .statusCode(404);
+                .statusCode(405);
     }
 }

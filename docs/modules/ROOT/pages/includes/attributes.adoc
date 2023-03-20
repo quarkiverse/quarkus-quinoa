@@ -1,4 +1,4 @@
-:quarkus-version: 3.0.0.Alpha4
+:quarkus-version: 3.0.0.Alpha6
 :quarkus-quinoa-version: 1.2.6
 :maven-version: 3.8.1+
 
