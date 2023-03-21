@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import org.jboss.logging.Logger;
 
@@ -67,29 +66,45 @@ public class PackageManager {
     }
 
     public void stopDev(Process process) {
-        if (process == null) {
+        if (process == null || !process.isAlive()) {
             return;
         }
         LOG.infof("Stopping Quinoa package manager live coding as a dev service.");
-        // Kill children before because react is swallowing the signal
-        process.descendants().forEach(new Consumer<ProcessHandle>() {
-            @Override
-            public void accept(ProcessHandle processHandle) {
-                processHandle.destroy();
-            }
-        });
-        if (process.isAlive()) {
-            process.destroy();
-            try {
+        try {
+            // Kill children before because React is swallowing the signal
+            killDescendants(process.toHandle(), false);
+            if (process.isAlive()) {
+                process.destroy();
+                // Force kill descendants if needed
+                killDescendants(process.toHandle(), true);
                 if (!process.waitFor(10, TimeUnit.SECONDS)) {
                     process.destroyForcibly();
                 }
-                ;
-            } catch (InterruptedException e) {
+            }
+        } catch (Exception e) {
+            if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
+            }
+            LOG.errorf(e, "Error while waiting for Quinoa Dev Server process (#%s) to exit.", process.pid());
+        } finally {
+            if (process.isAlive()) {
+                LOG.warnf("Quinoa was not able to stop the Dev Server process (#%s).", process.pid());
             }
         }
 
+    }
+
+    private static void killDescendants(ProcessHandle process, boolean force) {
+        process.children().forEach(child -> {
+            killDescendants(child, force);
+            if (child.isAlive()) {
+                if (force) {
+                    child.destroyForcibly();
+                } else {
+                    child.destroy();
+                }
+            }
+        });
     }
 
     public Process dev(int checkPort, String checkPath, int checkTimeout) {
