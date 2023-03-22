@@ -80,9 +80,6 @@ public class QuinoaProcessor {
         final String configuredDir = quinoaConfig.uiDir;
         final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
         if (projectDirs == null) {
-            LOG.warnf(
-                    "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
-                    configuredDir);
             return null;
         }
         final Path packageFile = projectDirs.uiDir.resolve("package.json");
@@ -139,7 +136,7 @@ public class QuinoaProcessor {
         final String configuredBuildDir = quinoaConfig.buildDir;
         final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
-            throw new ConfigurationException("Quinoa build directory not found: '" + buildDir + "'",
+            throw new ConfigurationException("Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'",
                     Set.of("quarkus.quinoa.build-dir"));
         }
         final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
@@ -268,10 +265,15 @@ public class QuinoaProcessor {
             if (configuredUIDirPath.isAbsolute() && Files.isDirectory(configuredUIDirPath)) {
                 return new ProjectDirs(null, configuredUIDirPath);
             }
-            return null;
+            throw new IllegalStateException(
+                    "If not absolute, the Web UI directory is resolved relative to the project root, but Quinoa was not able to find the project root.");
         }
         final Path uiRoot = projectRoot.resolve(configuredUIDirPath);
         if (!Files.isDirectory(uiRoot)) {
+            LOG.warnf(
+                    "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s' resolved to '%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
+                    config.uiDir,
+                    uiRoot.toAbsolutePath());
             return null;
         }
         return new ProjectDirs(projectRoot, uiRoot);
