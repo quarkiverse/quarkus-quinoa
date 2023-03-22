@@ -15,7 +15,7 @@ public class QuinoaNoDirTest {
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ui-dir", "src/test/no-webui")
             .assertLogRecords(l -> assertThat(l).anyMatch(s -> s.getMessage().equals(
-                    "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s'. It is recommended to remove the quarkus-quinoa extension if not used.")
+                    "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s' resolved to '%s'. It is recommended to remove the quarkus-quinoa extension if not used.")
                     &&
                     s.getParameters()[0].equals("src/test/no-webui")));
 
