@@ -23,7 +23,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>3.0.0.Alpha6</quarkus.version>
+    <quarkus.version>3.0.0.Beta1</quarkus.version>
     <playright.version>1.31.0</playright.version>
     <assertj.version>3.24.2</assertj.version>
     <frontend-plugin.version>1.12.1</frontend-plugin.version>
