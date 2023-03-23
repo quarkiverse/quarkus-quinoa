@@ -1,5 +1,7 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaDevProxyHandler.computeHostName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +32,7 @@ class QuinoaDevWebSocketProxyHandler {
         ctx.request().pause();
         request.toWebSocket(r -> {
             if (r.succeeded()) {
-                final String host = request.localAddress().host();
+                final String host = computeHostName(request);
                 final String forwardUri = request.uri();
                 LOG.debugf("Quinoa Dev WebSocket Server Connected: %s:%s%s", host, port, forwardUri);
                 final ServerWebSocket serverWs = r.result();

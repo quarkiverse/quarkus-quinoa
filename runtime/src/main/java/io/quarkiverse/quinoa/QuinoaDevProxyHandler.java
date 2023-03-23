@@ -88,7 +88,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         headers.remove("Accept");
         // Disable compression in the forwarded request
         headers.remove("Accept-Encoding");
-        client.request(request.method(), port, request.localAddress().host(), uri)
+        client.request(request.method(), port, computeHostName(request), uri)
                 .putHeaders(headers)
                 .send(event -> {
                     if (event.succeeded()) {
@@ -107,6 +107,14 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         error(event, ctx);
                     }
                 });
+    }
+
+    static String computeHostName(HttpServerRequest request) {
+        final String[] split = request.host().split(":");
+        if (split.length < 0) {
+            throw new IllegalStateException("Invalid host: " + request.host());
+        }
+        return split[0];
     }
 
     private String computeResourceURI(String path, HttpServerRequest request) {
