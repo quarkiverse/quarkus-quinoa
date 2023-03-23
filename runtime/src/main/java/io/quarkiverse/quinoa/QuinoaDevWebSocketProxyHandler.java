@@ -1,7 +1,10 @@
 package io.quarkiverse.quinoa;
 
+import static io.quarkiverse.quinoa.QuinoaDevProxyHandler.computeHostName;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jboss.logging.Logger;
@@ -18,10 +21,12 @@ import io.vertx.ext.web.RoutingContext;
 class QuinoaDevWebSocketProxyHandler {
     private static final Logger LOG = Logger.getLogger(QuinoaDevWebSocketProxyHandler.class);
     private final HttpClient httpClient;
+    private Optional<String> configuredHost;
     private final int port;
 
-    QuinoaDevWebSocketProxyHandler(Vertx vertx, int port) {
+    QuinoaDevWebSocketProxyHandler(Vertx vertx, String host, int port) {
         this.httpClient = vertx.createHttpClient();
+        this.configuredHost = Optional.ofNullable(host);
         this.port = port;
     }
 
@@ -30,7 +35,7 @@ class QuinoaDevWebSocketProxyHandler {
         ctx.request().pause();
         request.toWebSocket(r -> {
             if (r.succeeded()) {
-                final String host = request.localAddress().host();
+                final String host = configuredHost.orElseGet(() -> computeHostName(request));
                 final String forwardUri = request.uri();
                 LOG.debugf("Quinoa Dev WebSocket Server Connected: %s:%s%s", host, port, forwardUri);
                 final ServerWebSocket serverWs = r.result();

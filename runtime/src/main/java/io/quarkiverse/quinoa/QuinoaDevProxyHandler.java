@@ -7,6 +7,7 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
 import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
@@ -29,16 +30,19 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             HttpHeaders.CONTENT_RANGE.toString(),
             HttpHeaders.CONTENT_LENGTH.toString(),
             HttpHeaders.CONTENT_TYPE.toString());
+
+    private final Optional<String> host;
     private final int port;
     private final WebClient client;
     private final QuinoaDevWebSocketProxyHandler wsUpgradeHandler;
     private final ClassLoader currentClassLoader;
     private final QuinoaHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, int port, boolean websocket) {
+    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port, boolean websocket) {
+        this.host = Optional.ofNullable(host);
         this.port = port;
         this.client = WebClient.create(vertx);
-        this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, port) : null;
+        this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, host, port) : null;
         this.config = config;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -88,7 +92,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         headers.remove("Accept");
         // Disable compression in the forwarded request
         headers.remove("Accept-Encoding");
-        client.request(request.method(), port, request.localAddress().host(), uri)
+        client.request(request.method(), port, host.orElseGet(() -> computeHostName(request)), uri)
                 .putHeaders(headers)
                 .send(event -> {
                     if (event.succeeded()) {
@@ -107,6 +111,14 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         error(event, ctx);
                     }
                 });
+    }
+
+    static String computeHostName(HttpServerRequest request) {
+        final String[] split = request.host().split(":");
+        if (split.length == 0) {
+            throw new IllegalStateException("Invalid host: " + request.host());
+        }
+        return split[0];
     }
 
     private String computeResourceURI(String path, HttpServerRequest request) {
