@@ -73,6 +73,7 @@ public class ForwardedDevProcessor {
         }
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
+        final String devServerHost = quinoaConfig.devServer.host.orElse(null);
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
@@ -82,7 +83,7 @@ public class ForwardedDevProcessor {
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(quinoaConfig.devServer.port.getAsInt());
+                return new ForwardedDevServerBuildItem(devServerHost, quinoaConfig.devServer.port.getAsInt());
             }
             shutdownDevService();
         }
@@ -109,7 +110,7 @@ public class ForwardedDevProcessor {
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
             if (PackageManager.isDevServerUp(checkPath, devServerPort)) {
-                return new ForwardedDevServerBuildItem(devServerPort);
+                return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
             } else {
                 throw new IllegalStateException(
                         "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + devServerPort);
@@ -147,7 +148,7 @@ public class ForwardedDevProcessor {
             devService = new DevServicesResultBuildItem.RunningDevService(
                     "quinoa-node-dev-process", null, onClose, Collections.emptyMap());
             devServices.produce(devService.toBuildItem());
-            return new ForwardedDevServerBuildItem(devServerPort);
+            return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
         } catch (Throwable t) {
             packageManager.stopDev(dev.get());
             compressor.closeAndDumpCaptured();
@@ -174,7 +175,8 @@ public class ForwardedDevProcessor {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getPort(),
+                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
+                            devProxy.get().getPort(),
                             quinoaConfig.devServer.websocket))
                     .build());
             if (quinoaConfig.devServer.websocket) {

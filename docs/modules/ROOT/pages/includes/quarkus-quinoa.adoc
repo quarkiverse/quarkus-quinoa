@@ -410,6 +410,20 @@ endif::add-copy-button-to-env-var[]
 |
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.host]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.host[quarkus.quinoa.dev-server.host]`
+
+[.description]
+--
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_HOST+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_HOST+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.check-path]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.check-path[quarkus.quinoa.dev-server.check-path]`
 
 [.description]
