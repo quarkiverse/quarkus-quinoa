@@ -34,6 +34,12 @@ public class DevServerConfig {
     public OptionalInt port;
 
     /**
+     * Host of the server to forward requests to.
+     * By default, Quinoa will use the host contained in the request headers.
+     */
+    public Optional<String> host;
+
+    /**
      * After start, Quinoa wait for the external dev server.
      * by sending GET requests to this path waiting for a 200 status.
      *
