@@ -73,7 +73,7 @@ public class ForwardedDevProcessor {
         }
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
-        final String devServerHost = quinoaConfig.devServer.host.orElse(null);
+        final String devServerHost = quinoaConfig.devServer.host;
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
@@ -109,7 +109,7 @@ public class ForwardedDevProcessor {
         final int devServerPort = quinoaConfig.devServer.port.getAsInt();
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
-            if (PackageManager.isDevServerUp(checkPath, devServerPort)) {
+            if (PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath)) {
                 return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
             } else {
                 throw new IllegalStateException(
@@ -130,7 +130,7 @@ public class ForwardedDevProcessor {
             }
             final long start = Instant.now().toEpochMilli();
 
-            dev.set(packageManager.dev(devServerPort, checkPath, checkTimeout));
+            dev.set(packageManager.dev(devServerHost, devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
                     quinoaConfig.devServer.logs);
