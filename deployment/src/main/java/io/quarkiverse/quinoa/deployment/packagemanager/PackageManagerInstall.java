@@ -1,8 +1,11 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Set;
+
+import org.jboss.logging.Logger;
 
 import com.github.eirslett.maven.plugins.frontend.lib.FrontendPluginFactory;
 import com.github.eirslett.maven.plugins.frontend.lib.InstallationException;
@@ -12,6 +15,8 @@ import io.quarkiverse.quinoa.deployment.QuinoaProcessor.ProjectDirs;
 import io.quarkus.runtime.configuration.ConfigurationException;
 
 public final class PackageManagerInstall {
+
+    private static final Logger LOG = Logger.getLogger(PackageManagerInstall.class);
     private static final String INSTALL_SUB_PATH = "node";
     public static final String NODE_BINARY = PackageManager.isWindows() ? "node.exe" : "node";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
@@ -22,7 +27,7 @@ public final class PackageManagerInstall {
 
     public static Installation install(PackageManagerInstallConfig config, final ProjectDirs projectDirs) {
 
-        Path installDir = resolveInstallDir(config, projectDirs);
+        Path installDir = resolveInstallDir(config, projectDirs).normalize();
         FrontendPluginFactory factory = new FrontendPluginFactory(null, installDir.toFile());
         if (!config.nodeVersion.isPresent()) {
             throw new ConfigurationException("node-version is required to install package manager",
@@ -34,11 +39,21 @@ public final class PackageManagerInstall {
         }
         try {
             final ProxyConfig proxy = new ProxyConfig(Collections.emptyList());
-            factory.getNodeInstaller(proxy)
-                    .setNodeVersion("v" + config.nodeVersion.get())
-                    .setNodeDownloadRoot(config.nodeDownloadRoot)
-                    .setNpmVersion(config.npmVersion)
-                    .install();
+            try {
+                factory.getNodeInstaller(proxy)
+                        .setNodeVersion("v" + config.nodeVersion.get())
+                        .setNodeDownloadRoot(config.nodeDownloadRoot)
+                        .setNpmVersion(config.npmVersion)
+                        .install();
+            } catch (InstallationException e) {
+                if (e.getCause() instanceof DirectoryNotEmptyException && e.getCause().getMessage().contains("tmp")) {
+                    LOG.warnf("Quinoa was not able to delete the Node install temporary directory: %s",
+                            e.getCause().getMessage());
+                } else {
+                    throw e;
+                }
+            }
+
             factory.getNPMInstaller(proxy)
                     .setNodeVersion("v" + config.nodeVersion.get())
                     .setNpmVersion(config.npmVersion)
