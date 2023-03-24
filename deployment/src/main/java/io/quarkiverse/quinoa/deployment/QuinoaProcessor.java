@@ -263,12 +263,12 @@ public class QuinoaProcessor {
         Path configuredUIDirPath = Path.of(config.uiDir.trim());
         if (projectRoot == null || !Files.isDirectory(projectRoot)) {
             if (configuredUIDirPath.isAbsolute() && Files.isDirectory(configuredUIDirPath)) {
-                return new ProjectDirs(null, configuredUIDirPath);
+                return new ProjectDirs(null, configuredUIDirPath.normalize());
             }
             throw new IllegalStateException(
                     "If not absolute, the Web UI directory is resolved relative to the project root, but Quinoa was not able to find the project root.");
         }
-        final Path uiRoot = projectRoot.resolve(configuredUIDirPath);
+        final Path uiRoot = projectRoot.resolve(configuredUIDirPath).normalize();
         if (!Files.isDirectory(uiRoot)) {
             LOG.warnf(
                     "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s' resolved to '%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
@@ -286,7 +286,7 @@ public class QuinoaProcessor {
                     || Files.exists(currentPath.resolve(Paths.get("config", "application.properties")))
                     || Files.exists(currentPath.resolve(Paths.get("config", "application.yaml")))
                     || Files.exists(currentPath.resolve(Paths.get("config", "application.yml")))) {
-                return currentPath;
+                return currentPath.normalize();
             }
             if (currentPath.getParent() != null && Files.exists(currentPath.getParent())) {
                 currentPath = currentPath.getParent();
