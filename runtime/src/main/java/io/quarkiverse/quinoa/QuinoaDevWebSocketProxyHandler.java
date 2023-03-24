@@ -68,7 +68,7 @@ class QuinoaDevWebSocketProxyHandler {
 
                 httpClient.webSocket(options, clientContext -> {
                     if (clientContext.succeeded()) {
-                        LOG.debugf("Quinoa Dev WebSocket Client Connected: %s:%s%s", host, port, forwardUri);
+                        LOG.infof("Quinoa Dev WebSocket Client Connected: %s:%s%s", host, port, forwardUri);
                         clientWs.set(clientContext.result());
                         // messages from NodeJS forwarded back to browser
                         clientWs.get().exceptionHandler(

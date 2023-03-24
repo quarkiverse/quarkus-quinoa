@@ -29,6 +29,7 @@ import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.builder.BuildException;
+import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -217,6 +218,18 @@ public class QuinoaProcessor {
                         .build());
             }
         }
+    }
+
+    @BuildStep(onlyIf = IsDevelopment.class)
+    List<HotDeploymentWatchedFileBuildItem> hotDeploymentWatchedFiles(QuinoaConfig quinoaConfig,
+            OutputTargetBuildItem outputTarget) {
+        final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(3);
+        final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
+        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("package-lock.json").toString()));
+        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("yarn.lock").toString()));
+        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("pnpm-lock.yaml").toString()));
+
+        return watchedFiles;
     }
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
