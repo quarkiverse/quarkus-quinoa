@@ -35,9 +35,10 @@ public class DevServerConfig {
 
     /**
      * Host of the server to forward requests to.
-     * By default, Quinoa will use the host contained in the request headers.
+     * "localhost" is the default
      */
-    public Optional<String> host;
+    @ConfigItem(defaultValue = "localhost")
+    public String host;
 
     /**
      * After start, Quinoa wait for the external dev server.
