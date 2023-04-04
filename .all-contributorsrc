@@ -16,6 +16,16 @@
       ]
     },
     {
+      "login": "melloware",
+      "name": "Melloware",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4399574?v=4",
+      "profile": "http://melloware.com",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
       "login": "phillip-kruger",
       "name": "Phillip Krüger",
       "avatar_url": "https://avatars.githubusercontent.com/u/6836179?v=4",
@@ -75,16 +85,6 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/11509290?v=4",
       "profile": "https://hollycummins.com",
       "contributions": [
-        "doc"
-      ]
-    },
-    {
-      "login": "melloware",
-      "name": "Melloware",
-      "avatar_url": "https://avatars.githubusercontent.com/u/4399574?v=4",
-      "profile": "http://melloware.com",
-      "contributions": [
-        "code",
         "doc"
       ]
     }
