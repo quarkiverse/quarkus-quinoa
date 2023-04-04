@@ -24,11 +24,13 @@ public class QuinoaConfig {
 
     private static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
     private static final String DEFAULT_INDEX_PAGE = "index.html";
+    private static final String DEFAULT_UI_BASE_PATH = "/";
 
     /**
      * Indicate if the extension should be enabled.
      * Default is true if the Web UI directory exists and dev and prod mode.
-     * Default is false in test mode (to avoid building the Web UI during backend tests).
+     * Default is false in test mode (to avoid building the Web UI during backend
+     * tests).
      */
     @ConfigItem(name = ConfigItem.PARENT, defaultValueDocumentation = "disabled in test mode")
     Optional<Boolean> enable;
@@ -38,7 +40,8 @@ public class QuinoaConfig {
      * If true, Quinoa will NOT serve the Web UI built resources.
      * This is handy when the output of the build is used
      * to be served via something else (nginx, cdn, ...)
-     * Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build with Gradle).
+     * Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build
+     * with Gradle).
      *
      * Default is false.
      */
@@ -56,7 +59,8 @@ public class QuinoaConfig {
     /**
      * This the Web UI internal build system (webpack, ...) output directory.
      * After the build, Quinoa will take the files from this directory,
-     * move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and serve them at runtime.
+     * move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and
+     * serve them at runtime.
      * The path is relative to the Web UI path.
      * If not set "build/" will be used
      */
@@ -65,7 +69,8 @@ public class QuinoaConfig {
 
     /**
      * Name of the package manager binary.
-     * If not set, it will be auto-detected depending on the lockfile falling back to "npm".
+     * If not set, it will be auto-detected depending on the lockfile falling back
+     * to "npm".
      * Only npm, pnpm and yarn are supported for the moment.
      */
     @ConfigItem(defaultValueDocumentation = "auto-detected with lockfile")
@@ -91,8 +96,10 @@ public class QuinoaConfig {
     public String indexPage;
 
     /**
-     * Indicate if the Web UI should also be tested during the build phase (i.e: npm test).
-     * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have Web UI test running during a
+     * Indicate if the Web UI should also be tested during the build phase (i.e: npm
+     * test).
+     * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have Web
+     * UI test running during a
      * {@link io.quarkus.test.junit.QuarkusTest}
      * Default is false.
      */
@@ -100,7 +107,8 @@ public class QuinoaConfig {
     boolean runTests;
 
     /**
-     * Install the packages using a frozen lockfile. Don’t generate a lockfile and fail if an update is needed (useful in CI).
+     * Install the packages using a frozen lockfile. Don’t generate a lockfile and
+     * fail if an update is needed (useful in CI).
      * If not set it is true if environment CI=true, else it is false.
      */
     @ConfigItem(defaultValueDocumentation = "true if environment CI=true")
@@ -108,23 +116,33 @@ public class QuinoaConfig {
 
     /**
      * Force install packages before building.
-     * If not set, it will install packages only if the node_modules directory is absent or when the package.json is modified in
+     * If not set, it will install packages only if the node_modules directory is
+     * absent or when the package.json is modified in
      * dev-mode.
      */
     @ConfigItem
     public boolean forceInstall;
 
     /**
-     * Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the "index.html".
-     * Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic.
+     * Enable SPA (Single Page Application) routing, all relevant requests will be
+     * re-routed to the "index.html".
+     * Currently, for technical reasons, the Quinoa SPA routing configuration won't
+     * work with RESTEasy Classic.
      * If not set, it is disabled.
      */
     @ConfigItem
     public boolean enableSPARouting;
 
     /**
+     * UI base path to route to; if not set, the default is "/".
+     */
+    @ConfigItem(defaultValue = DEFAULT_UI_BASE_PATH)
+    public String uiBasePath;
+
+    /**
      * List of path prefixes to be ignored by Quinoa.
-     * If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and "quarkus.http.non-application-root-path" will
+     * If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and
+     * "quarkus.http.non-application-root-path" will
      * be ignored.
      */
     @ConfigItem
@@ -154,7 +172,7 @@ public class QuinoaConfig {
     public QuinoaHandlerConfig toHandlerConfig(boolean prodMode, final HttpBuildTimeConfig httpBuildTimeConfig) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
         return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), indexPage, prodMode,
-                httpBuildTimeConfig.enableCompression, compressMediaTypes);
+                httpBuildTimeConfig.enableCompression, compressMediaTypes, uiBasePath);
     }
 
     private Optional<String> readExternalConfigPath(Config config, String key) {
@@ -174,18 +192,21 @@ public class QuinoaConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         QuinoaConfig that = (QuinoaConfig) o;
-        return runTests == that.runTests && forceInstall == that.forceInstall && enableSPARouting == that.enableSPARouting
+        return runTests == that.runTests && forceInstall == that.forceInstall
+                && enableSPARouting == that.enableSPARouting
                 && Objects.equals(enable, that.enable) && Objects.equals(uiDir, that.uiDir)
                 && Objects.equals(buildDir, that.buildDir) && Objects.equals(packageManager, that.packageManager)
                 && Objects.equals(packageManagerInstall, that.packageManagerInstall)
                 && Objects.equals(packageManagerCommand, that.packageManagerCommand)
                 && Objects.equals(indexPage, that.indexPage) && Objects.equals(frozenLockfile, that.frozenLockfile)
-                && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(devServer, that.devServer);
+                && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes)
+                && Objects.equals(devServer, that.devServer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enable, uiDir, buildDir, packageManager, packageManagerInstall, packageManagerCommand, indexPage,
+        return Objects.hash(enable, uiDir, buildDir, packageManager, packageManagerInstall, packageManagerCommand,
+                indexPage,
                 runTests, frozenLockfile, forceInstall, enableSPARouting, ignoredPathPrefixes, devServer);
     }
 }

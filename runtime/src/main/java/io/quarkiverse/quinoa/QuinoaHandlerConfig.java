@@ -12,15 +12,18 @@ public class QuinoaHandlerConfig {
     public final boolean prodMode;
     public final boolean enableCompression;
     public final Set<String> compressMediaTypes;
+    public final String uiBasePath;
 
     @RecordableConstructor
-    public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode, boolean enableCompression,
-            Set<String> compressMediaTypes) {
+    public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode,
+            boolean enableCompression,
+            Set<String> compressMediaTypes, String uiBasePath) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
         this.indexPage = indexPage;
         this.prodMode = prodMode;
         this.enableCompression = enableCompression;
         this.compressMediaTypes = compressMediaTypes;
+        this.uiBasePath = uiBasePath;
     }
 
     @Override
@@ -30,7 +33,8 @@ public class QuinoaHandlerConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         QuinoaHandlerConfig that = (QuinoaHandlerConfig) o;
-        return Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(indexPage, that.indexPage);
+        return Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes)
+                && Objects.equals(indexPage, that.indexPage);
     }
 
     @Override
