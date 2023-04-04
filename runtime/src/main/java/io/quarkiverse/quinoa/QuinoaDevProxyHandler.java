@@ -85,7 +85,6 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         final HttpServerRequest request = ctx.request();
         final MultiMap headers = request.headers();
         final String uri = computeResourceURI(resourcePath, request);
-        LOG.info("uri: " + uri);
         // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
         // See
         // https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
