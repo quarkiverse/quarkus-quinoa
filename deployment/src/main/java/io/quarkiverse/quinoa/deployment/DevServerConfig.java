@@ -20,15 +20,18 @@ public class DevServerConfig {
 
     /**
      * When set to true, Quinoa will manage the Web UI dev server
-     * When set to false, the Web UI dev server have to be started before running Quarkus dev
+     * When set to false, the Web UI dev server have to be started before running
+     * Quarkus dev
      */
     @ConfigItem(defaultValue = "true")
     public boolean managed;
 
     /**
      * Port of the server to forward requests to.
-     * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
-     * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
+     * The dev server process (i.e npm start) is managed like a dev service by
+     * Quarkus.
+     * If the external server responds with a 404, it is ignored by Quinoa and
+     * processed like any other backend request.
      */
     @ConfigItem
     public OptionalInt port;
@@ -51,8 +54,10 @@ public class DevServerConfig {
     public Optional<String> checkPath;
 
     /**
-     * By default, Quinoa will handle request upgrade to websocket and act as proxy with the dev server.
-     * If set to false, Quinoa will pass websocket upgrade request to the next Vert.x route handler.
+     * By default, Quinoa will handle request upgrade to websocket and act as proxy
+     * with the dev server.
+     * If set to false, Quinoa will pass websocket upgrade request to the next
+     * Vert.x route handler.
      */
     @ConfigItem(defaultValue = "true")
     public boolean websocket;
@@ -66,11 +71,18 @@ public class DevServerConfig {
 
     /**
      * Enable external dev server live coding logs.
-     * This is not enabled by default because most dev servers display compilation errors directly in the browser.
+     * This is not enabled by default because most dev servers display compilation
+     * errors directly in the browser.
      * False if not set.
      */
     @ConfigItem
     public boolean logs;
+
+    /**
+     * UI base path to route to; if not set, the default is "/".
+     */
+    @ConfigItem(defaultValue = "/")
+    public String path;
 
     @Override
     public boolean equals(Object o) {

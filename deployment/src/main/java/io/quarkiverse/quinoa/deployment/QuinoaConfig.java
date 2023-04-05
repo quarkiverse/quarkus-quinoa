@@ -24,7 +24,6 @@ public class QuinoaConfig {
 
     private static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
     private static final String DEFAULT_INDEX_PAGE = "index.html";
-    private static final String DEFAULT_UI_BASE_PATH = "/";
 
     /**
      * Indicate if the extension should be enabled.
@@ -134,12 +133,6 @@ public class QuinoaConfig {
     public boolean enableSPARouting;
 
     /**
-     * UI base path to route to; if not set, the default is "/".
-     */
-    @ConfigItem(defaultValue = DEFAULT_UI_BASE_PATH)
-    public String uiBasePath;
-
-    /**
      * List of path prefixes to be ignored by Quinoa.
      * If not set, "quarkus.resteasy-reactive.path", "quarkus.resteasy.path" and
      * "quarkus.http.non-application-root-path" will
@@ -172,7 +165,7 @@ public class QuinoaConfig {
     public QuinoaHandlerConfig toHandlerConfig(boolean prodMode, final HttpBuildTimeConfig httpBuildTimeConfig) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
         return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(), indexPage, prodMode,
-                httpBuildTimeConfig.enableCompression, compressMediaTypes, uiBasePath);
+                httpBuildTimeConfig.enableCompression, compressMediaTypes);
     }
 
     private Optional<String> readExternalConfigPath(Config config, String key) {

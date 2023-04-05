@@ -113,7 +113,8 @@ public class ForwardedDevProcessor {
                 return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
             } else {
                 throw new IllegalStateException(
-                        "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + devServerPort);
+                        "The Web UI dev server (configured as not managed by Quinoa) is not started on port: "
+                                + devServerPort);
             }
         }
 
@@ -177,7 +178,8 @@ public class ForwardedDevProcessor {
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
                             devProxy.get().getPort(),
-                            quinoaConfig.devServer.websocket))
+                            quinoaConfig.devServer.websocket,
+                            quinoaConfig.devServer.path))
                     .build());
             if (quinoaConfig.devServer.websocket) {
                 websocketSubProtocols.produce(new WebsocketSubProtocolsBuildItem("*"));

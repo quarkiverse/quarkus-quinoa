@@ -33,16 +33,18 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private final String host;
     private final int port;
     private final WebClient client;
+    private final String path;
     private final QuinoaDevWebSocketProxyHandler wsUpgradeHandler;
     private final ClassLoader currentClassLoader;
     private final QuinoaHandlerConfig config;
 
     QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port,
-            boolean websocket) {
+            boolean websocket, String path) {
         this.host = host;
         this.port = port;
         this.client = WebClient.create(vertx);
         this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, host, port) : null;
+        this.path = path;
         this.config = config;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -113,13 +115,14 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                 });
     }
 
-    private String computeResourceURI(String path, HttpServerRequest request) {
-        String uri = path;
+    private String computeResourceURI(String currentPath, HttpServerRequest request) {
+        String uri = currentPath;
         final String query = request.query();
         if (query != null) {
             uri += "?" + query;
         }
-        return config.uiBasePath.equals("/") ? uri : config.uiBasePath + uri;
+
+        return this.path.equals("/") ? uri : this.path + uri;
     }
 
     private void forwardError(AsyncResult<HttpResponse<Buffer>> event, int statusCode, RoutingContext ctx) {

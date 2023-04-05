@@ -12,18 +12,16 @@ public class QuinoaHandlerConfig {
     public final boolean prodMode;
     public final boolean enableCompression;
     public final Set<String> compressMediaTypes;
-    public final String uiBasePath;
 
     @RecordableConstructor
     public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode,
             boolean enableCompression,
-            Set<String> compressMediaTypes, String uiBasePath) {
+            Set<String> compressMediaTypes) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
         this.indexPage = indexPage;
         this.prodMode = prodMode;
         this.enableCompression = enableCompression;
         this.compressMediaTypes = compressMediaTypes;
-        this.uiBasePath = uiBasePath;
     }
 
     @Override
