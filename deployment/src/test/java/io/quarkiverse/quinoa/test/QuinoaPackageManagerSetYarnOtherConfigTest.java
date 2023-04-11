@@ -1,11 +1,11 @@
 package io.quarkiverse.quinoa.test;
 
-import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.LockFile.YARN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -14,7 +14,7 @@ public class QuinoaPackageManagerSetYarnOtherConfigTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .initialLockfile(YARN)
+            .initialLockfile(PackageManagerType.YARN.getLockFile())
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager", "yarn.binary")
             .assertException(e -> {

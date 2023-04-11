@@ -2,7 +2,6 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 class PNPMPackageManagerCommands implements PackageManagerCommands {
 
-    static final String pnpm = "pnpm";
     private final String binary;
 
     public PNPMPackageManagerCommands(String binary) {

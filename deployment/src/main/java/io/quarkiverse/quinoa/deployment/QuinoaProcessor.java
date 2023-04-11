@@ -27,6 +27,7 @@ import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.builder.BuildException;
 import io.quarkus.deployment.IsDevelopment;
@@ -223,12 +224,12 @@ public class QuinoaProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     List<HotDeploymentWatchedFileBuildItem> hotDeploymentWatchedFiles(QuinoaConfig quinoaConfig,
             OutputTargetBuildItem outputTarget) {
-        final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(3);
+        final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(PackageManagerType.values().length);
         final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
-        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("package-lock.json").toString()));
-        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("yarn.lock").toString()));
-        watchedFiles.add(new HotDeploymentWatchedFileBuildItem(projectDirs.uiDir.resolve("pnpm-lock.yaml").toString()));
-
+        for (PackageManagerType pm : PackageManagerType.values()) {
+            final String watchFile = projectDirs.uiDir.resolve(pm.getLockFile()).toString();
+            watchedFiles.add(new HotDeploymentWatchedFileBuildItem(watchFile));
+        }
         return watchedFiles;
     }
 

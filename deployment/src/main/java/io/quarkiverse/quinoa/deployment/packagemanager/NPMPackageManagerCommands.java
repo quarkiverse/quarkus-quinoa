@@ -1,7 +1,6 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
 class NPMPackageManagerCommands implements PackageManagerCommands {
-    static final String npm = "npm";
     private final String binary;
 
     public NPMPackageManagerCommands(String binary) {
