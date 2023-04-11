@@ -9,6 +9,7 @@ import io.quarkus.runtime.annotations.ConfigItem;
 @ConfigGroup
 public class PackageManagerInstallConfig {
 
+    public static final String NPM_PROVIDED = "provided";
     private static final String DEFAULT_INSTALL_DIR = ".quinoa/";
 
     /**
@@ -45,7 +46,7 @@ public class PackageManagerInstallConfig {
      * The NPM version to install.
      * By default, the version is provided by NodeJS.
      */
-    @ConfigItem(defaultValue = "provided")
+    @ConfigItem(defaultValue = NPM_PROVIDED)
     public String npmVersion;
 
     /**
@@ -53,6 +54,32 @@ public class PackageManagerInstallConfig {
      */
     @ConfigItem(defaultValue = "https://registry.npmjs.org/npm/-/")
     public String npmDownloadRoot;
+
+    /**
+     * The PNPM version to install.
+     * If the version is set and NPM and YARN are not set, then this version will attempt to be downloaded.
+     */
+    @ConfigItem
+    public Optional<String> pnpmVersion;
+
+    /**
+     * Where to download PNPM from.
+     */
+    @ConfigItem(defaultValue = "https://registry.npmjs.org/pnpm/-/")
+    public String pnpmDownloadRoot;
+
+    /**
+     * The YARN version to install.
+     * If the version is set and NPM Version is not set, then this version will attempt to be downloaded.
+     */
+    @ConfigItem
+    public Optional<String> yarnVersion;
+
+    /**
+     * Where to download YARN from.
+     */
+    @ConfigItem(defaultValue = "https://github.com/yarnpkg/yarn/releases/download/")
+    public String yarnDownloadRoot;
 
     @Override
     public boolean equals(Object o) {
@@ -62,11 +89,15 @@ public class PackageManagerInstallConfig {
             return false;
         PackageManagerInstallConfig that = (PackageManagerInstallConfig) o;
         return enabled == that.enabled && Objects.equals(nodeVersion, that.nodeVersion)
-                && Objects.equals(nodeDownloadRoot, that.nodeDownloadRoot);
+                && Objects.equals(nodeDownloadRoot, that.nodeDownloadRoot) && Objects.equals(npmVersion, that.npmVersion)
+                && Objects.equals(npmDownloadRoot, that.npmDownloadRoot) && Objects.equals(pnpmVersion, that.pnpmVersion)
+                && Objects.equals(pnpmDownloadRoot, that.pnpmDownloadRoot) && Objects.equals(yarnVersion, that.yarnVersion)
+                && Objects.equals(yarnDownloadRoot, that.yarnDownloadRoot);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, nodeVersion, nodeDownloadRoot);
+        return Objects.hash(enabled, nodeVersion, nodeDownloadRoot, npmVersion, npmDownloadRoot, pnpmVersion, pnpmDownloadRoot,
+                yarnVersion, yarnDownloadRoot);
     }
 }
