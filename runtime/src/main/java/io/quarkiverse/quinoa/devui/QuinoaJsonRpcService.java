@@ -25,7 +25,7 @@ public class QuinoaJsonRpcService {
 
     public Multi<String> install() throws Exception {
         LOG.info("Stopping Node server, installing new packages, and restarting...");
-        Map<String, String> params = Collections.EMPTY_MAP;
+        Map<String, String> params = Collections.emptyMap();
 
         // For now, the JSON RPC are called on the event loop, but the action is blocking,
         // So, work around this by invoking the action on a worker thread.

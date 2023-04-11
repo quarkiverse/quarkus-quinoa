@@ -5,10 +5,10 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
 
-import io.netty.util.internal.StringUtil;
 import io.quarkiverse.quinoa.deployment.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.QuinoaDirectoryBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.devui.QuinoaJsonRpcService;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -47,13 +47,32 @@ public class QuinoaDevUIProcessor {
         }
 
         final String npmVersion = quinoaConfig.packageManagerInstall.npmVersion;
-        if (!StringUtil.isNullOrEmpty(npmVersion)) {
+        if (!PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion)) {
             final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("NPM")
                     .icon("font-awesome-brands:square-js")
                     .url("https://www.npmjs.com/")
                     .doNotEmbed()
                     .staticLabel(npmVersion);
             card.addPage(nodejsPage);
+        } else {
+            final Optional<String> pnpmVersion = quinoaConfig.packageManagerInstall.pnpmVersion;
+            if (pnpmVersion.isPresent()) {
+                final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("PNPM")
+                        .icon("font-awesome-brands:square-js")
+                        .url("https://pnpm.io/")
+                        .doNotEmbed()
+                        .staticLabel(pnpmVersion.get());
+                card.addPage(nodejsPage);
+            }
+            final Optional<String> yarnVersion = quinoaConfig.packageManagerInstall.yarnVersion;
+            if (yarnVersion.isPresent()) {
+                final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("Yarn")
+                        .icon("font-awesome-brands:square-js")
+                        .url("https://yarnpkg.com/")
+                        .doNotEmbed()
+                        .staticLabel(yarnVersion.get());
+                card.addPage(nodejsPage);
+            }
         }
 
         final OptionalInt port = quinoaConfig.devServer.port;

@@ -3,6 +3,7 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
@@ -20,6 +21,8 @@ public final class PackageManagerInstall {
     private static final String INSTALL_SUB_PATH = "node";
     public static final String NODE_BINARY = PackageManager.isWindows() ? "node.exe" : "node";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
+    public static final String PNPM_PATH = INSTALL_SUB_PATH + "/node_modules/corepack/dist/pnpm.js";
+    public static final String YARN_PATH = INSTALL_SUB_PATH + "/node_modules/corepack/dist/yarn.js";
 
     private PackageManagerInstall() {
 
@@ -54,12 +57,41 @@ public final class PackageManagerInstall {
                 }
             }
 
-            factory.getNPMInstaller(proxy)
-                    .setNodeVersion("v" + config.nodeVersion.get())
-                    .setNpmVersion(config.npmVersion)
-                    .setNpmDownloadRoot(config.npmDownloadRoot)
-                    .install();
-            return resolveInstalledNpmBinary(installDir);
+            // Use npm if npmVersion is different from provided or if no other version is set (then it will use the version provided by nodejs)
+            String executionPath = NPM_PATH;
+            final String npmVersion = config.npmVersion;
+            boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
+            if (!isNpmProvided) {
+                factory.getNPMInstaller(proxy)
+                        .setNodeVersion("v" + config.nodeVersion.get())
+                        .setNpmVersion(npmVersion)
+                        .setNpmDownloadRoot(config.npmDownloadRoot)
+                        .install();
+            }
+
+            // Use yarn if yarnVersion is set (and npm is provided)
+            final Optional<String> yarnVersion = config.yarnVersion;
+            if (yarnVersion.isPresent() && isNpmProvided) {
+                executionPath = YARN_PATH;
+                factory.getYarnInstaller(proxy)
+                        .setYarnVersion("v" + config.yarnVersion.get())
+                        .setYarnDownloadRoot(config.yarnDownloadRoot)
+                        .setIsYarnBerry(true)
+                        .install();
+            }
+
+            // Use pnpm if pnpmVersion is set (and npm is provided and yarnVersion is not set)
+            final Optional<String> pnpmVersion = config.pnpmVersion;
+            if (pnpmVersion.isPresent() && isNpmProvided && !yarnVersion.isPresent()) {
+                executionPath = PNPM_PATH;
+                factory.getPNPMInstaller(proxy)
+                        .setNodeVersion("v" + config.nodeVersion.get())
+                        .setPnpmVersion(pnpmVersion.get())
+                        .setPnpmDownloadRoot(config.pnpmDownloadRoot)
+                        .install();
+            }
+
+            return resolveInstalledExecutorBinary(installDir, executionPath);
         } catch (InstallationException e) {
             throw new RuntimeException("Error while installing NodeJS", e);
         }
@@ -78,13 +110,13 @@ public final class PackageManagerInstall {
         return projectDirs.getProjectRootDir().resolve(installPath);
     }
 
-    private static Installation resolveInstalledNpmBinary(Path installDirectory) {
+    private static Installation resolveInstalledExecutorBinary(Path installDirectory, String executionPath) {
         final Path nodeDirPath = installDirectory.resolve(INSTALL_SUB_PATH)
                 .toAbsolutePath();
-        final Path npmPath = installDirectory.resolve(NPM_PATH).toAbsolutePath();
+        final Path executorPath = installDirectory.resolve(executionPath).toAbsolutePath();
         final String platformNodeDirPath = normalizePath(nodeDirPath.toString());
-        final String platformNPMPath = normalizePath(npmPath.toString());
-        final String packageManagerBinary = NODE_BINARY + " " + quotePathWithSpaces(platformNPMPath);
+        final String platformExecutorPath = normalizePath(executorPath.toString());
+        final String packageManagerBinary = NODE_BINARY + " " + quotePathWithSpaces(platformExecutorPath);
         return new Installation(platformNodeDirPath, packageManagerBinary);
     }
 
