@@ -18,22 +18,6 @@ public class QuinoaQuarkusUnitTest {
 
     public static final String TARGET_TEST_WEBUI = "target/test-webui";
 
-    public enum LockFile {
-        YARN("yarn.lock"),
-        NPM("package-lock.json"),
-        PNPM("pnpm-lock.yaml");
-
-        private final String fileName;
-
-        LockFile(String fileName) {
-            this.fileName = fileName;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-    }
-
     private static final String OS_NAME = System.getProperty("os.name");
     private static final String CI = System.getProperty("CI");
 
@@ -54,8 +38,8 @@ public class QuinoaQuarkusUnitTest {
         return new QuinoaQuarkusUnitTest(uiDir);
     }
 
-    public QuinoaQuarkusUnitTest initialLockfile(LockFile lockFile) {
-        this.initialLockfile = lockFile.getFileName();
+    public QuinoaQuarkusUnitTest initialLockfile(String lockFile) {
+        this.initialLockfile = lockFile;
         return this;
     }
 

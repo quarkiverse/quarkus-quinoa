@@ -145,12 +145,12 @@ public class PackageManager {
             PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths) {
         String resolved = null;
         if (binary.isEmpty()) {
-            if (Files.isRegularFile(directory.resolve("yarn.lock"))) {
-                resolved = YarnPackageManagerCommands.yarn;
-            } else if (Files.isRegularFile(directory.resolve("pnpm-lock.yaml"))) {
-                resolved = PNPMPackageManagerCommands.pnpm;
+            if (Files.isRegularFile(directory.resolve(PackageManagerType.YARN.getLockFile()))) {
+                resolved = PackageManagerType.YARN.getCommand();
+            } else if (Files.isRegularFile(directory.resolve(PackageManagerType.PNPM.getLockFile()))) {
+                resolved = PackageManagerType.PNPM.getCommand();
             } else {
-                resolved = NPMPackageManagerCommands.npm;
+                resolved = PackageManagerType.NPM.getCommand();
             }
             if (isWindows()) {
                 resolved = resolved + ".cmd";
@@ -167,13 +167,13 @@ public class PackageManager {
 
     static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands,
             List<String> paths) {
-        if (binary.contains(PNPMPackageManagerCommands.pnpm)) {
+        if (binary.contains(PackageManagerType.PNPM.getCommand())) {
             return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands, paths);
         }
-        if (binary.contains(NPMPackageManagerCommands.npm)) {
+        if (binary.contains(PackageManagerType.NPM.getCommand())) {
             return new EffectiveCommands(new NPMPackageManagerCommands(binary), packageManagerCommands, paths);
         }
-        if (binary.contains(YarnPackageManagerCommands.yarn)) {
+        if (binary.contains(PackageManagerType.YARN.getCommand())) {
             return new EffectiveCommands(new YarnPackageManagerCommands(binary), packageManagerCommands, paths);
         }
         throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
