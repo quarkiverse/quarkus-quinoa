@@ -3,7 +3,6 @@ package io.quarkiverse.quinoa;
 import static io.quarkiverse.quinoa.QuinoaRecorder.compressIfNeeded;
 import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaRecorder.next;
-import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
 import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
 import java.util.List;
@@ -52,7 +51,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             next(currentClassLoader, ctx);
             return;
         }
-        String path = resolvePath(ctx);
+        String path = ctx.normalizedPath();
         if (isIgnored(path, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
             return;
