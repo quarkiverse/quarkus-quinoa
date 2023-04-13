@@ -87,6 +87,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "shivam-sharma7",
+      "name": "Shivam Sharma",
+      "avatar_url": "https://avatars.githubusercontent.com/u/91419219?v=4",
+      "profile": "http://shivams.bio.link/",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
