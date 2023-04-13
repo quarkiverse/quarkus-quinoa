@@ -4,7 +4,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single project.
@@ -56,16 +56,17 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ia3andy"><img src="https://avatars.githubusercontent.com/u/2223984?v=4?s=100" width="100px;" alt="Andy Damevin"/><br /><sub><b>Andy Damevin</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=ia3andy" title="Code">💻</a> <a href="#maintenance-ia3andy" title="Maintenance">🚧</a></td>
-            <td align="center" valign="top" width="14.28%"><a href="http://melloware.com"><img src="https://avatars.githubusercontent.com/u/4399574?v=4?s=100" width="100px;" alt="Melloware"/><br /><sub><b>Melloware</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=melloware" title="Code">💻</a>  <a href="#maintenance-melloware" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://melloware.com"><img src="https://avatars.githubusercontent.com/u/4399574?v=4?s=100" width="100px;" alt="Melloware"/><br /><sub><b>Melloware</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=melloware" title="Code">💻</a> <a href="#maintenance-melloware" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.phillip-kruger.com"><img src="https://avatars.githubusercontent.com/u/6836179?v=4?s=100" width="100px;" alt="Phillip Krüger"/><br /><sub><b>Phillip Krüger</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=phillip-kruger" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rvansa"><img src="https://avatars.githubusercontent.com/u/2167869?v=4?s=100" width="100px;" alt="Radim Vansa"/><br /><sub><b>Radim Vansa</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=rvansa" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/fblan"><img src="https://avatars.githubusercontent.com/u/13745480?v=4?s=100" width="100px;" alt="Blanc Frederic"/><br /><sub><b>Blanc Frederic</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=fblan" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/andyhan"><img src="https://avatars.githubusercontent.com/u/142950?v=4?s=100" width="100px;" alt="andyhan"/><br /><sub><b>andyhan</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=andyhan" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/computerlove"><img src="https://avatars.githubusercontent.com/u/769579?v=4?s=100" width="100px;" alt="Marvin Bredal Lillehaug"/><br /><sub><b>Marvin Bredal Lillehaug</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=computerlove" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/johnaohara"><img src="https://avatars.githubusercontent.com/u/959822?v=4?s=100" width="100px;" alt="John O'Hara"/><br /><sub><b>John O'Hara</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=johnaohara" title="Code">💻</a></td>
     </tr>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/johnaohara"><img src="https://avatars.githubusercontent.com/u/959822?v=4?s=100" width="100px;" alt="John O'Hara"/><br /><sub><b>John O'Hara</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=johnaohara" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://hollycummins.com"><img src="https://avatars.githubusercontent.com/u/11509290?v=4?s=100" width="100px;" alt="Holly Cummins"/><br /><sub><b>Holly Cummins</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=holly-cummins" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://shivams.bio.link/"><img src="https://avatars.githubusercontent.com/u/91419219?v=4?s=100" width="100px;" alt="Shivam Sharma"/><br /><sub><b>Shivam Sharma</b></sub></a><br /><a href="#infra-shivam-sharma7" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>
