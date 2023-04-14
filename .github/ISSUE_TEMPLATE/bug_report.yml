@@ -1,0 +1,68 @@
+name: Bug report
+description: Create a report to help Quinoa improve
+title: ''
+labels: ['Status: needs triage']
+body:
+    - type: textarea
+      id: description
+      attributes:
+          label: Describe the bug
+          description: A clear and concise description of what the bug is.
+      validations:
+          required: true
+    - type: input
+      id: quinoa-version
+      attributes:
+          label: Quinoa version
+          placeholder: x.x.x
+      validations:
+          required: true
+    - type: input
+      id: quarkus-version
+      attributes:
+          label: Quarkus version
+          placeholder: x.x.x
+      validations:
+          required: true
+    - type: dropdown
+      id: engine
+      attributes:
+          label: Build / Runtime
+          multiple: false
+          options:
+              - Vite
+              - Angular
+              - Create React App (CRA)
+              - Next.js
+              - Other
+      validations:
+          required: true
+    - type: dropdown
+      id: package-manager
+      attributes:
+          label: Package Manager
+          multiple: false
+          options:
+              - NPM
+              - PNPM
+              - YARN
+              - OTHER
+    - type: textarea
+      id: reproduce-steps
+      attributes:
+          label: Steps to reproduce the behavior
+          description: A clear and concise description of how to make the issue happen.
+          placeholder: >
+              1. Go to '...'
+              2. Click on '....'
+              3. Scroll down to '....'
+              4. See error
+      validations:
+          required: false
+    - type: textarea
+      id: expected-behavior
+      attributes:
+          label: Expected behavior
+          description: A clear and concise description of what you expected to happen.
+      validations:
+          required: false
