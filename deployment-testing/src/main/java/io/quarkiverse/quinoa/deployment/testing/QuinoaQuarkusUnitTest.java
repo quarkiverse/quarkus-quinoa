@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import io.quarkus.deployment.util.FileUtil;
+import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.test.QuarkusUnitTest;
 
 /**
@@ -17,8 +18,6 @@ import io.quarkus.test.QuarkusUnitTest;
 public class QuinoaQuarkusUnitTest {
 
     public static final String TARGET_TEST_WEBUI = "target/test-webui";
-
-    private static final String OS_NAME = System.getProperty("os.name");
     private static final String CI = System.getProperty("CI");
 
     private final Path testDir;
@@ -90,7 +89,7 @@ public class QuinoaQuarkusUnitTest {
     }
 
     public static boolean isWindows() {
-        return OS_NAME != null && OS_NAME.startsWith("Windows");
+        return QuarkusConsole.IS_WINDOWS;
     }
 
     public static void prepareTestWebUI(Path testDir, boolean nodeModules) {

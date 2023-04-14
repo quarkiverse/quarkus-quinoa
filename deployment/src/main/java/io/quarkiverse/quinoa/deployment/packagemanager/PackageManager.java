@@ -19,12 +19,11 @@ import java.util.concurrent.TimeUnit;
 import org.jboss.logging.Logger;
 
 import io.quarkus.deployment.util.ProcessUtil;
+import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.runtime.LaunchMode;
 
 public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
-    private static final String OS_NAME = System.getProperty("os.name");
-    private static final boolean IS_WINDOWS = OS_NAME != null && OS_NAME.startsWith("Windows");
 
     private final Path directory;
     private final PackageManagerCommands packageManagerCommands;
@@ -162,7 +161,7 @@ public class PackageManager {
     }
 
     public static boolean isWindows() {
-        return IS_WINDOWS;
+        return QuarkusConsole.IS_WINDOWS;
     }
 
     static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands,
@@ -218,8 +217,7 @@ public class PackageManager {
     }
 
     private String[] runner(Command command) {
-        final String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Windows")) {
+        if (isWindows()) {
             return new String[] { "cmd.exe", "/c", command.commandWithArguments };
         } else {
             return new String[] { "sh", "-c", command.commandWithArguments };
@@ -268,10 +266,7 @@ public class PackageManager {
             connection.setReadTimeout(200);
             connection.connect();
             int code = connection.getResponseCode();
-            if (code == 200) {
-                return true;
-            }
-            return false;
+            return code == 200;
         } catch (ConnectException | SocketTimeoutException e) {
             return false;
         } catch (IOException e) {
