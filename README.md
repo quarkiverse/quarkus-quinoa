@@ -44,6 +44,10 @@ You could also just add the extension (but you won't get the starter code):
 ```bash
 quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 ```
+## 🧑‍💻 Contributing
+
+- Contribution is the best way to support and get involved in community!
+- Contributions to `quarkus-quinoa` Please check our [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Contributors ✨
 
