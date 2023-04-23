@@ -13,9 +13,9 @@
     "theaterjs": "3.2.0"
   },
   "devDependencies": {
-    "webpack": "^5.72.0",
+    "copy-webpack-plugin": "^10.2.4",
+    "webpack": "^5.80.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.0",
-    "copy-webpack-plugin": "^10.2.4"
+    "webpack-dev-server": "^4.9.0"
   }
 }
