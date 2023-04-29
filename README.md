@@ -62,7 +62,7 @@ quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 - Please, consult our [Code of Conduct](./CODE_OF_CONDUCT.md) policies for interacting in our community.
 - Contributions to `quarkus-quinoa` Please check our [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-### If you have any idea or doubt 🤷
+### If you have any idea or question 🤷
 
 - [Ask a question](https://github.com/quarkiverse/quarkus-quinoa/discussions)
 - [Raise an issue](https://github.com/quarkiverse/quarkus-quinoa/issues)
