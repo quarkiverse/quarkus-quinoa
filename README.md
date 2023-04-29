@@ -8,10 +8,13 @@
 [![Build](https://github.com/quarkiverse/quarkus-quinoa/workflows/Build/badge.svg)](https://github.com/quarkiverse/quarkus-quinoa/actions?query=workflow%3ABuild)
 [![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
- 
+
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single project.
 
 You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
@@ -22,21 +25,23 @@ Read the full [Quinoa documentation](https://quarkiverse.github.io/quarkiverse-d
 
 ### Prerequisite
 
-* Create or use an existing Quarkus application
-* Add the Quinoa extension
-* Install NodeJS (https://nodejs.org/) or make sure Quinoa is [configured](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/#package-manager-install) to install it.
+- Create or use an existing Quarkus application
+- Add the Quinoa extension
+- Install NodeJS (https://nodejs.org/) or make sure Quinoa is [configured](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/#package-manager-install) to install it.
 
 ### Installation
 
 Create a new Quinoa project (with a base Quinoa starter code):
 
-* With [code.quarkus.io](https://code.quarkus.io/?a=quinoa-bowl&j=17&e=io.quarkiverse.quinoa%3Aquarkus-quinoa)
-* With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+- With [code.quarkus.io](https://code.quarkus.io/?a=quinoa-bowl&j=17&e=io.quarkiverse.quinoa%3Aquarkus-quinoa)
+- With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+
 ```bash
 quarkus create app quinoa-app -x=io.quarkiverse.quinoa:quarkus-quinoa
 ```
 
 Then start the live-coding:
+
 ```bash
 quarkus dev
 ```
@@ -45,14 +50,24 @@ And navigate to http://0.0.0.0:8080/quinoa.html
 
 You could also just add the extension (but you won't get the starter code):
 
-* With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+- With the [Quarkus CLI](https://quarkus.io/guides/cli-tooling):
+
 ```bash
 quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 ```
+
 ## 🧑‍💻 Contributing
 
 - Contribution is the best way to support and get involved in community!
+- Please, consult our [Code of Conduct](./CODE_OF_CONDUCT.md) policies for interacting in our community.
 - Contributions to `quarkus-quinoa` Please check our [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+### If you have any idea or doubt 🤷
+
+- [Ask a question](https://github.com/quarkiverse/quarkus-quinoa/discussions)
+- [Raise an issue](https://github.com/quarkiverse/quarkus-quinoa/issues)
+- [Feature request](https://github.com/quarkiverse/quarkus-quinoa/issues)
+- [Code submission](https://github.com/quarkiverse/quarkus-quinoa/pulls)
 
 ## Contributors ✨
 
