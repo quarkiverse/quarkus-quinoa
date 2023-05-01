@@ -5,3 +5,4 @@ quarkus:
       node-version: 18.15.0
     dev-server:
       port: 3000
+      host: localhost
