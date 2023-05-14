@@ -16,7 +16,7 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [NodeJS](https://nodejs.org/en) : [React](https://react.dev/learn), [Angular](), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
+Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [NodeJS](https://nodejs.org/en) : [React](https://react.dev/learn), [Angular](https://angular.io/guide/what-is-angular), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
 
 You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
 
@@ -28,7 +28,7 @@ Read the full [Quinoa documentation](https://quarkiverse.github.io/quarkiverse-d
 
 - Create or use an existing Quarkus application
 - Add the Quinoa extension
-- Install NodeJS (https://nodejs.org/) or make sure Quinoa is [configured](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/#package-manager-install) to install it.
+- Install [NodeJS](https://nodejs.org/) or make sure Quinoa is [configured](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/#package-manager-install) to install it.
 
 ### Installation
 
