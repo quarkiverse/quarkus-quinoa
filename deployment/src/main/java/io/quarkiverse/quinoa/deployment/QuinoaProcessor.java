@@ -226,6 +226,10 @@ public class QuinoaProcessor {
             OutputTargetBuildItem outputTarget) {
         final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(PackageManagerType.values().length);
         final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
+        if (projectDirs == null) {
+            // UI dir is misconfigured so just skip watching files
+            return watchedFiles;
+        }
         for (PackageManagerType pm : PackageManagerType.values()) {
             final String watchFile = projectDirs.uiDir.resolve(pm.getLockFile()).toString();
             watchedFiles.add(new HotDeploymentWatchedFileBuildItem(watchFile));
