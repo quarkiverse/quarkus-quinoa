@@ -241,13 +241,8 @@ NOTE: Quinoa relies on the dev server returning a 404 when the file is not found
 [#react]
 === React
 
-App created by Create React App (https://create-react-app.dev/docs/getting-started) are compatible without any change.
+App created by  https://create-react-app.dev/docs/getting-started[Create React App], https://github.com/timarney/react-app-rewired[React App Rewired] and https://craco.js.org/[CRACO] are compatible without any change.
 
-To enable React live coding server:
-[source,properties]
-----
-quarkus.quinoa.dev-server.port=3000
-----
 
 [#angular]
 === Angular
@@ -258,11 +253,7 @@ App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of
 quarkus.quinoa.build-dir=dist/[your-app-name]
 ----
 
-To enable Angular live coding server, you need to edit the package.json start script with `ng serve --host 0.0.0.0 --disable-host-check`, then add this configuration:
-[source,properties]
-----
-quarkus.quinoa.dev-server.port=4200
-----
+To enable Angular live coding server, you need to edit the package.json start script with `ng serve --host 0.0.0.0 --disable-host-check`.
 
 If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
 
@@ -289,13 +280,12 @@ Edit the karma.conf.js:
 
 [#nextjs]
 === Next.js
-Any app created with Next.js (https://nextjs.org/) should work with Quinoa after the following changes:
+Any app created with https://nextjs.org/[Next.js] should work with Quinoa after the following changes:
 
 In application.properties add:
 [source,properties]
 ----
 %dev.quarkus.quinoa.index-page=/
-quarkus.quinoa.build-dir=out
 ----
 
 In Dev mode Next.js serves everything out of root "/" but in PRD mode its the normal "/index.html".
@@ -312,20 +302,12 @@ Add these scripts to package.json
 
 [#vite]
 === Vite
-Any app created with Vite (https://vitejs.dev/guide/) should work with Quinoa after the following changes:
-
-In application.properties add:
-[source,properties]
-----
-quarkus.quinoa.dev-server.port=5173
-quarkus.quinoa.build-dir=dist
-----
+Any app created with https://vitejs.dev/guide/[Vite] should work with Quinoa after the following changes:
 
 Add start script to package.json
 [source,json]
 ----
   "scripts": {
-    ...
     "start": "vite"
   },
 ----

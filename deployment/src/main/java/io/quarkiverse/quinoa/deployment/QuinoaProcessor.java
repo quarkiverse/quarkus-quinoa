@@ -17,14 +17,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonString;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
+import io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
@@ -57,7 +65,7 @@ public class QuinoaProcessor {
 
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
-    private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "build", "target", "dist");
+    private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "build", "target", "dist", "out");
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -84,10 +92,9 @@ public class QuinoaProcessor {
         if (projectDirs == null) {
             return null;
         }
-        final Path packageFile = projectDirs.uiDir.resolve("package.json");
-        if (!Files.isRegularFile(packageFile)) {
-            throw new ConfigurationException(
-                    "No package.json found in Web UI directory: '" + configuredDir + "'");
+        final Path packageJsonFile = projectDirs.uiDir.resolve("package.json");
+        if (!Files.isRegularFile(packageJsonFile)) {
+            throw new ConfigurationException("No package.json found in Web UI directory: '" + configuredDir + "'");
         }
         Optional<String> packageManagerBinary = quinoaConfig.packageManager;
         List<String> paths = new ArrayList<>();
@@ -101,11 +108,18 @@ public class QuinoaProcessor {
                 quinoaConfig.packageManagerCommand, projectDirs.getUIDir(), paths);
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
-                && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageFile.toString()));
+                && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageJsonFile.toString()));
         if (quinoaConfig.forceInstall || !alreadyInstalled || packageFileModified) {
             final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
             packageManager.install(frozenLockfile);
         }
+
+        // attempt to autoconfigure settings based on the framework being used
+        final Pair<FrameworkType, String> detectionResult = detectFramework(packageJsonFile);
+        final FrameworkType framework = detectionResult.getLeft();
+        final String applicationName = detectionResult.getRight();
+        initDefaultConfig(launchMode, quinoaConfig, framework, applicationName);
+
         return new QuinoaDirectoryBuildItem(packageManager);
     }
 
@@ -237,6 +251,62 @@ public class QuinoaProcessor {
         return watchedFiles;
     }
 
+    private Pair<FrameworkType, String> detectFramework(Path packageJsonFile) {
+        JsonString applicationName = null;
+        JsonString startScript = null;
+        try (JsonReader reader = Json.createReader(Files.newInputStream(packageJsonFile))) {
+            JsonObject root = reader.readObject();
+            applicationName = root.getJsonString("name");
+            JsonObject scripts = root.getJsonObject("scripts");
+            if (scripts != null) {
+                startScript = scripts.getJsonString("start");
+                if (startScript == null) {
+                    startScript = scripts.getJsonString("dev");
+                }
+            }
+        } catch (IOException e) {
+            LOG.warnf("Quinoa failed to auto-detect the framework from package.json file. %s", e.getMessage());
+        }
+
+        if (startScript == null) {
+            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
+            return Pair.of(null, null);
+        }
+
+        // check if we found a script to detect which framework
+        final FrameworkType frameworkType = FrameworkType.evaluate(startScript.getString());
+        if (frameworkType == null) {
+            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
+            return Pair.of(null, null);
+        }
+
+        LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
+        return Pair.of(frameworkType, Objects.toString(applicationName, "quinoa"));
+    }
+
+    private void initDefaultConfig(LaunchModeBuildItem launchMode, QuinoaConfig config, FrameworkType framework,
+            String applicationName) {
+        if (framework == null) {
+            // nothing to do as no framework was detected
+            return;
+        }
+        // only override properties that have not been set
+        if (launchMode.getLaunchMode() != LaunchMode.NORMAL && config.devServer.port.isEmpty()) {
+            LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
+            config.devServer.port = OptionalInt.of(framework.getDevServerPort());
+        }
+        if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir)) {
+            String newDirectory = framework.getBuildDirectory();
+
+            // Angular builds a custom directory "dist/[appname]"
+            if (framework == FrameworkType.ANGULAR) {
+                newDirectory = String.format(newDirectory, applicationName);
+            }
+            LOG.infof("%s framework setting build directory: '%s'", framework, newDirectory);
+            config.buildDir = newDirectory;
+        }
+    }
+
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
             BuildProducer<GeneratedResourceBuildItem> generatedResources,
             BuildProducer<NativeImageResourceBuildItem> nativeImageResources,
@@ -275,7 +345,7 @@ public class QuinoaProcessor {
         }
     }
 
-    private ProjectDirs resolveProjectDirs(QuinoaConfig config,
+    private static ProjectDirs resolveProjectDirs(QuinoaConfig config,
             OutputTargetBuildItem outputTarget) {
         Path projectRoot = findProjectRoot(outputTarget.getOutputDirectory());
         Path configuredUIDirPath = Path.of(config.uiDir.trim());

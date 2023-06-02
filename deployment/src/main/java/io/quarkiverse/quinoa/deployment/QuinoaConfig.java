@@ -22,6 +22,7 @@ import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 @ConfigRoot(phase = ConfigPhase.BUILD_TIME)
 public class QuinoaConfig {
 
+    public static final String DEFAULT_BUILD_DIR = "build/";
     private static final String DEFAULT_WEB_UI_DIR = "src/main/webui";
     private static final String DEFAULT_INDEX_PAGE = "index.html";
 
@@ -60,7 +61,7 @@ public class QuinoaConfig {
      * The path is relative to the Web UI path.
      * If not set "build/" will be used
      */
-    @ConfigItem(defaultValue = "build/")
+    @ConfigItem(defaultValue = DEFAULT_BUILD_DIR)
     public String buildDir;
 
     /**
