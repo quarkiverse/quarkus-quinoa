@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -145,8 +147,18 @@ public class ForwardedDevProcessor {
                     packageManager.stopDev(dev.get());
                 }
             };
+            Map<String, String> devServerConfigMap = new LinkedHashMap<>();
+            devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer.host);
+            devServerConfigMap.put("quarkus.quinoa.dev-server.port",
+                    Integer.toString(quinoaConfig.devServer.port.isPresent() ? quinoaConfig.devServer.port.getAsInt() : 0));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.checkTimeout",
+                    Integer.toString(quinoaConfig.devServer.checkTimeout));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.checkPath", quinoaConfig.devServer.checkPath.orElse(""));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.managed", Boolean.toString(quinoaConfig.devServer.managed));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
             devService = new DevServicesResultBuildItem.RunningDevService(
-                    "quinoa-node-dev-process", null, onClose, Collections.emptyMap());
+                    "node-server", null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
             return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
         } catch (Throwable t) {
