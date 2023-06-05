@@ -17,6 +17,7 @@ metadata:
     - web
     - frontend
   guide: https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/index.html
+  icon-url: "https://raw.githubusercontent.com/quarkiverse/quarkus-quinoa/main/docs/modules/ROOT/assets/images/node_logo.svg"
   categories:
     - "web"
   status: "stable"
