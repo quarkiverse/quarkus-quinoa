@@ -158,7 +158,7 @@ public class ForwardedDevProcessor {
             devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
             devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
             devService = new DevServicesResultBuildItem.RunningDevService(
-                    "node-server", null, onClose, devServerConfigMap);
+                    "quinoa-dev-server", null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
             return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
         } catch (Throwable t) {
