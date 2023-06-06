@@ -118,9 +118,8 @@ public class QuinoaProcessor {
         final Pair<FrameworkType, String> detectionResult = detectFramework(packageJsonFile);
         final FrameworkType framework = detectionResult.getLeft();
         final String applicationName = detectionResult.getRight();
-        initDefaultConfig(launchMode, quinoaConfig, framework, applicationName);
 
-        return new QuinoaDirectoryBuildItem(packageManager);
+        return initDefaultConfig(packageManager, launchMode, quinoaConfig, framework, applicationName);
     }
 
     @BuildStep
@@ -134,9 +133,11 @@ public class QuinoaProcessor {
             return null;
         }
 
-        final PackageManager packageManager = quinoaDir.get().getPackageManager();
+        final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
+        final PackageManager packageManager = quinoaDirectoryBuildItem.getPackageManager();
         final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
-        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT && quinoaConfig.isDevServerMode()) {
+        if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT
+                && quinoaDirectoryBuildItem.isDevServerMode(quinoaConfig.devServer)) {
             return null;
         }
         if (liveReload.isLiveReload()
@@ -149,7 +150,7 @@ public class QuinoaProcessor {
             packageManager.test();
         }
         packageManager.build(launchMode.getLaunchMode());
-        final String configuredBuildDir = quinoaConfig.buildDir;
+        final String configuredBuildDir = quinoaDirectoryBuildItem.getBuildDirectory();
         final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
             throw new ConfigurationException("Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'",
@@ -191,7 +192,7 @@ public class QuinoaProcessor {
             QuinoaConfig quinoaConfig,
             Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (!quinoaDir.isPresent() || quinoaConfig.isDevServerMode()) {
+        if (!quinoaDir.isPresent() || quinoaDir.get().isDevServerMode(quinoaConfig.devServer)) {
             return;
         }
         scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);
@@ -284,18 +285,23 @@ public class QuinoaProcessor {
         return Pair.of(frameworkType, Objects.toString(applicationName, "quinoa"));
     }
 
-    private void initDefaultConfig(LaunchModeBuildItem launchMode, QuinoaConfig config, FrameworkType framework,
+    private QuinoaDirectoryBuildItem initDefaultConfig(PackageManager packageManager, LaunchModeBuildItem launchMode,
+            QuinoaConfig config, FrameworkType framework,
             String applicationName) {
+        String buildDirectory = config.buildDir;
+        OptionalInt port = config.devServer.port;
         if (framework == null) {
             // nothing to do as no framework was detected
-            return;
+            return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
         }
+
         // only override properties that have not been set
-        if (launchMode.getLaunchMode() != LaunchMode.NORMAL && config.devServer.port.isEmpty()) {
+        if (launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
             LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
-            config.devServer.port = OptionalInt.of(framework.getDevServerPort());
+            port = OptionalInt.of(framework.getDevServerPort());
         }
-        if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir)) {
+
+        if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(buildDirectory)) {
             String newDirectory = framework.getBuildDirectory();
 
             // Angular builds a custom directory "dist/[appname]"
@@ -303,8 +309,9 @@ public class QuinoaProcessor {
                 newDirectory = String.format(newDirectory, applicationName);
             }
             LOG.infof("%s framework setting build directory: '%s'", framework, newDirectory);
-            config.buildDir = newDirectory;
+            buildDirectory = newDirectory;
         }
+        return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
     }
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(

@@ -32,6 +32,7 @@ public class QuinoaDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     void createCard(BuildProducer<CardPageBuildItem> cardPageBuildItemBuildProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
+            Optional<QuinoaDirectoryBuildItem> quinoaDirectoryBuildItem,
             QuinoaConfig quinoaConfig) {
         final CardPageBuildItem card = new CardPageBuildItem();
 
@@ -75,7 +76,7 @@ public class QuinoaDevUIProcessor {
             }
         }
 
-        final OptionalInt port = quinoaConfig.devServer.port;
+        final OptionalInt port = quinoaDirectoryBuildItem.get().getPort();
         if (port.isPresent() && port.getAsInt() > 0) {
             final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
                     .icon("font-awesome-solid:plug")

@@ -73,19 +73,20 @@ public class ForwardedDevProcessor {
         if (!quinoaDir.isPresent()) {
             return null;
         }
+        final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
         final String devServerHost = quinoaConfig.devServer.host;
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
-                if (quinoaConfig.devServer.port.isEmpty()) {
+                if (quinoaDirectoryBuildItem.getPort().isEmpty()) {
                     throw new IllegalStateException(
                             "Quinoa package manager live coding shouldn't running with an empty the dev-server.port");
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(devServerHost, quinoaConfig.devServer.port.getAsInt());
+                return new ForwardedDevServerBuildItem(devServerHost, quinoaDirectoryBuildItem.getPort().getAsInt());
             }
             shutdownDevService();
         }
@@ -103,12 +104,12 @@ public class ForwardedDevProcessor {
             shutdown.addCloseTask(closeTask, true);
         }
 
-        if (!quinoaConfig.isDevServerMode()) {
+        if (!quinoaDirectoryBuildItem.isDevServerMode(quinoaConfig.devServer)) {
             return null;
         }
 
         PackageManager packageManager = quinoaDir.get().getPackageManager();
-        final int devServerPort = quinoaConfig.devServer.port.getAsInt();
+        final int devServerPort = quinoaDirectoryBuildItem.getPort().getAsInt();
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
             if (PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath)) {
@@ -149,11 +150,10 @@ public class ForwardedDevProcessor {
             };
             Map<String, String> devServerConfigMap = new LinkedHashMap<>();
             devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer.host);
-            devServerConfigMap.put("quarkus.quinoa.dev-server.port",
-                    Integer.toString(quinoaConfig.devServer.port.isPresent() ? quinoaConfig.devServer.port.getAsInt() : 0));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.checkTimeout",
+            devServerConfigMap.put("quarkus.quinoa.dev-server.port", Integer.toString(devServerPort));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.check-timeout",
                     Integer.toString(quinoaConfig.devServer.checkTimeout));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.checkPath", quinoaConfig.devServer.checkPath.orElse(""));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.check-path", quinoaConfig.devServer.checkPath.orElse(""));
             devServerConfigMap.put("quarkus.quinoa.dev-server.managed", Boolean.toString(quinoaConfig.devServer.managed));
             devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
             devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
@@ -183,8 +183,8 @@ public class ForwardedDevProcessor {
             LOG.info("Quinoa is in build only mode");
             return;
         }
-        if (quinoaConfig.isDevServerMode() && devProxy.isPresent()) {
-            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
+        if (quinoaConfig.isEnabled() && devProxy.isPresent()) {
+            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
