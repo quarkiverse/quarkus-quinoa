@@ -1,4 +1,4 @@
-name: Build
+name: Build and Test Java Application
 
 on:
   push:
@@ -46,8 +46,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          # refresh cache every month to avoid unlimited growth
-          key: maven-repo-${{ runner.os }}-${{ steps.get-date.outputs.date }}
+          # resulting in faster build times. 
+          key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Build with Maven
@@ -73,8 +73,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          # refresh cache every month to avoid unlimited growth
-          key: maven-repo-${{ runner.os }}-${{ steps.get-date.outputs.date }}
+          # resulting in faster build times. 
+          key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm@~8.1.0
       - name: Build with Maven
