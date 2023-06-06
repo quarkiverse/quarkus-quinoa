@@ -18,6 +18,11 @@
     <module>testing</module>
     <module>docs</module>
   </modules>
+  <scm>
+    <connection>:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
+    <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</developerConnection>
+    <url>https://github.com/quarkiverse/quarkus-quinoa</url>
+  </scm>
   <properties>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <maven.compiler.release>11</maven.compiler.release>
