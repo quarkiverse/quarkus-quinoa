@@ -27,11 +27,11 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonString;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
+import io.quarkiverse.quinoa.deployment.packagemanager.DetectedFramework;
 import io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
@@ -115,11 +115,9 @@ public class QuinoaProcessor {
         }
 
         // attempt to autoconfigure settings based on the framework being used
-        final Pair<FrameworkType, String> detectionResult = detectFramework(packageJsonFile);
-        final FrameworkType framework = detectionResult.getLeft();
-        final String applicationName = detectionResult.getRight();
+        final DetectedFramework detectedFramework = detectFramework(launchMode, quinoaConfig, packageJsonFile);
 
-        return initDefaultConfig(packageManager, launchMode, quinoaConfig, framework, applicationName);
+        return initDefaultConfig(packageManager, launchMode, quinoaConfig, detectedFramework);
     }
 
     @BuildStep
@@ -252,13 +250,17 @@ public class QuinoaProcessor {
         return watchedFiles;
     }
 
-    private Pair<FrameworkType, String> detectFramework(Path packageJsonFile) {
-        JsonString applicationName = null;
+    private DetectedFramework detectFramework(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
+        // only read package.json if the defaults are in use
+        if (launchMode.getLaunchMode() == LaunchMode.NORMAL || (!config.devServer.port.isEmpty() &&
+                !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir))) {
+            return new DetectedFramework();
+        }
+        JsonObject packageJson = null;
         JsonString startScript = null;
         try (JsonReader reader = Json.createReader(Files.newInputStream(packageJsonFile))) {
-            JsonObject root = reader.readObject();
-            applicationName = root.getJsonString("name");
-            JsonObject scripts = root.getJsonObject("scripts");
+            packageJson = reader.readObject();
+            JsonObject scripts = packageJson.getJsonObject("scripts");
             if (scripts != null) {
                 startScript = scripts.getJsonString("start");
                 if (startScript == null) {
@@ -271,45 +273,40 @@ public class QuinoaProcessor {
 
         if (startScript == null) {
             LOG.info("Quinoa could not auto-detect the framework from package.json file.");
-            return Pair.of(null, null);
+            return new DetectedFramework();
         }
 
         // check if we found a script to detect which framework
         final FrameworkType frameworkType = FrameworkType.evaluate(startScript.getString());
         if (frameworkType == null) {
             LOG.info("Quinoa could not auto-detect the framework from package.json file.");
-            return Pair.of(null, null);
+            return new DetectedFramework();
         }
 
         LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
-        return Pair.of(frameworkType, Objects.toString(applicationName, "quinoa"));
+        return new DetectedFramework(frameworkType, packageJson);
     }
 
     private QuinoaDirectoryBuildItem initDefaultConfig(PackageManager packageManager, LaunchModeBuildItem launchMode,
-            QuinoaConfig config, FrameworkType framework,
-            String applicationName) {
+            QuinoaConfig config, DetectedFramework detectedFramework) {
         String buildDirectory = config.buildDir;
         OptionalInt port = config.devServer.port;
-        if (framework == null) {
+
+        if (detectedFramework == null || detectedFramework.getFrameworkType() == null) {
             // nothing to do as no framework was detected
             return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
         }
 
         // only override properties that have not been set
+        FrameworkType framework = detectedFramework.getFrameworkType();
         if (launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
             LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
             port = OptionalInt.of(framework.getDevServerPort());
         }
 
         if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(buildDirectory)) {
-            String newDirectory = framework.getBuildDirectory();
-
-            // Angular builds a custom directory "dist/[appname]"
-            if (framework == FrameworkType.ANGULAR) {
-                newDirectory = String.format(newDirectory, applicationName);
-            }
-            LOG.infof("%s framework setting build directory: '%s'", framework, newDirectory);
-            buildDirectory = newDirectory;
+            buildDirectory = detectedFramework.getBuildDirectory();
+            LOG.infof("%s framework setting build directory: '%s'", framework, buildDirectory);
         }
         return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
     }
