@@ -80,13 +80,13 @@ public class ForwardedDevProcessor {
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
-                if (quinoaDirectoryBuildItem.getPort().isEmpty()) {
+                if (quinoaDirectoryBuildItem.getDevServerPort().isEmpty()) {
                     throw new IllegalStateException(
                             "Quinoa package manager live coding shouldn't running with an empty the dev-server.port");
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(devServerHost, quinoaDirectoryBuildItem.getPort().getAsInt());
+                return new ForwardedDevServerBuildItem(devServerHost, quinoaDirectoryBuildItem.getDevServerPort().getAsInt());
             }
             shutdownDevService();
         }
@@ -109,7 +109,7 @@ public class ForwardedDevProcessor {
         }
 
         PackageManager packageManager = quinoaDir.get().getPackageManager();
-        final int devServerPort = quinoaDirectoryBuildItem.getPort().getAsInt();
+        final int devServerPort = quinoaDirectoryBuildItem.getDevServerPort().getAsInt();
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
             if (PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath)) {

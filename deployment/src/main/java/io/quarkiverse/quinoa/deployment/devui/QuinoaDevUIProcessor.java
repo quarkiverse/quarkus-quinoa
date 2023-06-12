@@ -76,14 +76,16 @@ public class QuinoaDevUIProcessor {
             }
         }
 
-        final OptionalInt port = quinoaDirectoryBuildItem.get().getPort();
-        if (port.isPresent() && port.getAsInt() > 0) {
-            final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
-                    .icon("font-awesome-solid:plug")
-                    .url(String.format("https://localhost:%d", port.getAsInt()))
-                    .doNotEmbed()
-                    .staticLabel(String.valueOf(port.getAsInt()));
-            card.addPage(portPage);
+        if (quinoaDirectoryBuildItem.isPresent()) {
+            final OptionalInt port = quinoaDirectoryBuildItem.get().getDevServerPort();
+            if (port.isPresent() && port.getAsInt() > 0) {
+                final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
+                        .icon("font-awesome-solid:plug")
+                        .url(String.format("https://localhost:%d", port.getAsInt()))
+                        .doNotEmbed()
+                        .staticLabel(String.valueOf(port.getAsInt()));
+                card.addPage(portPage);
+            }
         }
 
         card.setCustomCard("qwc-quinoa-card.js");

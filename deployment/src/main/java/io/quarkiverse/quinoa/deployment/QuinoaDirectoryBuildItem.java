@@ -15,7 +15,7 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
      * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
      */
-    private OptionalInt port;
+    private OptionalInt devServerPort;
 
     /**
      * This the Web UI internal build system (webpack, ...) output directory.
@@ -26,9 +26,9 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
      */
     private final String buildDirectory;
 
-    public QuinoaDirectoryBuildItem(PackageManager packageManager, OptionalInt port, String buildDirectory) {
+    public QuinoaDirectoryBuildItem(PackageManager packageManager, OptionalInt devServerPort, String buildDirectory) {
         this.packageManager = packageManager;
-        this.port = port;
+        this.devServerPort = devServerPort;
         this.buildDirectory = buildDirectory;
     }
 
@@ -40,8 +40,8 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
         return getPackageManager().getDirectory();
     }
 
-    public OptionalInt getPort() {
-        return port;
+    public OptionalInt getDevServerPort() {
+        return devServerPort;
     }
 
     public String getBuildDirectory() {
@@ -49,6 +49,6 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
     }
 
     public boolean isDevServerMode(DevServerConfig devServerConfig) {
-        return devServerConfig.enabled && port.isPresent();
+        return devServerConfig.enabled && devServerPort.isPresent();
     }
 }
