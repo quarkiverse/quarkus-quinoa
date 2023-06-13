@@ -53,8 +53,8 @@ class EffectiveCommands implements PackageManagerCommands {
     }
 
     @Override
-    public Command dev() {
-        Command c = defaultCommands.dev();
+    public Command dev(String command) {
+        Command c = defaultCommands.dev(command);
         return new Command(
                 environment(c, commandsConfig.devEnv),
                 getCustomCommandWithArguments(commandsConfig.dev)

@@ -2,6 +2,7 @@ package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Configuration defaults for multiple JS frameworks that can be used to allow for easier adoption with less user configuration.
@@ -21,7 +22,7 @@ public enum FrameworkType {
     private final String buildDirectory;
 
     /**
-     * The script to run in package.json in dev mode.
+     * The script to run in package.json in dev mode typically "start" or "dev".
      */
     private final String devScript;
 
@@ -59,6 +60,19 @@ public enum FrameworkType {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the unique list of possible start dev scripts like "dev" and "start" etc.
+     *
+     * @return the Set of unique start scripts
+     */
+    public static Set<String> getDevScripts() {
+        final Set<String> scripts = new TreeSet<>();
+        for (FrameworkType value : values()) {
+            scripts.add(value.getDevScript());
+        }
+        return scripts;
     }
 
     public String getBuildDirectory() {

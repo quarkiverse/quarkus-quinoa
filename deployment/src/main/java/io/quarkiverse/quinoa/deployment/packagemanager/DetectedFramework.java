@@ -8,15 +8,17 @@ public class DetectedFramework {
 
     private FrameworkType frameworkType;
     private JsonObject packageJson;
+    private String devServerCommand;
 
     public DetectedFramework() {
         super();
     }
 
-    public DetectedFramework(FrameworkType frameworkType, JsonObject packageJson) {
+    public DetectedFramework(FrameworkType frameworkType, JsonObject packageJson, String devServerCommand) {
         super();
         this.frameworkType = frameworkType;
         this.packageJson = packageJson;
+        this.devServerCommand = devServerCommand;
     }
 
     public FrameworkType getFrameworkType() {
@@ -33,6 +35,14 @@ public class DetectedFramework {
 
     public void setPackageJson(JsonObject packageJson) {
         this.packageJson = packageJson;
+    }
+
+    public String getDevServerCommand() {
+        return devServerCommand;
+    }
+
+    public void setDevServerCommand(String devServerCommand) {
+        this.devServerCommand = devServerCommand;
     }
 
     /**
@@ -61,6 +71,7 @@ public class DetectedFramework {
         return "DetectedFramework{" +
                 "frameworkType=" + frameworkType +
                 ", packageJson=" + packageJson +
+                ", devServerCommand=" + devServerCommand +
                 '}';
     }
 
@@ -71,11 +82,12 @@ public class DetectedFramework {
         if (o == null || getClass() != o.getClass())
             return false;
         DetectedFramework that = (DetectedFramework) o;
-        return frameworkType == that.frameworkType && packageJson.equals(that.packageJson);
+        return frameworkType == that.frameworkType && packageJson.equals(that.packageJson)
+                && devServerCommand.equals(that.devServerCommand);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(frameworkType, packageJson);
+        return Objects.hash(frameworkType, packageJson, devServerCommand);
     }
 }

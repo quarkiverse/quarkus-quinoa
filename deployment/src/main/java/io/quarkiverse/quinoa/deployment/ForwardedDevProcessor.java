@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import org.jboss.logging.Logger;
 
@@ -52,12 +51,8 @@ import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 public class ForwardedDevProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForwardedDevProcessor.class);
-    private static final Predicate<Thread> PROCESS_THREAD_PREDICATE = new Predicate<>() {
-        @Override
-        public boolean test(Thread thread) {
-            return thread.getName().matches("Process (stdout|stderr) streamer");
-        }
-    };
+    private static final Predicate<Thread> PROCESS_THREAD_PREDICATE = thread -> thread.getName()
+            .matches("Process (stdout|stderr) streamer");
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
 
     @BuildStep(onlyIf = IsDevelopment.class)
@@ -70,13 +65,14 @@ public class ForwardedDevProcessor {
             LoggingSetupBuildItem loggingSetup,
             CuratedApplicationShutdownBuildItem shutdown,
             LiveReloadBuildItem liveReload) {
-        if (!quinoaDir.isPresent()) {
+        if (quinoaDir.isEmpty()) {
             return null;
         }
         final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
         final String devServerHost = quinoaConfig.devServer.host;
+        final String devServerCommand = quinoaDirectoryBuildItem.getDevServerCommand();
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
@@ -92,14 +88,11 @@ public class ForwardedDevProcessor {
         }
 
         if (oldConfig == null) {
-            Runnable closeTask = new Runnable() {
-                @Override
-                public void run() {
-                    if (devService != null) {
-                        shutdownDevService();
-                    }
-                    devService = null;
+            Runnable closeTask = () -> {
+                if (devService != null) {
+                    shutdownDevService();
                 }
+                devService = null;
             };
             shutdown.addCloseTask(closeTask, true);
         }
@@ -133,7 +126,7 @@ public class ForwardedDevProcessor {
             }
             final long start = Instant.now().toEpochMilli();
 
-            dev.set(packageManager.dev(devServerHost, devServerPort, checkPath, checkTimeout));
+            dev.set(packageManager.dev(devServerCommand, devServerHost, devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
                     quinoaConfig.devServer.logs);
@@ -141,12 +134,9 @@ public class ForwardedDevProcessor {
                 LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
                         devServerPort, Instant.now().toEpochMilli() - start);
             }
-            final Closeable onClose = new Closeable() {
-                @Override
-                public void close() throws IOException {
-                    logOutputFilter.close();
-                    packageManager.stopDev(dev.get());
-                }
+            final Closeable onClose = () -> {
+                logOutputFilter.close();
+                packageManager.stopDev(dev.get());
             };
             Map<String, String> devServerConfigMap = new LinkedHashMap<>();
             devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer.host);
@@ -220,7 +210,7 @@ public class ForwardedDevProcessor {
         private final Thread thread;
         private final List<String> buffer = Collections.synchronizedList(new ArrayList<>());
         private final boolean enableLogs;
-        private AtomicReference<ScheduledFuture<?>> scheduled = new AtomicReference<>();
+        private final AtomicReference<ScheduledFuture<?>> scheduled = new AtomicReference<>();
 
         public LiveCodingLogOutputFilter(boolean enableLogs) {
             this.enableLogs = enableLogs;
@@ -238,7 +228,7 @@ public class ForwardedDevProcessor {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (thread == null) {
                 return;
             }
@@ -254,23 +244,17 @@ public class ForwardedDevProcessor {
                     return false;
                 }
                 buffer.add(s.replaceAll("\\x1b\\[[0-9;]*[a-zA-Z]", ""));
-                scheduled.getAndUpdate(new UnaryOperator<ScheduledFuture<?>>() {
-                    @Override
-                    public ScheduledFuture<?> apply(ScheduledFuture<?> scheduledFuture) {
-                        if (scheduledFuture != null && !scheduledFuture.isDone()) {
-                            scheduledFuture.cancel(true);
-                        }
-                        return executor.schedule(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!buffer.isEmpty()) {
-                                    LOG.infof("\u001b[33mQuinoa package manager live coding server has spoken: " + RESET
-                                            + " \n%s", join("", buffer));
-                                    buffer.clear();
-                                }
-                            }
-                        }, 200, TimeUnit.MILLISECONDS);
+                scheduled.getAndUpdate(scheduledFuture -> {
+                    if (scheduledFuture != null && !scheduledFuture.isDone()) {
+                        scheduledFuture.cancel(true);
                     }
+                    return executor.schedule(() -> {
+                        if (!buffer.isEmpty()) {
+                            LOG.infof("\u001b[33mQuinoa package manager live coding server has spoken: " + RESET
+                                    + " \n%s", join("", buffer));
+                            buffer.clear();
+                        }
+                    }, 200, TimeUnit.MILLISECONDS);
                 });
                 return false;
             }

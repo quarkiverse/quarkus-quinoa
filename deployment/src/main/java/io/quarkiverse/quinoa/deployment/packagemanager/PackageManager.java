@@ -26,6 +26,7 @@ public class PackageManager {
     private static final Logger LOG = Logger.getLogger(PackageManager.class);
 
     private final Path directory;
+
     private final PackageManagerCommands packageManagerCommands;
 
     private PackageManager(Path directory, PackageManagerCommands packageManagerCommands) {
@@ -35,6 +36,10 @@ public class PackageManager {
 
     public Path getDirectory() {
         return directory;
+    }
+
+    public PackageManagerCommands getPackageManagerCommands() {
+        return packageManagerCommands;
     }
 
     public void install(boolean frozenLockfile) {
@@ -106,8 +111,8 @@ public class PackageManager {
         });
     }
 
-    public Process dev(String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
-        final Command dev = packageManagerCommands.dev();
+    public Process dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+        final Command dev = packageManagerCommands.dev(devServerCommand);
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {

@@ -36,8 +36,6 @@ import io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
-import io.quarkus.arc.deployment.BeanContainerBuildItem;
-import io.quarkus.builder.BuildException;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -54,8 +52,6 @@ import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
-import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
-import io.quarkus.vertx.http.deployment.DefaultRouteBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
@@ -77,12 +73,12 @@ public class QuinoaProcessor {
             LaunchModeBuildItem launchMode,
             LiveReloadBuildItem liveReload,
             QuinoaConfig quinoaConfig,
-            OutputTargetBuildItem outputTarget) throws IOException {
+            OutputTargetBuildItem outputTarget) {
         if (!quinoaConfig.isEnabled()) {
             LOG.info("Quinoa is disabled.");
             return null;
         }
-        if (launchMode.isTest() && !quinoaConfig.enable.isPresent()) {
+        if (launchMode.isTest() && quinoaConfig.enable.isEmpty()) {
             // Default to disabled in tests
             LOG.warn("Quinoa is disabled by default in tests.");
             return null;
@@ -104,7 +100,8 @@ public class QuinoaProcessor {
             packageManagerBinary = Optional.of(result.getPackageManagerBinary());
             paths.add(result.getNodeDirPath());
         }
-        PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
+
+        final PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
                 quinoaConfig.packageManagerCommand, projectDirs.getUIDir(), paths);
         final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
@@ -126,8 +123,8 @@ public class QuinoaProcessor {
             Optional<QuinoaDirectoryBuildItem> quinoaDir,
             OutputTargetBuildItem outputTarget,
             LaunchModeBuildItem launchMode,
-            LiveReloadBuildItem liveReload) throws IOException, BuildException {
-        if (!quinoaDir.isPresent()) {
+            LiveReloadBuildItem liveReload) throws IOException {
+        if (quinoaDir.isEmpty()) {
             return null;
         }
 
@@ -166,7 +163,7 @@ public class QuinoaProcessor {
             Optional<TargetDirBuildItem> targetDir,
             BuildProducer<GeneratedResourceBuildItem> generatedResources,
             BuildProducer<NativeImageResourceBuildItem> nativeImageResources) throws IOException {
-        if (!targetDir.isPresent()) {
+        if (targetDir.isEmpty()) {
             return null;
         }
         return new BuiltResourcesBuildItem(
@@ -177,7 +174,7 @@ public class QuinoaProcessor {
     public BuiltResourcesBuildItem prepareResourcesForOtherMode(
             Optional<TargetDirBuildItem> targetDir,
             BuildProducer<GeneratedResourceBuildItem> generatedResources) throws IOException {
-        if (!targetDir.isPresent()) {
+        if (targetDir.isEmpty()) {
             return null;
         }
         final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = prepareBuiltResources(generatedResources,
@@ -190,7 +187,7 @@ public class QuinoaProcessor {
             QuinoaConfig quinoaConfig,
             Optional<QuinoaDirectoryBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (!quinoaDir.isPresent() || quinoaDir.get().isDevServerMode(quinoaConfig.devServer)) {
+        if (quinoaDir.isEmpty() || quinoaDir.get().isDevServerMode(quinoaConfig.devServer)) {
             return;
         }
         scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);
@@ -204,9 +201,6 @@ public class QuinoaProcessor {
             LaunchModeBuildItem launchMode,
             Optional<BuiltResourcesBuildItem> uiResources,
             QuinoaRecorder recorder,
-            CoreVertxBuildItem vertx,
-            BeanContainerBuildItem beanContainer,
-            BuildProducer<DefaultRouteBuildItem> defaultRoutes,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
         if (quinoaConfig.justBuild) {
@@ -252,26 +246,31 @@ public class QuinoaProcessor {
 
     private DetectedFramework detectFramework(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
         // only read package.json if the defaults are in use
-        if (launchMode.getLaunchMode() == LaunchMode.NORMAL || (!config.devServer.port.isEmpty() &&
+        if (launchMode.getLaunchMode() == LaunchMode.NORMAL || (config.devServer.port.isPresent() &&
                 !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir))) {
             return new DetectedFramework();
         }
         JsonObject packageJson = null;
         JsonString startScript = null;
+        String startCommand = null;
         try (JsonReader reader = Json.createReader(Files.newInputStream(packageJsonFile))) {
             packageJson = reader.readObject();
             JsonObject scripts = packageJson.getJsonObject("scripts");
             if (scripts != null) {
-                startScript = scripts.getJsonString("start");
-                if (startScript == null) {
-                    startScript = scripts.getJsonString("dev");
+                // loop over all possible start scripts until we find one
+                for (String devScript : FrameworkType.getDevScripts()) {
+                    startScript = scripts.getJsonString(devScript);
+                    if (startScript != null) {
+                        startCommand = devScript;
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {
             LOG.warnf("Quinoa failed to auto-detect the framework from package.json file. %s", e.getMessage());
         }
 
-        if (startScript == null) {
+        if (startScript == null || startCommand == null) {
             LOG.info("Quinoa could not auto-detect the framework from package.json file.");
             return new DetectedFramework();
         }
@@ -283,8 +282,14 @@ public class QuinoaProcessor {
             return new DetectedFramework();
         }
 
+        String expectedCommand = frameworkType.getDevScript();
+        if (!Objects.equals(startCommand, expectedCommand)) {
+            LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
+                    frameworkType, expectedCommand, startCommand);
+        }
+
         LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
-        return new DetectedFramework(frameworkType, packageJson);
+        return new DetectedFramework(frameworkType, packageJson, startCommand);
     }
 
     private QuinoaDirectoryBuildItem initDefaultConfig(PackageManager packageManager, LaunchModeBuildItem launchMode,
@@ -294,21 +299,24 @@ public class QuinoaProcessor {
 
         if (detectedFramework == null || detectedFramework.getFrameworkType() == null) {
             // nothing to do as no framework was detected
-            return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
+            return new QuinoaDirectoryBuildItem(packageManager, "start", port, buildDirectory);
         }
+
+        LOG.infof("%s", packageManager.getPackageManagerCommands());
 
         // only override properties that have not been set
         FrameworkType framework = detectedFramework.getFrameworkType();
         if (launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
             LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
             port = OptionalInt.of(framework.getDevServerPort());
+            LOG.infof("%s framework setting dev script: '%s'", framework, detectedFramework.getDevServerCommand());
         }
 
         if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(buildDirectory)) {
             buildDirectory = detectedFramework.getBuildDirectory();
             LOG.infof("%s framework setting build directory: '%s'", framework, buildDirectory);
         }
-        return new QuinoaDirectoryBuildItem(packageManager, port, buildDirectory);
+        return new QuinoaDirectoryBuildItem(packageManager, detectedFramework.getDevServerCommand(), port, buildDirectory);
     }
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(

@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.OptionalInt;
 
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
@@ -15,7 +16,12 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
      * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
      * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
      */
-    private OptionalInt devServerPort;
+    private final OptionalInt devServerPort;
+
+    /**
+     * Command to start the dev sever. Will be "start" by default if not detected.
+     */
+    private final String devServerCommand;
 
     /**
      * This the Web UI internal build system (webpack, ...) output directory.
@@ -26,10 +32,12 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
      */
     private final String buildDirectory;
 
-    public QuinoaDirectoryBuildItem(PackageManager packageManager, OptionalInt devServerPort, String buildDirectory) {
+    public QuinoaDirectoryBuildItem(PackageManager packageManager, String devServerCommand, OptionalInt devServerPort,
+            String buildDirectory) {
         this.packageManager = packageManager;
         this.devServerPort = devServerPort;
         this.buildDirectory = buildDirectory;
+        this.devServerCommand = Objects.toString(devServerCommand, "start");
     }
 
     public PackageManager getPackageManager() {
@@ -42,6 +50,10 @@ public final class QuinoaDirectoryBuildItem extends SimpleBuildItem {
 
     public OptionalInt getDevServerPort() {
         return devServerPort;
+    }
+
+    public String getDevServerCommand() {
+        return devServerCommand;
     }
 
     public String getBuildDirectory() {

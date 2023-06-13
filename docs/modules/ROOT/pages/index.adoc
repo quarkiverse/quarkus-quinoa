@@ -295,24 +295,13 @@ Add these scripts to package.json
 ----
   "scripts": {
     ...
-    "start": "next dev",
     "build": "next build && next export",
   }
 ----
 
 [#vite]
 === Vite
-Any app created with https://vitejs.dev/guide/[Vite] should work with Quinoa after the following changes:
-
-Add start script to package.json
-[source,json]
-----
-  "scripts": {
-    "start": "vite"
-  },
-----
-
-Hot Module Replacement (HMR) should work by default.
+Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
 
 [#spa-routing]
 === Single Page application routing
