@@ -29,7 +29,6 @@ public final class PackageManagerInstall {
     }
 
     public static Installation install(PackageManagerInstallConfig config, final ProjectDirs projectDirs) {
-
         Path installDir = resolveInstallDir(config, projectDirs).normalize();
         FrontendPluginFactory factory = new FrontendPluginFactory(null, installDir.toFile());
         if (!config.nodeVersion.isPresent()) {

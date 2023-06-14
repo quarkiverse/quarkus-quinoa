@@ -3,5 +3,3 @@ quarkus:
     package-manager-install:
       ~: true
       node-version: 18.16.0
-    dev-server:
-      port: 3000

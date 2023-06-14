@@ -105,8 +105,9 @@ public class ForwardedDevProcessor {
         final int devServerPort = quinoaDirectoryBuildItem.getDevServerPort().getAsInt();
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
-            if (PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath)) {
-                return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
+            final String hostAddress = PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath);
+            if (hostAddress != null) {
+                return new ForwardedDevServerBuildItem(hostAddress, devServerPort);
             } else {
                 throw new IllegalStateException(
                         "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + devServerPort);
@@ -126,7 +127,9 @@ public class ForwardedDevProcessor {
             }
             final long start = Instant.now().toEpochMilli();
 
-            dev.set(packageManager.dev(devServerCommand, devServerHost, devServerPort, checkPath, checkTimeout));
+            final PackageManager.DevServer devServer = packageManager.dev(devServerCommand, devServerHost, devServerPort,
+                    checkPath, checkTimeout);
+            dev.set(devServer.process());
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
                     quinoaConfig.devServer.logs);
@@ -150,7 +153,7 @@ public class ForwardedDevProcessor {
             devService = new DevServicesResultBuildItem.RunningDevService(
                     "quinoa-dev-server", null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
-            return new ForwardedDevServerBuildItem(devServerHost, devServerPort);
+            return new ForwardedDevServerBuildItem(devServer.hostAddress(), devServerPort);
         } catch (Throwable t) {
             packageManager.stopDev(dev.get());
             compressor.closeAndDumpCaptured();
