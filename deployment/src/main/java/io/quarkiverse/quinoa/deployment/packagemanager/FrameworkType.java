@@ -19,7 +19,6 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.deployment.QuinoaConfig;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
-import io.quarkus.runtime.LaunchMode;
 
 /**
  * Configuration defaults for multiple JS frameworks that can be used to allow for easier adoption with less user configuration.
@@ -67,8 +66,7 @@ public enum FrameworkType {
 
     public static DetectedFramework detectFramework(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
         // only read package.json if the defaults are in use
-        if (launchMode.getLaunchMode() == LaunchMode.NORMAL || (config.devServer.port.isPresent() &&
-                !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir))) {
+        if (config.devServer.port.isPresent() && !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir)) {
             return new DetectedFramework();
         }
         JsonObject packageJson = null;

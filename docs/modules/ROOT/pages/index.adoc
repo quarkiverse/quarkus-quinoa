@@ -253,7 +253,7 @@ App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of
 quarkus.quinoa.build-dir=dist/[your-app-name]
 ----
 
-To enable Angular live coding server, you need to edit the package.json start script with `ng serve --host 0.0.0.0 --disable-host-check`.
+To enable Angular live coding server, you need to edit the package.json start script with `ng serve --disable-host-check`.
 
 If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
 

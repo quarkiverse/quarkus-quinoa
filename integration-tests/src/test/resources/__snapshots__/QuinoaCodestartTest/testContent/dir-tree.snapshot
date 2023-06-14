@@ -1,9 +1,9 @@
 /
+main.js
 package-lock.json
 package.json
 public/
-public/quinoa.css
-public/quinoa.html
-src/
-src/index.js
-webpack.config.js
+public/vite.svg
+quinoa.css
+quinoa.html
+vite.config.js
