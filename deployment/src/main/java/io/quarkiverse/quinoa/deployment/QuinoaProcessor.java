@@ -3,6 +3,7 @@ package io.quarkiverse.quinoa.deployment;
 import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType.detectFramework;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.autoDetectPackageManager;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.install;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
@@ -21,11 +22,6 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
-import jakarta.json.JsonString;
 
 import org.jboss.logging.Logger;
 
@@ -242,54 +238,6 @@ public class QuinoaProcessor {
             watchedFiles.add(new HotDeploymentWatchedFileBuildItem(watchFile));
         }
         return watchedFiles;
-    }
-
-    private DetectedFramework detectFramework(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
-        // only read package.json if the defaults are in use
-        if (launchMode.getLaunchMode() == LaunchMode.NORMAL || (config.devServer.port.isPresent() &&
-                !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir))) {
-            return new DetectedFramework();
-        }
-        JsonObject packageJson = null;
-        JsonString startScript = null;
-        String startCommand = null;
-        try (JsonReader reader = Json.createReader(Files.newInputStream(packageJsonFile))) {
-            packageJson = reader.readObject();
-            JsonObject scripts = packageJson.getJsonObject("scripts");
-            if (scripts != null) {
-                // loop over all possible start scripts until we find one
-                for (String devScript : FrameworkType.getDevScripts()) {
-                    startScript = scripts.getJsonString(devScript);
-                    if (startScript != null) {
-                        startCommand = devScript;
-                        break;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOG.warnf("Quinoa failed to auto-detect the framework from package.json file. %s", e.getMessage());
-        }
-
-        if (startScript == null || startCommand == null) {
-            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
-            return new DetectedFramework();
-        }
-
-        // check if we found a script to detect which framework
-        final FrameworkType frameworkType = FrameworkType.evaluate(startScript.getString());
-        if (frameworkType == null) {
-            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
-            return new DetectedFramework();
-        }
-
-        String expectedCommand = frameworkType.getDevScript();
-        if (!Objects.equals(startCommand, expectedCommand)) {
-            LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
-                    frameworkType, expectedCommand, startCommand);
-        }
-
-        LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
-        return new DetectedFramework(frameworkType, packageJson, startCommand);
     }
 
     private QuinoaDirectoryBuildItem initDefaultConfig(PackageManager packageManager, LaunchModeBuildItem launchMode,

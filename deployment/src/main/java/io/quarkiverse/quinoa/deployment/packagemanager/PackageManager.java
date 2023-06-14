@@ -8,8 +8,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -111,7 +114,7 @@ public class PackageManager {
         });
     }
 
-    public Process dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+    public DevServer dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
         final Command dev = packageManagerCommands.dev(devServerCommand);
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         Process p = process(dev);
@@ -122,11 +125,12 @@ public class PackageManager {
         });
         if (checkPath == null) {
             LOG.infof("Quinoa is configured to continue without check if the live coding server is up");
-            return p;
+            return new DevServer(p, devServerHost);
         }
+        String ipAddress = null;
         try {
             int i = 0;
-            while (!isDevServerUp(devServerHost, devServerPort, checkPath)) {
+            while ((ipAddress = isDevServerUp(devServerHost, devServerPort, checkPath)) == null) {
                 if (++i >= checkTimeout / 500) {
                     stopDev(p);
                     throw new RuntimeException(
@@ -142,7 +146,7 @@ public class PackageManager {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
-        return p;
+        return new DevServer(p, ipAddress);
     }
 
     public static PackageManager autoDetectPackageManager(Optional<String> binary,
@@ -261,21 +265,49 @@ public class PackageManager {
         }
     }
 
-    public static boolean isDevServerUp(String host, int port, String path) {
+    public static String isDevServerUp(String host, int port, String path) {
+        final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
         try {
-            final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
-            URL url = new URL(String.format("http://%s:%d%s", host, port, normalizedPath));
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(200);
-            connection.setReadTimeout(200);
-            connection.connect();
-            int code = connection.getResponseCode();
-            return code == 200;
-        } catch (ConnectException | SocketTimeoutException e) {
-            return false;
-        } catch (IOException e) {
-            throw new RuntimeException("Error while checking if package manager dev server is up", e);
+            InetAddress[] addresses = InetAddress.getAllByName(host);
+            for (InetAddress address : addresses) {
+                try {
+                    final String hostAddress = address.getHostAddress();
+                    final String ipAddress = address instanceof Inet6Address ? "[" + hostAddress + "]" : hostAddress;
+                    URL url = new URL(String.format("http://%s:%d%s", ipAddress, port, normalizedPath));
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setConnectTimeout(2000);
+                    connection.setReadTimeout(2000);
+                    connection.connect();
+                    int code = connection.getResponseCode();
+                    return code == 200 ? ipAddress : null;
+                } catch (ConnectException | SocketTimeoutException e) {
+                    // Try the next address
+                } catch (IOException e) {
+                    throw new RuntimeException("Error while checking if package manager dev server is up", e);
+                }
+            }
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public static class DevServer {
+        private final Process process;
+        private final String hostAddress;
+
+        public DevServer(Process process, String hostAddress) {
+            this.process = process;
+            this.hostAddress = hostAddress;
+        }
+
+        public Process process() {
+            return process;
+        }
+
+        public String hostAddress() {
+            return hostAddress;
         }
     }
 }
