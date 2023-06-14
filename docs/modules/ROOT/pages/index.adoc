@@ -1,5 +1,5 @@
 = Quarkus - Quinoa
-:extension-status: experimental
+:extension-status: stable
 
 include::./includes/attributes.adoc[]
 
@@ -238,71 +238,6 @@ quarkus.quinoa.dev-server.port=3000
 
 NOTE: Quinoa relies on the dev server returning a 404 when the file is not found (See link:#how-dev-server[How it works]). This is not the case on some dev servers configured with SPA routing. Make sure it is disabled in the dev server configuration (for React Create App, see https://github.com/quarkiverse/quarkus-quinoa/issues/91[#91]). Another option, when possible, is to use <<quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes>>.
 
-[#react]
-=== React
-
-App created by  https://create-react-app.dev/docs/getting-started[Create React App], https://github.com/timarney/react-app-rewired[React App Rewired] and https://craco.js.org/[CRACO] are compatible without any change.
-
-
-[#angular]
-=== Angular
-
-App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration:
-[source,properties]
-----
-quarkus.quinoa.build-dir=dist/[your-app-name]
-----
-
-To enable Angular live coding server, you need to edit the package.json start script with `ng serve --disable-host-check`.
-
-If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
-
-Change the package.json test script:
-[source,json]
-----
-  "scripts": {
-    ...
-    "test": "ng test -- --no-watch --no-progress --browsers=ChromeHeadlessCI"
-  },
-----
-
-Edit the karma.conf.js:
-[source,javascript]
-----
-  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessCI'],
-  customLaunchers: {
-    ChromeHeadlessCI: {
-      base: 'ChromeHeadless',
-      flags: ['--no-sandbox']
-    }
-},
-----
-
-[#nextjs]
-=== Next.js
-Any app created with https://nextjs.org/[Next.js] should work with Quinoa after the following changes:
-
-In application.properties add:
-[source,properties]
-----
-%dev.quarkus.quinoa.index-page=/
-----
-
-In Dev mode Next.js serves everything out of root "/" but in PRD mode its the normal "/index.html".
-
-Add these scripts to package.json
-[source,json]
-----
-  "scripts": {
-    ...
-    "build": "next build && next export",
-  }
-----
-
-[#vite]
-=== Vite
-Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
-
 [#spa-routing]
 === Single Page application routing
 
@@ -463,6 +398,82 @@ Most CI images already include NodeJS. if they don't, just make sure to install 
 Quinoa can be configured to install packages with a link:#frozen-lockfile[frozen lockfile].
 
 On compatible CIs, don't forget to enable the Maven/Gradle and NPM/Yarn repository caching.
+
+[#frameworks]
+== Frameworks
+
+Quinoa attempts to automatically determine which framework you are using by reading your package.json file and auto-configure settings for that framework.  
+For developers, this provides more "convention over configuration" approach for a smoother experience.
+
+[#react]
+=== React
+
+App created by  https://create-react-app.dev/docs/getting-started[Create React App], https://github.com/timarney/react-app-rewired[React App Rewired] and https://craco.js.org/[CRACO] are compatible without any change.
+
+
+[#angular]
+=== Angular
+
+App created by `ng` (https://angular.io/guide/setup-local) require a tiny bit of configuration:
+
+To enable Angular live coding server, you need to edit the package.json start script:
+
+[source,json]
+----
+  "scripts": {
+    ...
+    "start": "ng serve --disable-host-check"
+  },
+----
+
+If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
+
+Change the package.json test script:
+[source,json]
+----
+  "scripts": {
+    ...
+    "test": "ng test -- --no-watch --no-progress --browsers=ChromeHeadlessCI"
+  },
+----
+
+Edit the karma.conf.js:
+[source,javascript]
+----
+  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessCI'],
+  customLaunchers: {
+    ChromeHeadlessCI: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox']
+    }
+},
+----
+
+[#nextjs]
+=== Next.js
+Any app created with https://nextjs.org/[Next.js] should work with Quinoa after the following changes:
+
+In application.properties add:
+[source,properties]
+----
+%dev.quarkus.quinoa.index-page=/
+----
+
+In Dev mode Next.js serves everything out of root "/" but in PRD mode its the normal "/index.html".
+
+Update this script in package.json:
+[source,json]
+----
+  "scripts": {
+    ...
+    "build": "next build && next export",
+  }
+----
+
+[#vite]
+=== Vite
+Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
+
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
