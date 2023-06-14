@@ -24,8 +24,8 @@ interface PackageManagerCommands {
         return new Command(Collections.singletonMap("CI", "true"), binary() + " test");
     }
 
-    default Command dev() {
+    default Command dev(String command) {
         // BROWSER=NONE so the browser is not automatically opened with React
-        return new Command(Collections.singletonMap("BROWSER", "none"), binary() + " start");
+        return new Command(Collections.singletonMap("BROWSER", "none"), binary() + " run " + command);
     }
 }

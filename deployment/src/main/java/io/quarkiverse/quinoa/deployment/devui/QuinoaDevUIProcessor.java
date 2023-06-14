@@ -32,6 +32,7 @@ public class QuinoaDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     void createCard(BuildProducer<CardPageBuildItem> cardPageBuildItemBuildProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
+            Optional<QuinoaDirectoryBuildItem> quinoaDirectoryBuildItem,
             QuinoaConfig quinoaConfig) {
         final CardPageBuildItem card = new CardPageBuildItem();
 
@@ -75,14 +76,16 @@ public class QuinoaDevUIProcessor {
             }
         }
 
-        final OptionalInt port = quinoaConfig.devServer.port;
-        if (port.isPresent() && port.getAsInt() > 0) {
-            final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
-                    .icon("font-awesome-solid:plug")
-                    .url(String.format("https://localhost:%d", port.getAsInt()))
-                    .doNotEmbed()
-                    .staticLabel(String.valueOf(port.getAsInt()));
-            card.addPage(portPage);
+        if (quinoaDirectoryBuildItem.isPresent()) {
+            final OptionalInt port = quinoaDirectoryBuildItem.get().getDevServerPort();
+            if (port.isPresent() && port.getAsInt() > 0) {
+                final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
+                        .icon("font-awesome-solid:plug")
+                        .url(String.format("https://localhost:%d", port.getAsInt()))
+                        .doNotEmbed()
+                        .staticLabel(String.valueOf(port.getAsInt()));
+                card.addPage(portPage);
+            }
         }
 
         card.setCustomCard("qwc-quinoa-card.js");

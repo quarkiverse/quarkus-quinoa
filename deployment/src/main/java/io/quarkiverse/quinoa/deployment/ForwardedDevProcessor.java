@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import org.jboss.logging.Logger;
 
@@ -52,12 +51,8 @@ import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 public class ForwardedDevProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForwardedDevProcessor.class);
-    private static final Predicate<Thread> PROCESS_THREAD_PREDICATE = new Predicate<>() {
-        @Override
-        public boolean test(Thread thread) {
-            return thread.getName().matches("Process (stdout|stderr) streamer");
-        }
-    };
+    private static final Predicate<Thread> PROCESS_THREAD_PREDICATE = thread -> thread.getName()
+            .matches("Process (stdout|stderr) streamer");
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
 
     @BuildStep(onlyIf = IsDevelopment.class)
@@ -70,45 +65,44 @@ public class ForwardedDevProcessor {
             LoggingSetupBuildItem loggingSetup,
             CuratedApplicationShutdownBuildItem shutdown,
             LiveReloadBuildItem liveReload) {
-        if (!quinoaDir.isPresent()) {
+        if (quinoaDir.isEmpty()) {
             return null;
         }
+        final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
         final String devServerHost = quinoaConfig.devServer.host;
+        final String devServerCommand = quinoaDirectoryBuildItem.getDevServerCommand();
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
-                if (quinoaConfig.devServer.port.isEmpty()) {
+                if (quinoaDirectoryBuildItem.getDevServerPort().isEmpty()) {
                     throw new IllegalStateException(
                             "Quinoa package manager live coding shouldn't running with an empty the dev-server.port");
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(devServerHost, quinoaConfig.devServer.port.getAsInt());
+                return new ForwardedDevServerBuildItem(devServerHost, quinoaDirectoryBuildItem.getDevServerPort().getAsInt());
             }
             shutdownDevService();
         }
 
         if (oldConfig == null) {
-            Runnable closeTask = new Runnable() {
-                @Override
-                public void run() {
-                    if (devService != null) {
-                        shutdownDevService();
-                    }
-                    devService = null;
+            Runnable closeTask = () -> {
+                if (devService != null) {
+                    shutdownDevService();
                 }
+                devService = null;
             };
             shutdown.addCloseTask(closeTask, true);
         }
 
-        if (!quinoaConfig.isDevServerMode()) {
+        if (!quinoaDirectoryBuildItem.isDevServerMode(quinoaConfig.devServer)) {
             return null;
         }
 
         PackageManager packageManager = quinoaDir.get().getPackageManager();
-        final int devServerPort = quinoaConfig.devServer.port.getAsInt();
+        final int devServerPort = quinoaDirectoryBuildItem.getDevServerPort().getAsInt();
         final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
             if (PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath)) {
@@ -132,7 +126,7 @@ public class ForwardedDevProcessor {
             }
             final long start = Instant.now().toEpochMilli();
 
-            dev.set(packageManager.dev(devServerHost, devServerPort, checkPath, checkTimeout));
+            dev.set(packageManager.dev(devServerCommand, devServerHost, devServerPort, checkPath, checkTimeout));
             compressor.close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
                     quinoaConfig.devServer.logs);
@@ -140,20 +134,16 @@ public class ForwardedDevProcessor {
                 LOG.infof("Quinoa package manager live coding is up and running on port: %d (in %dms)",
                         devServerPort, Instant.now().toEpochMilli() - start);
             }
-            final Closeable onClose = new Closeable() {
-                @Override
-                public void close() throws IOException {
-                    logOutputFilter.close();
-                    packageManager.stopDev(dev.get());
-                }
+            final Closeable onClose = () -> {
+                logOutputFilter.close();
+                packageManager.stopDev(dev.get());
             };
             Map<String, String> devServerConfigMap = new LinkedHashMap<>();
             devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer.host);
-            devServerConfigMap.put("quarkus.quinoa.dev-server.port",
-                    Integer.toString(quinoaConfig.devServer.port.isPresent() ? quinoaConfig.devServer.port.getAsInt() : 0));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.checkTimeout",
+            devServerConfigMap.put("quarkus.quinoa.dev-server.port", Integer.toString(devServerPort));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.check-timeout",
                     Integer.toString(quinoaConfig.devServer.checkTimeout));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.checkPath", quinoaConfig.devServer.checkPath.orElse(""));
+            devServerConfigMap.put("quarkus.quinoa.dev-server.check-path", quinoaConfig.devServer.checkPath.orElse(""));
             devServerConfigMap.put("quarkus.quinoa.dev-server.managed", Boolean.toString(quinoaConfig.devServer.managed));
             devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
             devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
@@ -183,8 +173,8 @@ public class ForwardedDevProcessor {
             LOG.info("Quinoa is in build only mode");
             return;
         }
-        if (quinoaConfig.isDevServerMode() && devProxy.isPresent()) {
-            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", quinoaConfig.devServer.port.getAsInt());
+        if (quinoaConfig.isEnabled() && devProxy.isPresent()) {
+            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
             final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(false, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
@@ -220,7 +210,7 @@ public class ForwardedDevProcessor {
         private final Thread thread;
         private final List<String> buffer = Collections.synchronizedList(new ArrayList<>());
         private final boolean enableLogs;
-        private AtomicReference<ScheduledFuture<?>> scheduled = new AtomicReference<>();
+        private final AtomicReference<ScheduledFuture<?>> scheduled = new AtomicReference<>();
 
         public LiveCodingLogOutputFilter(boolean enableLogs) {
             this.enableLogs = enableLogs;
@@ -238,7 +228,7 @@ public class ForwardedDevProcessor {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (thread == null) {
                 return;
             }
@@ -254,23 +244,17 @@ public class ForwardedDevProcessor {
                     return false;
                 }
                 buffer.add(s.replaceAll("\\x1b\\[[0-9;]*[a-zA-Z]", ""));
-                scheduled.getAndUpdate(new UnaryOperator<ScheduledFuture<?>>() {
-                    @Override
-                    public ScheduledFuture<?> apply(ScheduledFuture<?> scheduledFuture) {
-                        if (scheduledFuture != null && !scheduledFuture.isDone()) {
-                            scheduledFuture.cancel(true);
-                        }
-                        return executor.schedule(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!buffer.isEmpty()) {
-                                    LOG.infof("\u001b[33mQuinoa package manager live coding server has spoken: " + RESET
-                                            + " \n%s", join("", buffer));
-                                    buffer.clear();
-                                }
-                            }
-                        }, 200, TimeUnit.MILLISECONDS);
+                scheduled.getAndUpdate(scheduledFuture -> {
+                    if (scheduledFuture != null && !scheduledFuture.isDone()) {
+                        scheduledFuture.cancel(true);
                     }
+                    return executor.schedule(() -> {
+                        if (!buffer.isEmpty()) {
+                            LOG.infof("\u001b[33mQuinoa package manager live coding server has spoken: " + RESET
+                                    + " \n%s", join("", buffer));
+                            buffer.clear();
+                        }
+                    }, 200, TimeUnit.MILLISECONDS);
                 });
                 return false;
             }
