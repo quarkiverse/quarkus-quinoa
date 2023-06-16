@@ -50,6 +50,8 @@ jobs:
           key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Maven Version
+        run: mvn --version
       - name: Build with Maven
         run: mvn -B formatter:validate install --file pom.xml
   build-windows:
@@ -77,5 +79,7 @@ jobs:
           key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm@~8.1.0
+      - name: Maven Version
+        run: mvn --version
       - name: Build with Maven
         run: mvn -B install --file pom.xml
