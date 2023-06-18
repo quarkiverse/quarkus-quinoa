@@ -9,7 +9,7 @@
         "test": ""
     },
     "dependencies": {
-        "lit": "^2.2.1"
+        "lit": "^2.7.5"
     },
     "browser": {
         "[module-name]": false
