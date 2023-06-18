@@ -410,6 +410,11 @@ For developers, this provides more "convention over configuration" approach for 
 
 App created by  https://create-react-app.dev/docs/getting-started[Create React App], https://github.com/timarney/react-app-rewired[React App Rewired] and https://craco.js.org/[CRACO] are compatible without any change.
 
+[#vue]
+=== Vue
+
+App created by https://cli.vuejs.org/guide/cli-service.html[Vue CLI Service] or https://github.com/vuejs/create-vue[Create Vue] are compatible without any change.
+
 
 [#angular]
 === Angular
