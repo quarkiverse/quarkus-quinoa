@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -36,6 +37,9 @@ public enum FrameworkType {
 
     public static final Set<String> DEV_SCRIPTS = Arrays.stream(values()).map(FrameworkType::getDevScript)
             .collect(Collectors.toCollection(TreeSet::new));
+
+    private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "target");
+    private static final String IGNORE_WATCH_REGEX = "^[.].+$"; // ignore "." directories
 
     /**
      * This the Web UI internal build system (webpack, …​) output directory. After the build, Quinoa will take the files from
@@ -110,6 +114,33 @@ public enum FrameworkType {
 
         LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
         return new DetectedFramework(frameworkType, packageJson, startCommand);
+    }
+
+    /**
+     * Check whether this path should be scanned for changes by comparing against known directories that should be ignored.
+     * Ignored directories include any that start with DOT "." like ".next" or ".svelte", also "node_modules" and any
+     * of the framework build directories.
+     *
+     * @param filePath the file path to check
+     * @return true if it is a directory that should be scanned for changes, false if it should be ignored
+     */
+    public static boolean shouldScanPath(Path filePath) {
+        if (!Files.isDirectory(filePath)) {
+            // not a directory so do not scan
+            return false;
+        }
+
+        final Set<String> ignoreSet = new HashSet<>(IGNORE_WATCH);
+        for (FrameworkType value : values()) {
+            String buildDirectory = value.getBuildDirectory();
+            ignoreSet.add(buildDirectory);
+        }
+        final String directory = filePath.getFileName().toString();
+        if (ignoreSet.contains(directory) || directory.matches(IGNORE_WATCH_REGEX)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

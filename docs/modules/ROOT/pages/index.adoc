@@ -475,6 +475,49 @@ Update this script in package.json:
   }
 ----
 
+[#svelte]
+=== Svelte (using Vite)
+Any app created with https://svelte.dev/docs/introduction#start-a-new-project-alternatives-to-sveltekit[Vite Svelte] are compatible without any change and Hot Module Replacement (HMR) should work by default similar to the link:#vite[Vite] section below
+
+[#svelte-kit]
+=== Svelte Kit
+Any app created with https://kit.svelte.dev/[Svelte Kit] does NOT work in dev mode as it has some complex server side interaction. It will work in production mode though with the following chnages:
+
+Install Svelte Static adapter:
+
+[source,shell]
+----
+npm i -D @sveltejs/adapter-static
+----
+
+Configure `svelte.config` file with the following changes:
+
+[source,json]
+----
+import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/kit/vite';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+    preprocess: vitePreprocess(),
+    kit: {
+        adapter: adapter({
+            fallback: 'index.html'
+        })
+    }
+};
+
+export default config;
+----
+
+In `application.properties` add:
+[source,properties]
+----
+quarkus.quinoa.dev-server=false
+quarkus.quinoa.build-dir=build
+----
+
+
 [#vite]
 === Vite
 Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
