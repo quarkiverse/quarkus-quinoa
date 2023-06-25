@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import jakarta.json.Json;
@@ -27,7 +28,7 @@ public enum FrameworkType {
 
     REACT("build", "start", 3000, Set.of("react-scripts", "react-app-rewired", "craco")),
     VUE_LEGACY("dist", "serve", 3000, Set.of("vue-cli-service")),
-    VITE("dist", "dev", 5173, Set.of("vite")),
+    VITE("dist", "dev", 5173, Set.of("vite"), "vite.config.js", Pattern.compile("port:\\s*(\\d+)")),
     NEXT("out", "dev", 3000, Set.of("next")),
     ANGULAR("dist/%s", "start", 4200, Set.of("ng")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
@@ -58,15 +59,35 @@ public enum FrameworkType {
      */
     private final Set<String> packageScripts;
 
-    FrameworkType(String buildDirectory, String devScript, int devServerPort, Set<String> packageScripts) {
+    /**
+     * If the framework has a custom config file like vite.config.js.
+     */
+    private final String frameworkConfigFile;
+
+    /**
+     * Regular expression to search in the framework config for a custom port value.
+     */
+    private final Pattern frameworkPortRegex;
+
+    FrameworkType(String buildDirectory, String devScript, int devServerPort, Set<String> packageScripts,
+            String frameworkConfigFile, Pattern frameworkPortRegex) {
         this.buildDirectory = buildDirectory;
         this.devScript = devScript;
         this.devServerPort = devServerPort;
         this.packageScripts = packageScripts;
+        this.frameworkConfigFile = frameworkConfigFile;
+        this.frameworkPortRegex = frameworkPortRegex;
+    }
+
+    FrameworkType(String buildDirectory, String devScript, int devServerPort, Set<String> packageScripts) {
+        this(buildDirectory, devScript, devServerPort, packageScripts, null, null);
     }
 
     public static DetectedFramework detectFramework(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
         // only read package.json if the defaults are in use
+        if (launchMode.isNotLocalDevModeType()) {
+            return new DetectedFramework();
+        }
         if (config.devServer.port.isPresent() && !QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(config.buildDir)) {
             return new DetectedFramework();
         }
@@ -102,14 +123,18 @@ public enum FrameworkType {
             return new DetectedFramework();
         }
 
-        String expectedCommand = frameworkType.getDevScript();
+        final String expectedCommand = frameworkType.getDevScript();
         if (!Objects.equals(startCommand, expectedCommand)) {
             LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
                     frameworkType, expectedCommand, startCommand);
         }
 
+        final int port = frameworkType.getDevServerPort();
+
         LOG.infof("%s framework automatically detected from package.json file.", frameworkType);
-        return new DetectedFramework(frameworkType, packageJson, startCommand);
+        DetectedFramework df = new DetectedFramework(frameworkType, packageJson, startCommand, port);
+        df.checkPortOverride(packageJsonFile.getParent());
+        return df;
     }
 
     /**
@@ -145,5 +170,13 @@ public enum FrameworkType {
 
     public int getDevServerPort() {
         return devServerPort;
+    }
+
+    public String getFrameworkConfigFile() {
+        return frameworkConfigFile;
+    }
+
+    public Pattern getFrameworkPortRegex() {
+        return frameworkPortRegex;
     }
 }

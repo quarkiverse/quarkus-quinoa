@@ -250,13 +250,11 @@ public class QuinoaProcessor {
             return new QuinoaDirectoryBuildItem(packageManager, "start", port, buildDirectory);
         }
 
-        LOG.infof("%s", packageManager.getPackageManagerCommands());
-
         // only override properties that have not been set
         FrameworkType framework = detectedFramework.getFrameworkType();
         if (launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
-            LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
-            port = OptionalInt.of(framework.getDevServerPort());
+            LOG.infof("%s framework setting dev server port: %d", framework, detectedFramework.getDevServerPort());
+            port = OptionalInt.of(detectedFramework.getDevServerPort());
             LOG.infof("%s framework setting dev script: '%s'", framework, detectedFramework.getDevServerCommand());
         }
 
