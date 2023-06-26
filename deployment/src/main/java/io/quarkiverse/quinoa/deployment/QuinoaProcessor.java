@@ -57,7 +57,6 @@ public class QuinoaProcessor {
 
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
-    private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "build", "target", "dist", "out");
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -252,8 +251,8 @@ public class QuinoaProcessor {
 
         // only override properties that have not been set
         FrameworkType framework = detectedFramework.getFrameworkType();
-        if (launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
-            LOG.infof("%s framework setting dev server port: %d", framework, detectedFramework.getDevServerPort());
+        if (config.devServer.enabled && launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
+            LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
             port = OptionalInt.of(detectedFramework.getDevServerPort());
             LOG.infof("%s framework setting dev script: '%s'", framework, detectedFramework.getDevServerCommand());
         }
@@ -295,7 +294,7 @@ public class QuinoaProcessor {
                 if (Files.isRegularFile(filePath)) {
                     LOG.debugf("Quinoa is watching: %s", filePath);
                     watchedPaths.produce(new HotDeploymentWatchedFileBuildItem(filePath.toString()));
-                } else if (Files.isDirectory(filePath) && !IGNORE_WATCH.contains(filePath.getFileName().toString())) {
+                } else if (FrameworkType.shouldScanPath(filePath)) {
                     LOG.debugf("Quinoa is scanning directory: %s", filePath);
                     scan(filePath, watchedPaths);
                 }
