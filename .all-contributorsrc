@@ -95,7 +95,8 @@
       "profile": "http://shivams.bio.link/",
       "contributions": [
         "infra",
-        "doc"
+        "doc",
+        "data"
       ]
     }
   ],
@@ -105,5 +106,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
