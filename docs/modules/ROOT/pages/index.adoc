@@ -479,6 +479,10 @@ Update this script in package.json:
 === Vite
 Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
 
+[#astro]
+=== Astro
+Any app created with https://astro.build/[Astro] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
+
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
