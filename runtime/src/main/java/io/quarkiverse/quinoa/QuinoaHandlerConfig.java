@@ -17,7 +17,7 @@ public class QuinoaHandlerConfig {
     public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode, boolean enableCompression,
             Set<String> compressMediaTypes) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
-        this.indexPage = indexPage;
+        this.indexPage = "/".equals(indexPage) ? "" : indexPage;
         this.prodMode = prodMode;
         this.enableCompression = enableCompression;
         this.compressMediaTypes = compressMediaTypes;

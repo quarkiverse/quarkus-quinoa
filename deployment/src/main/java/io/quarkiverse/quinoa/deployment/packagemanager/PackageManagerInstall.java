@@ -31,7 +31,7 @@ public final class PackageManagerInstall {
     public static Installation install(PackageManagerInstallConfig config, final ProjectDirs projectDirs) {
         Path installDir = resolveInstallDir(config, projectDirs).normalize();
         FrontendPluginFactory factory = new FrontendPluginFactory(null, installDir.toFile());
-        if (!config.nodeVersion.isPresent()) {
+        if (config.nodeVersion.isEmpty()) {
             throw new ConfigurationException("node-version is required to install package manager",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
         }
@@ -81,9 +81,9 @@ public final class PackageManagerInstall {
 
             // Use pnpm if pnpmVersion is set (and npm is provided and yarnVersion is not set)
             final Optional<String> pnpmVersion = config.pnpmVersion;
-            if (pnpmVersion.isPresent() && isNpmProvided && !yarnVersion.isPresent()) {
+            if (pnpmVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty()) {
                 executionPath = PNPM_PATH;
-                factory.getPNPMInstaller(proxy)
+                factory.getPnpmInstaller(proxy)
                         .setNodeVersion("v" + config.nodeVersion.get())
                         .setPnpmVersion(pnpmVersion.get())
                         .setPnpmDownloadRoot(config.pnpmDownloadRoot)
