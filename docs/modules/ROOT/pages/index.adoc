@@ -522,6 +522,10 @@ quarkus.quinoa.build-dir=build
 === Vite
 Any app created with https://vitejs.dev/guide/[Vite] are compatible without any change and Hot Module Replacement (HMR) should work by default.
 
+[#solidstart]
+=== Solid Start
+Any app created with https://start.solidjs.com/getting-started/what-is-solidstart[SolidStart] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
+
 [#astro]
 === Astro
 Any app created with https://astro.build/[Astro] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
