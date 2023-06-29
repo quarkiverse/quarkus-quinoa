@@ -30,6 +30,7 @@ public enum FrameworkType {
     VUE_LEGACY("dist", "serve", 3000, Set.of("vue-cli-service")),
     VITE("dist", "dev", 5173, Set.of("vite")),
     SOLID_START("dist", "dev", 3000, Set.of("solid-start")),
+    PREACT("dist", "dev", 3000, Set.of("preact-cli")),
     ASTRO("dist", "dev", 3000, Set.of("astro")),
     NEXT("out", "dev", 3000, Set.of("next")),
     ANGULAR("dist/%s", "start", 4200, Set.of("ng")),
