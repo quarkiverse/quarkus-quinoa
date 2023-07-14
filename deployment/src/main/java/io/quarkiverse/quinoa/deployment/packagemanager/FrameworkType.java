@@ -34,7 +34,7 @@ public enum FrameworkType {
     NEXT("out", "dev", 3000, Set.of("next")),
     ANGULAR("dist/%s", "start", 4200, Set.of("ng")),
     EMBER("dist", "serve", 4200, Set.of("ember-cli")),
-    Aurelia("dist", "start", 8080, Set.of("aurelia-cli")),
+    AURELIA("dist", "start", 8080, Set.of("aurelia-cli")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
