@@ -2,4 +2,4 @@ quarkus:
   quinoa:
     package-manager-install:
       ~: true
-      node-version: 18.16.0
+      node-version: 18.16.1
