@@ -20,13 +20,13 @@ You will be able to do live coding of the backend and frontend together nearly o
 
 ## Getting started
 
-Read the full [Quinoa documentation](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/).
+Read the full [Quinoa documentation](https://docs.quarkiverse.io/quarkus-quinoa/dev/index.html).
 
 ### Prerequisite
 
 - Create or use an existing Quarkus application
 - Add the Quinoa extension
-- Install [NodeJS](https://nodejs.org/) or make sure Quinoa is [configured](https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/#package-manager-install) to install it.
+- Install [NodeJS](https://nodejs.org/) or make sure Quinoa is [configured](https://docs.quarkiverse.io/quarkus-quinoa/dev/index.html#package-manager) to install it.
 
 ### Installation
 
