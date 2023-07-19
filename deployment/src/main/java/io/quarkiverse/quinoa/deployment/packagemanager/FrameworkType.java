@@ -36,6 +36,7 @@ public enum FrameworkType {
     EMBER("dist", "serve", 4200, Set.of("ember-cli")),
     AURELIA("dist", "start", 8080, Set.of("aurelia-cli")),
     POLYMER("build", "serve", 8080, Set.of("polymer-cli")),
+    QWIK("dist", "start", 5173, Set.of("qwik")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
