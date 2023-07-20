@@ -530,6 +530,10 @@ Any app created with https://start.solidjs.com/getting-started/what-is-solidstar
 === Astro
 Any app created with https://astro.build/[Astro] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
 
+[#gatsby]
+=== Gatsby
+Any app created with https://www.gatsbyjs.com/docs/quick-start/[Gatsby] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
+
 [#ember]
 === Ember
 Any app created with https://guides.emberjs.com/release/getting-started/[Ember] are compatible without any change and Hot Module Replacement (HMR) should work by default.
