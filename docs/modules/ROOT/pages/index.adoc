@@ -530,6 +530,21 @@ Any app created with https://start.solidjs.com/getting-started/what-is-solidstar
 === Astro
 Any app created with https://astro.build/[Astro] are compatible without any change and Hot Module Replacement (HMR) should work by default. It is based on link:#vite[Vite].
 
+[#ember]
+=== Ember
+Any app created with https://guides.emberjs.com/release/getting-started/[Ember] are compatible without any change and Hot Module Replacement (HMR) should work by default.
+
+[#aurelia]
+=== Aurelia
+App created with https://aurelia.io/docs/tutorials/creating-a-todo-app#setup[Aurelia] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
+
+[#polymer]
+=== Polymer
+App created with https://polymer-library.polymer-project.org/3.0/docs/first-element/intro[Polymer] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
+
+[#qwik]
+=== Qwik
+App created with https://qwik.builder.io/docs/getting-started/[Qwik] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
