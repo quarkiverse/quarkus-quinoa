@@ -32,6 +32,7 @@ public enum FrameworkType {
     SOLID_START("dist", "dev", 3000, Set.of("solid-start")),
     ASTRO("dist", "dev", 3000, Set.of("astro")),
     NEXT("out", "dev", 3000, Set.of("next")),
+    NUXT("dist", "dev", 3000, Set.of("nuxt")),
     ANGULAR("dist/%s", "start", 4200, Set.of("ng")),
     EMBER("dist", "serve", 4200, Set.of("ember-cli")),
     AURELIA("dist", "start", 8080, Set.of("aurelia-cli")),
