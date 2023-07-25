@@ -34,8 +34,7 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
                 LOG.debugf("Quinoa is re-routing SPA request '%s' to '/'", ctx.normalizedPath());
             }
             ctx.reroute(ctx.mountPoint() != null ? ctx.mountPoint() : "/");
-        } else {
-            next(currentClassLoader, ctx);
         }
+        next(currentClassLoader, ctx);
     }
 }

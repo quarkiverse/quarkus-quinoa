@@ -226,7 +226,8 @@ public class QuinoaProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     List<HotDeploymentWatchedFileBuildItem> hotDeploymentWatchedFiles(QuinoaConfig quinoaConfig,
             OutputTargetBuildItem outputTarget) {
-        final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(PackageManagerType.values().length);
+        final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(
+                PackageManagerType.values().length);
         final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
         if (projectDirs == null) {
             // UI dir is misconfigured so just skip watching files
@@ -263,7 +264,8 @@ public class QuinoaProcessor {
             buildDirectory = detectedFramework.getBuildDirectory();
             LOG.infof("%s framework setting build directory: '%s'", framework, buildDirectory);
         }
-        return new QuinoaDirectoryBuildItem(packageManager, detectedFramework.getDevServerCommand(), port, buildDirectory);
+        return new QuinoaDirectoryBuildItem(packageManager, detectedFramework.getDevServerCommand(), port,
+                buildDirectory);
     }
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
@@ -277,7 +279,8 @@ public class QuinoaProcessor {
         for (Path file : files) {
             final String name = "/" + targetDir.relativize(file).toString().replace('\\', '/');
             LOG.infof("Quinoa generated resource: '%s'", name);
-            generatedResources.produce(new GeneratedResourceBuildItem(META_INF_WEB_UI + name, Files.readAllBytes(file), true));
+            generatedResources
+                    .produce(new GeneratedResourceBuildItem(META_INF_WEB_UI + name, Files.readAllBytes(file), true));
             if (nativeImageResources != null) {
                 nativeImageResources
                         .produce(new NativeImageResourceBuildItem(META_INF_WEB_UI + name));
@@ -337,9 +340,9 @@ public class QuinoaProcessor {
             }
             if (currentPath.getParent() != null && Files.exists(currentPath.getParent())) {
                 currentPath = currentPath.getParent();
-            } else {
-                return null;
             }
+            return null;
+
         } while (true);
     }
 

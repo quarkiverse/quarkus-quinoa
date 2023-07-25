@@ -50,7 +50,8 @@ public class PackageManager {
         LOG.infof("Running Quinoa package manager install command: %s", install.commandWithArguments);
         if (!exec(install)) {
             throw new RuntimeException(
-                    format("Error in Quinoa while running package manager install command: %s", install.commandWithArguments));
+                    format("Error in Quinoa while running package manager install command: %s",
+                            install.commandWithArguments));
         }
     }
 
@@ -59,7 +60,8 @@ public class PackageManager {
         LOG.infof("Running Quinoa package manager build command: %s", build.commandWithArguments);
         if (!exec(build)) {
             throw new RuntimeException(
-                    format("Error in Quinoa while running package manager build command: %s", build.commandWithArguments));
+                    format("Error in Quinoa while running package manager build command: %s",
+                            build.commandWithArguments));
         }
     }
 
@@ -68,7 +70,8 @@ public class PackageManager {
         LOG.infof("Running Quinoa package manager test command: %s", test.commandWithArguments);
         if (!exec(test)) {
             throw new RuntimeException(
-                    format("Error in Quinoa while running package manager test command: %s", test.commandWithArguments));
+                    format("Error in Quinoa while running package manager test command: %s",
+                            test.commandWithArguments));
         }
     }
 
@@ -114,7 +117,8 @@ public class PackageManager {
         });
     }
 
-    public DevServer dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+    public DevServer dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath,
+            int checkTimeout) {
         final Command dev = packageManagerCommands.dev(devServerCommand);
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         Process p = process(dev);
@@ -228,9 +232,8 @@ public class PackageManager {
     private String[] runner(Command command) {
         if (isWindows()) {
             return new String[] { "cmd.exe", "/c", command.commandWithArguments };
-        } else {
-            return new String[] { "sh", "-c", command.commandWithArguments };
         }
+        return new String[] { "sh", "-c", command.commandWithArguments };
     }
 
     private static class HandleOutput implements Runnable {
