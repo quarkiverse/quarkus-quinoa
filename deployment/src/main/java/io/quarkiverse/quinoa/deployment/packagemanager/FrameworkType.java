@@ -39,6 +39,7 @@ public enum FrameworkType {
     POLYMER("build", "serve", 8080, Set.of("polymer-cli")),
     QWIK("dist", "start", 5173, Set.of("qwik")),
     GATSBY("dist", "develop", 8000, Set.of("gatsby-cli")),
+    CYCLEJS("build", "start", 8000, Set.of("cycle")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
