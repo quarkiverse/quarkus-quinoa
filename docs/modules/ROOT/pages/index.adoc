@@ -554,6 +554,10 @@ App created with https://polymer-library.polymer-project.org/3.0/docs/first-elem
 === Qwik
 App created with https://qwik.builder.io/docs/getting-started/[Qwik] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
 
+[#cycle]
+=== Cycle
+App created with https://cycle.js.org/getting-started.html[Cycle] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
