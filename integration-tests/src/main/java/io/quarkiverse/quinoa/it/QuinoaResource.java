@@ -18,8 +18,10 @@ package io.quarkiverse.quinoa.it;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -40,5 +42,18 @@ public class QuinoaResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String hello(String message) {
         return "Hello Quinoa " + message;
+    }
+
+    @PUT
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String update(String message) {
+        return "Quinoa updated with: " + message;
+    }
+
+    @DELETE
+    @Produces(MediaType.TEXT_PLAIN)
+    public String delete() {
+        return "Quinoa deleted successfully!";
     }
 }
