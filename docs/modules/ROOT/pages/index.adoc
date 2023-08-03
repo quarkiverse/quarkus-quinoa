@@ -558,6 +558,10 @@ App created with https://qwik.builder.io/docs/getting-started/[Qwik] are compati
 === Cycle
 App created with https://cycle.js.org/getting-started.html[Cycle] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
 
+[#riotjs]
+=== Riot.js
+App created with https://riot.js.org/[Riot.js] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
