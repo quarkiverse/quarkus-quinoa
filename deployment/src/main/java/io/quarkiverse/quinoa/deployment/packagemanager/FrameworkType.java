@@ -40,6 +40,7 @@ public enum FrameworkType {
     QWIK("dist", "start", 5173, Set.of("qwik")),
     GATSBY("dist", "develop", 8000, Set.of("gatsby-cli")),
     CYCLEJS("build", "start", 8000, Set.of("cycle")),
+    RIOTJS("build", "start", 3000, Set.of("riot-cli")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
