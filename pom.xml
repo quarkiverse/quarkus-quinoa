@@ -19,7 +19,7 @@
     <module>docs</module>
   </modules>
   <scm>
-    <connection>:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
+    <connection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
     <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</developerConnection>
     <url>https://github.com/quarkiverse/quarkus-quinoa</url>
     <tag>HEAD</tag>
