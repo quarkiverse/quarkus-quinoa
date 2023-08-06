@@ -24,6 +24,15 @@
     <url>https://github.com/quarkiverse/quarkus-quinoa</url>
     <tag>HEAD</tag>
   </scm>
+
+  <!-- Licenses -->
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+  
   <properties>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <maven.compiler.release>11</maven.compiler.release>
