@@ -18,6 +18,10 @@
     <module>testing</module>
     <module>docs</module>
   </modules>
+  
+  <name>quarkus-quinoa</name>
+    <description>Quinoa is a Quarkus extension</description>
+  
   <scm>
     <connection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
     <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</developerConnection>
