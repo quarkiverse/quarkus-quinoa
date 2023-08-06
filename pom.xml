@@ -11,6 +11,7 @@
   <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus - Quinoa - Parent</name>
+   <description>Quinoa is a Quarkus extension</description>
   <modules>
     <module>deployment-testing</module>
     <module>deployment</module>
@@ -18,9 +19,6 @@
     <module>testing</module>
     <module>docs</module>
   </modules>
-  
-  <name>quarkus-quinoa</name>
-    <description>Quinoa is a Quarkus extension</description>
   
   <scm>
     <connection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
