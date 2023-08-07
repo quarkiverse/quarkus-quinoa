@@ -25,6 +25,12 @@
     <url>https://github.com/quarkiverse/quarkus-quinoa</url>
     <tag>HEAD</tag>
   </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/quarkiverse/quarkus-quinoa/issues/</url>
+  </issueManagement>
+
   <properties>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <maven.compiler.release>11</maven.compiler.release>
