@@ -41,6 +41,7 @@ public enum FrameworkType {
     GATSBY("dist", "develop", 8000, Set.of("gatsby-cli")),
     CYCLEJS("build", "start", 8000, Set.of("cycle")),
     RIOTJS("build", "start", 3000, Set.of("riot-cli")),
+    MIDWAYJS("dist", "dev", 7001, Set.of("midway")),
     WEB_COMPONENTS("dist", "start", 8003, Set.of("web-dev-server"));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
