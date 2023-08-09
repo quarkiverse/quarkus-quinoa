@@ -42,6 +42,28 @@
     <assertj.version>3.24.2</assertj.version>
     <frontend-plugin.version>1.13.4</frontend-plugin.version>
   </properties>
+
+  <developers>
+    <developer>
+        <name>Andy Damevin</name>
+        <email>ia3andy@gmail.com</email>
+        <organization>Red Hat</organization>
+        <organizationUrl>http://www.redhat.com</organizationUrl>
+    </developer>
+      <developer>
+        <name>melloware</name>
+        <email>mellowaredev@gmail.com</email>
+        <organization>Melloware</organization>
+        <organizationUrl>https://melloware.com/</organizationUrl>
+    </developer>
+    <developer>
+        <name>Shivam Sharma</name>
+        <email>meshivam81@gmail.com</email>
+        <organization>Hyperfoil</organization>
+        <organizationUrl>https://github.com/Hyperfoil</organizationUrl>
+    </developer>
+</developers>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
