@@ -78,7 +78,7 @@ jobs:
           # resulting in faster build times. 
           key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
-        run: npm install -g pnpm@~8.1.0
+        run: npm install -g pnpm@~8.6.12
       - name: Maven Version
         run: mvn --version
       - name: Build with Maven
