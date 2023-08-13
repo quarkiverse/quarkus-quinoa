@@ -566,6 +566,10 @@ App created with https://riot.js.org/[Riot.js] are compatible without any change
 === Midway.js
 App created with https://www.midwayjs.org/[Midway.js] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
 
+[#refine]
+=== Refine
+App created with https://refine.dev/docs/getting-started/quickstart/[Refine] are compatible without any changes and Hot Module Replacement (HMR) should work by default.
+
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
