@@ -14,7 +14,7 @@ import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaPackageManagerNPMOverrideEnvTest {
     private static final String NAME = "package-manager-npm-override-env";
-    private static final String MODE = "devolup";
+    private static final String MODE = "develop";
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()

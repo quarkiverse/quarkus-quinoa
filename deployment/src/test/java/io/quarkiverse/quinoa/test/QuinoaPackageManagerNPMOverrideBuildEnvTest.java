@@ -19,7 +19,7 @@ public class QuinoaPackageManagerNPMOverrideBuildEnvTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build", BUILD_COMMAND)
-            .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "devolup")
+            .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "develop")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
                             s.getParameters()[0].equals(BUILD_COMMAND)));
@@ -27,7 +27,7 @@ public class QuinoaPackageManagerNPMOverrideBuildEnvTest {
     @Test
     public void testQuinoa() {
         assertThat(Path.of("target/quinoa-build/index.html")).isRegularFile()
-                .hasContent("devolup");
+                .hasContent("develop");
         assertThat(getWebUITestDirPath(NAME).resolve("node_modules/installed")).isRegularFile()
                 .hasContent("hello");
     }
