@@ -6,7 +6,9 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
 import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
@@ -26,7 +28,12 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
 
     QuinoaUIResourceHandler(final QuinoaHandlerConfig config, final String directory, final Set<String> uiResources) {
         this.config = config;
-        this.uiResources = uiResources;
+        this.uiResources = new HashSet<>(uiResources.size());
+        for (String uiResource : uiResources) {
+            final String encoded = encodeURI(uiResource);
+            this.uiResources.add(encoded);
+            LOG.debugf("Quinoa UI encoded: '%s'", encoded);
+        }
         handler = createStaticHandler(config, directory);
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -43,10 +50,9 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
             return;
         }
         final String resourcePath = path.endsWith("/") ? path + config.indexPage : path;
+        LOG.debugf("Quinoa is checking: '%s'", resourcePath);
         if (!isIgnored(resourcePath, config.ignoredPathPrefixes) && uiResources.contains(resourcePath)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debugf("Quinoa is serving: '%s'", resourcePath);
-            }
+            LOG.debugf("Quinoa is serving: '%s'", resourcePath);
             compressIfNeeded(config, ctx, resourcePath);
             handler.handle(ctx);
         } else {
@@ -63,4 +69,30 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
         return staticHandler;
     }
 
+    /**
+     * Duplicate code from OmniFaces project under apache license:
+     * https://github.com/omnifaces/omnifaces/blob/develop/license.txt
+     * <p>
+     * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
+     * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
+     * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
+     * the space has to be %20 and some chars doesn't necessarily need to be encoded.
+     *
+     * @param string The string to be URI-encoded using UTF-8.
+     * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
+     */
+    private static String encodeURI(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return URLEncoder.encode(string, StandardCharsets.UTF_8)
+                .replace("+", "%20")
+                .replace("%21", "!")
+                .replace("%27", "'")
+                .replace("%28", "(")
+                .replace("%29", ")")
+                .replace("%2F", "/")
+                .replace("%7E", "~");
+    }
 }
