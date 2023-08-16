@@ -36,7 +36,8 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private final ClassLoader currentClassLoader;
     private final QuinoaHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port, boolean websocket) {
+    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port,
+            boolean websocket) {
         this.host = host;
         this.port = port;
         this.client = WebClient.create(vertx);
@@ -85,7 +86,8 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         final String uri = computeResourceURI(resourcePath, request);
 
         // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
-        // See https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
+        // See
+        // https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
         // When no Accept header is provided, the historyApiFallback is disabled
         headers.remove("Accept");
         // Disable compression in the forwarded request
@@ -132,9 +134,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
 
     private void forwardResponse(AsyncResult<HttpResponse<Buffer>> event, HttpServerRequest request, RoutingContext ctx,
             String resourcePath) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debugf("Quinoa is forwarding: '%s'", request.uri());
-        }
+        LOG.debugf("Quinoa is forwarding: '%s'", request.uri());
         final HttpServerResponse response = ctx.response();
         for (String header : HEADERS_TO_FORWARD) {
             response.headers().add(header, event.result().headers().getAll(header));

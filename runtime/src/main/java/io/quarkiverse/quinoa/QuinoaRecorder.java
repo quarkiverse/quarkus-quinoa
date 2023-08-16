@@ -44,15 +44,14 @@ public class QuinoaRecorder {
     static String resolvePath(RoutingContext ctx) {
         return (ctx.mountPoint() == null) ? ctx.normalizedPath()
                 : ctx.normalizedPath().substring(
-                        // let's be extra careful here in case Vert.x normalizes the mount points at some point
+                        // let's be extra careful here in case Vert.x normalizes the mount points at
+                        // some point
                         ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
     }
 
     static boolean isIgnored(final String path, final List<String> ignoredPathPrefixes) {
         if (ignoredPathPrefixes.stream().anyMatch(path::startsWith)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debugf("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
-            }
+            LOG.debugf("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
             return true;
         }
         return false;
@@ -60,8 +59,10 @@ public class QuinoaRecorder {
 
     static void compressIfNeeded(QuinoaHandlerConfig config, RoutingContext ctx, String path) {
         if (config.enableCompression && isCompressed(config, path)) {
-            // VertxHttpRecorder is adding "Content-Encoding: identity" to all requests if compression is enabled.
-            // Handlers can remove the "Content-Encoding: identity" header to enable compression.
+            // VertxHttpRecorder is adding "Content-Encoding: identity" to all requests if
+            // compression is enabled.
+            // Handlers can remove the "Content-Encoding: identity" header to enable
+            // compression.
             ctx.response().headers().remove(HttpHeaders.CONTENT_ENCODING);
         }
     }
