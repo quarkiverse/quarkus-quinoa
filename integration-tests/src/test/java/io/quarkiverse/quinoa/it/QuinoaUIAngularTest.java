@@ -39,6 +39,9 @@ public class QuinoaUIAngularTest {
     @TestHTTPResource("/bar/foo/api/quinoa")
     URL api;
 
+    @TestHTTPResource("/image%20with%20spaces.svg")
+    URL imageWithSpaces;
+
     @Test
     public void testUIIndex() {
         checkUrl(index);
@@ -62,6 +65,18 @@ public class QuinoaUIAngularTest {
         final ElementHandle quinoaEl = page.waitForSelector(".quinoa");
         String greeting = quinoaEl.innerText();
         Assertions.assertEquals("Hello Quinoa", greeting);
+    }
+
+    /**
+     * Test an image with spaces "a b.png" get encoded "a%20b.png".
+     *
+     * @see <a href="https://github.com/quarkiverse/quarkus-quinoa/issues/481">GitHub Issue 481</a>
+     */
+    @Test
+    public void testUIEncodedPath() {
+        final Page page = context.newPage();
+        Response response = page.navigate(imageWithSpaces.toString());
+        Assertions.assertEquals("OK", response.statusText());
     }
 
     @Test
