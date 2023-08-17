@@ -107,6 +107,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "alexkarezin",
+      "name": "Alex Karezin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6850153?v=4",
+      "profile": "https://sourcespy.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
