@@ -87,12 +87,12 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
         }
 
         return URLEncoder.encode(string, StandardCharsets.UTF_8)
-                .replace("+", "%20")
-                .replace("%21", "!")
-                .replace("%27", "'")
-                .replace("%28", "(")
-                .replace("%29", ")")
-                .replace("%2F", "/")
-                .replace("%7E", "~");
+                .replaceAll("+", "%20")
+                .replaceAll("%21", "!")
+                .replaceAll("%27", "'")
+                .replaceAll("%28", "(")
+                .replaceAll("%29", ")")
+                .replaceAll("%2F", "/")
+                .replaceAll("%7E", "~");
     }
 }
