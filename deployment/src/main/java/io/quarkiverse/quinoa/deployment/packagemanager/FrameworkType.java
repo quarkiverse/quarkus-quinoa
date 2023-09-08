@@ -107,7 +107,7 @@ public enum FrameworkType {
         }
 
         if (startScript == null || startCommand == null) {
-            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
+            LOG.trace("Quinoa could not auto-detect the framework from package.json file.");
             return new DetectedFramework();
         }
 
