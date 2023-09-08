@@ -114,7 +114,7 @@ public enum FrameworkType {
         // check if we found a script to detect which framework
         final FrameworkType frameworkType = evaluate(startScript.getString());
         if (frameworkType == null) {
-            LOG.trace("Quinoa could not auto-detect the framework from package.json file.");
+            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
             return new DetectedFramework();
         }
 
