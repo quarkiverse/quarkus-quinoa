@@ -24,7 +24,7 @@ public class QuinoaFrozenLockfileConfigTest {
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager install command: %s") &&
                             s.getParameters()[0].equals(
-                                    systemBinary(PackageManagerType.YARN.getCommand()) + " install --frozen-lockfile")));
+                                    systemBinary(PackageManagerType.YARN.getCommand()) + " install")));
 
     @Test
     public void testQuinoa() {

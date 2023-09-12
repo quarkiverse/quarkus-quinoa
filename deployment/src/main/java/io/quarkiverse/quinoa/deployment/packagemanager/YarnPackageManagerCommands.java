@@ -15,7 +15,7 @@ class YarnPackageManagerCommands implements PackageManagerCommands {
     @Override
     public Command install(boolean frozenLockfile) {
         if (frozenLockfile) {
-            return new Command(binary() + " install --frozen-lockfile");
+            return new Command(binary() + " install");
         }
         return new Command(binary() + " install");
     }
