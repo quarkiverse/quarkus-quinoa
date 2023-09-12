@@ -2,6 +2,7 @@ package io.quarkiverse.quinoa.it;
 
 import java.net.URL;
 
+import io.quarkiverse.playwright.WithPlaywright;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ import io.quarkus.test.junit.TestProfile;
 
 @QuarkusTest
 @TestProfile(TestProfiles.LitTests.class)
-@QuarkusTestResource(QuarkusPlaywrightManager.class)
+@WithPlaywright
 public class QuinoaUILitTest {
 
     @InjectPlaywright
