@@ -13,8 +13,8 @@ import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
-import io.quarkiverse.quinoa.testing.QuarkusPlaywrightManager;
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkiverse.playwright.WithPlaywright;
+import io.quarkiverse.playwright.InjectPlaywright;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -22,10 +22,10 @@ import io.restassured.http.ContentType;
 
 @QuarkusTest
 @TestProfile(TestProfiles.ReactTests.class)
-@QuarkusTestResource(QuarkusPlaywrightManager.class)
+@WithPlaywright
 public class QuinoaUIReactTest {
 
-    @QuarkusPlaywrightManager.InjectPlaywright
+    @InjectPlaywright
     BrowserContext context;
 
     @TestHTTPResource("/index.html")

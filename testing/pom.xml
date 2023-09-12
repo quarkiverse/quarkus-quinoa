@@ -10,14 +10,9 @@
   <name>Quarkus - Quinoa - Testing</name>
   <dependencies>
     <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>playwright</artifactId>
-      <version>${playright.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>driver-bundle</artifactId>
-      <version>${playright.version}</version>
+      <groupId>io.quarkiverse.playwright</groupId>
+      <artifactId>quarkus-playwright</artifactId>
+      <version>${quarkus-playright.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
