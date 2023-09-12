@@ -53,6 +53,7 @@ public class ForwardedDevProcessor {
     private static final Logger LOG = Logger.getLogger(ForwardedDevProcessor.class);
     private static final Predicate<Thread> PROCESS_THREAD_PREDICATE = thread -> thread.getName()
             .matches("Process (stdout|stderr) streamer");
+    private static final String DEV_SERVICE_NAME = "quinoa-dev-server";
     private static volatile DevServicesResultBuildItem.RunningDevService devService;
 
     @BuildStep(onlyIf = IsDevelopment.class)
@@ -71,8 +72,10 @@ public class ForwardedDevProcessor {
         final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
         QuinoaConfig oldConfig = liveReload.getContextObject(QuinoaConfig.class);
         liveReload.setContextObject(QuinoaConfig.class, quinoaConfig);
-        final String devServerHost = quinoaConfig.devServer.host;
+        final String configuredDevServerHost = quinoaConfig.devServer.host;
         final String devServerCommand = quinoaDirectoryBuildItem.getDevServerCommand();
+        final PackageManager packageManager = quinoaDir.get().getPackageManager();
+        final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (devService != null) {
             boolean shouldShutdownTheBroker = !quinoaConfig.equals(oldConfig);
             if (!shouldShutdownTheBroker) {
@@ -82,7 +85,10 @@ public class ForwardedDevProcessor {
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                return new ForwardedDevServerBuildItem(devServerHost, quinoaDirectoryBuildItem.getDevServerPort().getAsInt());
+                final int devServerPort = quinoaDirectoryBuildItem.getDevServerPort().getAsInt();
+                final String resolvedDevServerHost = PackageManager.isDevServerUp(configuredDevServerHost, devServerPort,
+                        checkPath);
+                return new ForwardedDevServerBuildItem(resolvedDevServerHost, devServerPort);
             }
             shutdownDevService();
         }
@@ -101,11 +107,11 @@ public class ForwardedDevProcessor {
             return null;
         }
 
-        PackageManager packageManager = quinoaDir.get().getPackageManager();
         final int devServerPort = quinoaDirectoryBuildItem.getDevServerPort().getAsInt();
-        final String checkPath = quinoaConfig.devServer.checkPath.orElse(null);
         if (!quinoaConfig.devServer.managed) {
-            final String hostAddress = PackageManager.isDevServerUp(devServerHost, devServerPort, checkPath);
+            // No need to start the dev-service it is not managed by Quinoa
+            // We just check that it is up
+            final String hostAddress = PackageManager.isDevServerUp(configuredDevServerHost, devServerPort, checkPath);
             if (hostAddress != null) {
                 return new ForwardedDevServerBuildItem(hostAddress, devServerPort);
             } else {
@@ -127,7 +133,8 @@ public class ForwardedDevProcessor {
             }
             final long start = Instant.now().toEpochMilli();
 
-            final PackageManager.DevServer devServer = packageManager.dev(devServerCommand, devServerHost, devServerPort,
+            final PackageManager.DevServer devServer = packageManager.dev(devServerCommand, configuredDevServerHost,
+                    devServerPort,
                     checkPath, checkTimeout);
             dev.set(devServer.process());
             compressor.close();
@@ -141,17 +148,10 @@ public class ForwardedDevProcessor {
                 logOutputFilter.close();
                 packageManager.stopDev(dev.get());
             };
-            Map<String, String> devServerConfigMap = new LinkedHashMap<>();
-            devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer.host);
-            devServerConfigMap.put("quarkus.quinoa.dev-server.port", Integer.toString(devServerPort));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.check-timeout",
-                    Integer.toString(quinoaConfig.devServer.checkTimeout));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.check-path", quinoaConfig.devServer.checkPath.orElse(""));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.managed", Boolean.toString(quinoaConfig.devServer.managed));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
-            devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
+            Map<String, String> devServerConfigMap = createDevServiceMapForDevUI(quinoaConfig, devServer.hostAddress(),
+                    devServerPort, checkPath);
             devService = new DevServicesResultBuildItem.RunningDevService(
-                    "quinoa-dev-server", null, onClose, devServerConfigMap);
+                    DEV_SERVICE_NAME, null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
             return new ForwardedDevServerBuildItem(devServer.hostAddress(), devServerPort);
         } catch (Throwable t) {
@@ -159,6 +159,20 @@ public class ForwardedDevProcessor {
             compressor.closeAndDumpCaptured();
             throw new RuntimeException(t);
         }
+    }
+
+    private static Map<String, String> createDevServiceMapForDevUI(QuinoaConfig quinoaConfig, String devServerHost,
+            int devServerPort, String checkPath) {
+        Map<String, String> devServerConfigMap = new LinkedHashMap<>();
+        devServerConfigMap.put("quarkus.quinoa.dev-server.host", devServerHost);
+        devServerConfigMap.put("quarkus.quinoa.dev-server.port", Integer.toString(devServerPort));
+        devServerConfigMap.put("quarkus.quinoa.dev-server.check-timeout",
+                Integer.toString(quinoaConfig.devServer.checkTimeout));
+        devServerConfigMap.put("quarkus.quinoa.dev-server.check-path", checkPath);
+        devServerConfigMap.put("quarkus.quinoa.dev-server.managed", Boolean.toString(quinoaConfig.devServer.managed));
+        devServerConfigMap.put("quarkus.quinoa.dev-server.logs", Boolean.toString(quinoaConfig.devServer.logs));
+        devServerConfigMap.put("quarkus.quinoa.dev-server.websocket", Boolean.toString(quinoaConfig.devServer.websocket));
+        return devServerConfigMap;
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
