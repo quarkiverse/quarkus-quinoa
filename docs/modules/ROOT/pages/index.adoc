@@ -346,15 +346,14 @@ public class AllWebUITest {
 }
 ----
 
-The library also brings a very elegant way to do e2e testing using https://github.com/microsoft/playwright-java[Playright]:
+The library also brings a very elegant way to do e2e testing using https://docs.quarkiverse.io/quarkus-playwright/dev/[Quarkus Playright]:
 [source,java]
 ----
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
-import io.quarkiverse.quinoa.testing.QuarkusPlaywrightManager;
-import io.quarkiverse.quinoa.testing.QuinoaTestProfiles;
-import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkiverse.playwright.WithPlaywright;
+import io.quarkiverse.playwright.InjectPlaywright;
 import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -365,9 +364,9 @@ import java.net.URL;
 
 @QuarkusTest
 @TestProfile(QuinoaTestProfiles.Enable.class)
-@QuarkusTestResource(QuarkusPlaywrightManager.class)
+@WithPlaywright
 public class MyWebUITest {
-    @QuarkusPlaywrightManager.InjectPlaywright
+    @InjectPlaywright
     BrowserContext context;
 
     @TestHTTPResource("/")
