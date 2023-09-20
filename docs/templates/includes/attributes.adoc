@@ -1,6 +1,7 @@
 :quarkus-version: ${quarkus.version}
 :quarkus-quinoa-version: ${release.current-version}
 :maven-version: 3.8.1+
+:extension-status: stable
 
 :quarkus-org-url: https://github.com/quarkusio
 :quarkus-base-url: {quarkus-org-url}/quarkus

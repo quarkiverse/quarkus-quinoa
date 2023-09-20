@@ -12,8 +12,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaPackageManagerInstallPrependBinaryTest {
-    private static final String NAME = "package-manager-install-prepend-binary";
+public class QuinoaPackageManagerInstallCommandOverrideTest {
+    private static final String NAME = "package-manager-install-command-override";
     public static final String INSTALL_DIR = "target/node-" + NAME;
 
     @RegisterExtension
@@ -21,7 +21,6 @@ public class QuinoaPackageManagerInstallPrependBinaryTest {
             .overrideConfigKey("quarkus.quinoa.package-manager-install", "true")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "18.17.0")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.install-dir", INSTALL_DIR)
-            .overrideConfigKey("quarkus.quinoa.package-manager-command.prepend-binary", "true")
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build", "run build-something")
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "yeahhh")
             .assertLogRecords(l -> assertThat(l)

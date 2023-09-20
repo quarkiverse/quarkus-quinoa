@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -22,7 +22,7 @@ public class QuinoaPackageManagerLockfileDetectYarnTest {
             .toQuarkusUnitTest()
             .assertLogRecords(l -> {
                 assertThat(l).anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
-                        s.getParameters()[0].equals(systemBinary(PackageManagerType.YARN.getCommand()) + " run build"));
+                        s.getParameters()[0].equals(systemBinary(PackageManagerType.YARN.getBinary()) + " run build"));
             });
 
     @Test

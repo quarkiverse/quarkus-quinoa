@@ -14,7 +14,7 @@ import io.quarkus.test.QuarkusUnitTest;
 
 public class QuinoaPackageManagerNPMOverrideBuildEnvTest {
     private static final String NAME = "package-manager-npm-override-build";
-    private static final String BUILD_COMMAND = systemBinary("npm") + " run build-something";
+    private static final String BUILD_COMMAND = "run build-something";
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
@@ -22,7 +22,7 @@ public class QuinoaPackageManagerNPMOverrideBuildEnvTest {
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "develop")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
-                            s.getParameters()[0].equals(BUILD_COMMAND)));
+                            s.getParameters()[0].equals(systemBinary("npm") + " " + BUILD_COMMAND)));
 
     @Test
     public void testQuinoa() {

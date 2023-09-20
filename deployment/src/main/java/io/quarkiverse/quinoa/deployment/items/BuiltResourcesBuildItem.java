@@ -1,4 +1,4 @@
-package io.quarkiverse.quinoa.deployment;
+package io.quarkiverse.quinoa.deployment.items;
 
 import java.nio.file.Path;
 import java.util.HashSet;

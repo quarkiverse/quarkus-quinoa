@@ -3,9 +3,12 @@ package io.quarkiverse.quinoa.deployment;
 import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType.detectFramework;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManager.autoDetectPackageManager;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toHandlerConfig;
+import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.install;
+import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.IOException;
@@ -13,13 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,11 +31,14 @@ import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
-import io.quarkiverse.quinoa.deployment.packagemanager.DetectedFramework;
-import io.quarkiverse.quinoa.deployment.packagemanager.FrameworkType;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
+import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
+import io.quarkiverse.quinoa.deployment.framework.FrameworkType;
+import io.quarkiverse.quinoa.deployment.items.BuiltResourcesBuildItem;
+import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
+import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -54,6 +61,11 @@ import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 public class QuinoaProcessor {
 
     private static final Logger LOG = Logger.getLogger(QuinoaProcessor.class);
+    private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "target");
+    private static final Set<String> IGNORE_WATCH_BUILD_DIRS = Arrays.stream(FrameworkType.values()).sequential()
+            .map(frameworkType -> frameworkType.factory().getFrameworkBuildDir())
+            .collect(Collectors.toSet());
+    private static final Pattern IGNORE_WATCH_REGEX = Pattern.compile("^[.].+$"); // ignore "." directories
 
     private static final String FEATURE = "quinoa";
     private static final String TARGET_DIR_NAME = "quinoa-build";
@@ -64,22 +76,22 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    public QuinoaDirectoryBuildItem prepareQuinoaDirectory(
+    public ConfiguredQuinoaBuildItem prepareQuinoaDirectory(
             LaunchModeBuildItem launchMode,
             LiveReloadBuildItem liveReload,
-            QuinoaConfig quinoaConfig,
+            QuinoaConfig userConfig,
             OutputTargetBuildItem outputTarget) {
-        if (!quinoaConfig.isEnabled()) {
+        if (!isEnabled(userConfig)) {
             LOG.info("Quinoa is disabled.");
             return null;
         }
-        if (launchMode.isTest() && quinoaConfig.enable.isEmpty()) {
+        if (launchMode.isTest() && userConfig.enabled().isEmpty()) {
             // Default to disabled in tests
             LOG.warn("Quinoa is disabled by default in tests.");
             return null;
         }
-        final String configuredDir = quinoaConfig.uiDir;
-        final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
+        final String configuredDir = userConfig.uiDir();
+        final ProjectDirs projectDirs = resolveProjectDirs(userConfig, outputTarget);
         if (projectDirs == null) {
             return null;
         }
@@ -87,61 +99,65 @@ public class QuinoaProcessor {
         if (!Files.isRegularFile(packageJsonFile)) {
             throw new ConfigurationException("No package.json found in Web UI directory: '" + configuredDir + "'");
         }
-        Optional<String> packageManagerBinary = quinoaConfig.packageManager;
+
+        final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJsonFile);
+
+        Optional<String> packageManagerBinary = resolvedConfig.packageManager();
         List<String> paths = new ArrayList<>();
-        if (quinoaConfig.packageManagerInstall.enabled) {
-            final PackageManagerInstall.Installation result = install(quinoaConfig.packageManagerInstall,
+        if (resolvedConfig.packageManagerInstall().enabled()) {
+            final PackageManagerInstall.Installation result = install(resolvedConfig.packageManagerInstall(),
                     projectDirs);
             packageManagerBinary = Optional.of(result.getPackageManagerBinary());
             paths.add(result.getNodeDirPath());
         }
 
-        final PackageManager packageManager = autoDetectPackageManager(packageManagerBinary,
-                quinoaConfig.packageManagerCommand, projectDirs.getUIDir(), paths);
-        final boolean alreadyInstalled = Files.isDirectory(packageManager.getDirectory().resolve("node_modules"));
+        final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
+                resolvedConfig.packageManagerCommand(), projectDirs.getUIDir(), paths);
+        final boolean alreadyInstalled = Files.isDirectory(packageManagerRunner.getDirectory().resolve("node_modules"));
         final boolean packageFileModified = liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageJsonFile.toString()));
-        if (quinoaConfig.forceInstall || !alreadyInstalled || packageFileModified) {
-            final boolean frozenLockfile = quinoaConfig.frozenLockfile.orElseGet(QuinoaProcessor::isCI);
-            packageManager.install(frozenLockfile);
+        if (resolvedConfig.forceInstall() || !alreadyInstalled || packageFileModified) {
+            final boolean ci = resolvedConfig.ci().orElseGet(QuinoaProcessor::isCI);
+            if (ci) {
+                packageManagerRunner.ci();
+            } else {
+                packageManagerRunner.install();
+            }
+
         }
 
         // attempt to autoconfigure settings based on the framework being used
-        final DetectedFramework detectedFramework = detectFramework(launchMode, quinoaConfig, packageJsonFile);
-
-        return initDefaultConfig(packageManager, launchMode, quinoaConfig, detectedFramework);
+        return new ConfiguredQuinoaBuildItem(packageManagerRunner, resolvedConfig);
     }
 
     @BuildStep
     public TargetDirBuildItem processBuild(
-            QuinoaConfig quinoaConfig,
-            Optional<QuinoaDirectoryBuildItem> quinoaDir,
+            ConfiguredQuinoaBuildItem configuredQuinoa,
             OutputTargetBuildItem outputTarget,
             LaunchModeBuildItem launchMode,
             LiveReloadBuildItem liveReload) throws IOException {
-        if (quinoaDir.isEmpty()) {
+        if (configuredQuinoa == null) {
             return null;
         }
 
-        final QuinoaDirectoryBuildItem quinoaDirectoryBuildItem = quinoaDir.get();
-        final PackageManager packageManager = quinoaDirectoryBuildItem.getPackageManager();
+        final PackageManagerRunner packageManagerRunner = configuredQuinoa.getPackageManager();
         final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
         if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT
-                && quinoaDirectoryBuildItem.isDevServerMode(quinoaConfig.devServer)) {
+                && isDevServerMode(configuredQuinoa.resolvedConfig())) {
             return null;
         }
         if (liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream()
-                        .noneMatch(r -> r.startsWith(packageManager.getDirectory().toString()))
+                        .noneMatch(r -> r.startsWith(packageManagerRunner.getDirectory().toString()))
                 && contextObject != null) {
             return new TargetDirBuildItem(contextObject.getLocation());
         }
-        if (quinoaConfig.runTests) {
-            packageManager.test();
+        if (configuredQuinoa.resolvedConfig().runTests()) {
+            packageManagerRunner.test();
         }
-        packageManager.build(launchMode.getLaunchMode());
-        final String configuredBuildDir = quinoaDirectoryBuildItem.getBuildDirectory();
-        final Path buildDir = packageManager.getDirectory().resolve(configuredBuildDir);
+        packageManagerRunner.build(launchMode.getLaunchMode());
+        final String configuredBuildDir = configuredQuinoa.resolvedConfig().buildDir().orElseThrow();
+        final Path buildDir = packageManagerRunner.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
             throw new ConfigurationException("Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'",
                     Set.of("quarkus.quinoa.build-dir"));
@@ -179,10 +195,9 @@ public class QuinoaProcessor {
 
     @BuildStep
     void watchChanges(
-            QuinoaConfig quinoaConfig,
-            Optional<QuinoaDirectoryBuildItem> quinoaDir,
+            Optional<ConfiguredQuinoaBuildItem> quinoaDir,
             BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths) throws IOException {
-        if (quinoaDir.isEmpty() || quinoaDir.get().isDevServerMode(quinoaConfig.devServer)) {
+        if (quinoaDir.isEmpty() || isDevServerMode(quinoaDir.get().resolvedConfig())) {
             return;
         }
         scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);
@@ -191,14 +206,14 @@ public class QuinoaProcessor {
     @BuildStep
     @Record(RUNTIME_INIT)
     public void runtimeInit(
-            QuinoaConfig quinoaConfig,
+            ConfiguredQuinoaBuildItem configuredQuinoa,
             HttpBuildTimeConfig httpBuildTimeConfig,
             LaunchModeBuildItem launchMode,
             Optional<BuiltResourcesBuildItem> uiResources,
             QuinoaRecorder recorder,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
-        if (quinoaConfig.justBuild) {
+        if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
             LOG.info("Quinoa is in build only mode");
             return;
         }
@@ -207,7 +222,7 @@ public class QuinoaProcessor {
             if (uiResources.get().getDirectory().isPresent()) {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
-            final QuinoaHandlerConfig handlerConfig = quinoaConfig.toHandlerConfig(
+            final QuinoaHandlerConfig handlerConfig = toHandlerConfig(configuredQuinoa.resolvedConfig(),
                     !launchMode.getLaunchMode().isDevOrTest(),
                     httpBuildTimeConfig);
             resumeOn404.produce(new ResumeOn404BuildItem());
@@ -215,7 +230,7 @@ public class QuinoaProcessor {
                     .handler(recorder.quinoaHandler(handlerConfig, directory,
                             uiResources.get().getNames()))
                     .build());
-            if (quinoaConfig.enableSPARouting) {
+            if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
                         .build());
@@ -224,46 +239,18 @@ public class QuinoaProcessor {
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
-    List<HotDeploymentWatchedFileBuildItem> hotDeploymentWatchedFiles(QuinoaConfig quinoaConfig,
+    List<HotDeploymentWatchedFileBuildItem> hotDeploymentWatchedFiles(Optional<ConfiguredQuinoaBuildItem> configuredQuinoa,
             OutputTargetBuildItem outputTarget) {
         final List<HotDeploymentWatchedFileBuildItem> watchedFiles = new ArrayList<>(PackageManagerType.values().length);
-        final ProjectDirs projectDirs = resolveProjectDirs(quinoaConfig, outputTarget);
-        if (projectDirs == null) {
-            // UI dir is misconfigured so just skip watching files
+        if (configuredQuinoa.isEmpty()) {
             return watchedFiles;
         }
+
         for (PackageManagerType pm : PackageManagerType.values()) {
-            final String watchFile = projectDirs.uiDir.resolve(pm.getLockFile()).toString();
+            final String watchFile = configuredQuinoa.get().getDirectory().resolve(pm.getLockFile()).toString();
             watchedFiles.add(new HotDeploymentWatchedFileBuildItem(watchFile));
         }
         return watchedFiles;
-    }
-
-    private QuinoaDirectoryBuildItem initDefaultConfig(PackageManager packageManager, LaunchModeBuildItem launchMode,
-            QuinoaConfig config, DetectedFramework detectedFramework) {
-        String buildDirectory = config.buildDir;
-        OptionalInt port = config.devServer.port;
-
-        if (detectedFramework == null || detectedFramework.getFrameworkType() == null) {
-            // nothing to do as no framework was detected
-            return new QuinoaDirectoryBuildItem(packageManager, "start", port, buildDirectory);
-        }
-
-        LOG.infof("%s", packageManager.getPackageManagerCommands());
-
-        // only override properties that have not been set
-        FrameworkType framework = detectedFramework.getFrameworkType();
-        if (config.devServer.enabled && launchMode.getLaunchMode() != LaunchMode.NORMAL && port.isEmpty()) {
-            LOG.infof("%s framework setting dev server port: %d", framework, framework.getDevServerPort());
-            port = OptionalInt.of(framework.getDevServerPort());
-            LOG.infof("%s framework setting dev script: '%s'", framework, detectedFramework.getDevServerCommand());
-        }
-
-        if (QuinoaConfig.DEFAULT_BUILD_DIR.equalsIgnoreCase(buildDirectory)) {
-            buildDirectory = detectedFramework.getBuildDirectory();
-            LOG.infof("%s framework setting build directory: '%s'", framework, buildDirectory);
-        }
-        return new QuinoaDirectoryBuildItem(packageManager, detectedFramework.getDevServerCommand(), port, buildDirectory);
     }
 
     private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
@@ -296,7 +283,7 @@ public class QuinoaProcessor {
                 if (Files.isRegularFile(filePath)) {
                     LOG.debugf("Quinoa is watching: %s", filePath);
                     watchedPaths.produce(new HotDeploymentWatchedFileBuildItem(filePath.toString()));
-                } else if (FrameworkType.shouldScanPath(filePath)) {
+                } else if (shouldScanPath(filePath)) {
                     LOG.debugf("Quinoa is scanning directory: %s", filePath);
                     scan(filePath, watchedPaths);
                 }
@@ -304,10 +291,34 @@ public class QuinoaProcessor {
         }
     }
 
+    /**
+     * Check whether this path should be scanned for changes by comparing against known directories that should be ignored.
+     * Ignored directories include any that start with DOT "." like ".next" or ".svelte", also "node_modules" and any
+     * of the framework build directories.
+     *
+     * @param filePath the file path to check
+     * @return true if it is a directory that should be scanned for changes, false if it should be ignored
+     */
+    private static boolean shouldScanPath(Path filePath) {
+        if (!Files.isDirectory(filePath)) {
+            // not a directory so do not scan
+            return false;
+        }
+
+        final Set<String> ignoreSet = new HashSet<>();
+        ignoreSet.addAll(IGNORE_WATCH);
+        ignoreSet.addAll(IGNORE_WATCH_BUILD_DIRS);
+        final String directory = filePath.getFileName().toString();
+        if (ignoreSet.contains(directory) || IGNORE_WATCH_REGEX.matcher(directory).matches()) {
+            return false;
+        }
+        return true;
+    }
+
     private static ProjectDirs resolveProjectDirs(QuinoaConfig config,
             OutputTargetBuildItem outputTarget) {
         Path projectRoot = findProjectRoot(outputTarget.getOutputDirectory());
-        Path configuredUIDirPath = Path.of(config.uiDir.trim());
+        Path configuredUIDirPath = Path.of(config.uiDir().trim());
         if (projectRoot == null || !Files.isDirectory(projectRoot)) {
             if (configuredUIDirPath.isAbsolute() && Files.isDirectory(configuredUIDirPath)) {
                 return new ProjectDirs(null, configuredUIDirPath.normalize());
@@ -319,7 +330,7 @@ public class QuinoaProcessor {
         if (!Files.isDirectory(uiRoot)) {
             LOG.warnf(
                     "Quinoa directory not found 'quarkus.quinoa.ui-dir=%s' resolved to '%s'. It is recommended to remove the quarkus-quinoa extension if not used.",
-                    config.uiDir,
+                    config.uiDir(),
                     uiRoot.toAbsolutePath());
             return null;
         }

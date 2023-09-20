@@ -1,0 +1,5 @@
+= Quarkus image:logo.svg[width=25em] Web Bundler - Configuration Reference
+
+include::./includes/attributes.adoc[]
+
+include::includes/quarkus-quinoa.adoc[leveloffset=+1, opts=optional]
