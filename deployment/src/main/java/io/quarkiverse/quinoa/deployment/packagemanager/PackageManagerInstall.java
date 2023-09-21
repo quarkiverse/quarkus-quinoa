@@ -47,7 +47,8 @@ public final class PackageManagerInstall {
         while (i < 5) {
             try {
                 if (i > 0) {
-                    LOG.infof("An error occurred during the previous Node.js install, retrying (%s/5)", i + 1);
+                    LOG.warnf("An error occurred '%s' during the previous Node.js install, retrying (%s/5)",
+                            thrown.getCause().getMessage(), i + 1);
                     FileUtil.deleteDirectory(installDir);
                 }
                 return attemptInstall(config, installDir, factory);
