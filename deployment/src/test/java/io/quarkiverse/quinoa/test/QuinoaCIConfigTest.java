@@ -7,24 +7,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerType;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaFrozenLockfileConfigTest {
+public class QuinoaCIConfigTest {
 
-    private static final String NAME = "frozen-lockfile";
+    private static final String NAME = "ci";
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
             .initialLockfile(PackageManagerType.YARN.getLockFile())
             .ci(null)
             .toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.quinoa.frozen-lockfile", "true")
+            .overrideConfigKey("quarkus.quinoa.ci", "true")
             .assertLogRecords(l -> assertThat(l)
-                    .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager install command: %s") &&
+                    .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager ci command: %s") &&
                             s.getParameters()[0].equals(
-                                    systemBinary(PackageManagerType.YARN.getCommand()) + " install --frozen-lockfile")));
+                                    systemBinary(PackageManagerType.YARN.getBinary()) + " install --frozen-lockfile")));
 
     @Test
     public void testQuinoa() {

@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
+import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.PNPM;
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
@@ -18,35 +19,53 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManager;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
+import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
+import io.quarkus.deployment.console.StartupLogCompressor;
+import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.ProcessUtil;
 import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.runtime.LaunchMode;
 
-public class PackageManager {
-    private static final Logger LOG = Logger.getLogger(PackageManager.class);
+public class PackageManagerRunner {
+    private static final Logger LOG = Logger.getLogger(PackageManagerRunner.class);
+    public static final Predicate<Thread> DEV_PROCESS_THREAD_PREDICATE = thread -> thread.getName()
+            .matches("Process (stdout|stderr) streamer");
 
     private final Path directory;
 
-    private final PackageManagerCommands packageManagerCommands;
+    private final PackageManager packageManager;
 
-    private PackageManager(Path directory, PackageManagerCommands packageManagerCommands) {
+    private PackageManagerRunner(Path directory, PackageManager packageManager) {
         this.directory = directory;
-        this.packageManagerCommands = packageManagerCommands;
+        this.packageManager = packageManager;
     }
 
     public Path getDirectory() {
         return directory;
     }
 
-    public PackageManagerCommands getPackageManagerCommands() {
-        return packageManagerCommands;
+    public PackageManager getPackageManager() {
+        return packageManager;
     }
 
-    public void install(boolean frozenLockfile) {
-        final Command install = packageManagerCommands.install(frozenLockfile);
+    public void ci() {
+        final PackageManager.Command ci = packageManager.ci();
+        LOG.infof("Running Quinoa package manager ci command: %s", ci.commandWithArguments);
+        if (!exec(ci)) {
+            throw new RuntimeException(
+                    format("Error in Quinoa while running package manager ci command: %s", ci.commandWithArguments));
+        }
+    }
+
+    public void install() {
+        final PackageManager.Command install = packageManager.install();
         LOG.infof("Running Quinoa package manager install command: %s", install.commandWithArguments);
         if (!exec(install)) {
             throw new RuntimeException(
@@ -55,7 +74,7 @@ public class PackageManager {
     }
 
     public void build(LaunchMode mode) {
-        final Command build = packageManagerCommands.build(mode);
+        final PackageManager.Command build = packageManager.build(mode);
         LOG.infof("Running Quinoa package manager build command: %s", build.commandWithArguments);
         if (!exec(build)) {
             throw new RuntimeException(
@@ -64,7 +83,7 @@ public class PackageManager {
     }
 
     public void test() {
-        final Command test = packageManagerCommands.test();
+        final PackageManager.Command test = packageManager.test();
         LOG.infof("Running Quinoa package manager test command: %s", test.commandWithArguments);
         if (!exec(test)) {
             throw new RuntimeException(
@@ -114,9 +133,15 @@ public class PackageManager {
         });
     }
 
-    public DevServer dev(String devServerCommand, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
-        final Command dev = packageManagerCommands.dev(devServerCommand);
+    public DevServer dev(Optional<ConsoleInstalledBuildItem> consoleInstalled, LoggingSetupBuildItem loggingSetup,
+            String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+        final PackageManager.Command dev = packageManager.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
+        StartupLogCompressor logCompressor = new StartupLogCompressor(
+                "Quinoa package manager live coding dev service starting:",
+                consoleInstalled,
+                loggingSetup,
+                DEV_PROCESS_THREAD_PREDICATE);
         Process p = process(dev);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -125,7 +150,7 @@ public class PackageManager {
         });
         if (checkPath == null) {
             LOG.infof("Quinoa is configured to continue without check if the live coding server is up");
-            return new DevServer(p, devServerHost);
+            return new DevServer(p, devServerHost, logCompressor);
         }
         String ipAddress = null;
         try {
@@ -146,48 +171,34 @@ public class PackageManager {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
-        return new DevServer(p, ipAddress);
+        return new DevServer(p, ipAddress, logCompressor);
     }
 
-    public static PackageManager autoDetectPackageManager(Optional<String> binary,
+    public static PackageManagerRunner autoDetectPackageManager(Optional<String> binary,
             PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths) {
-        String resolved = null;
+        String resolvedBinary = null;
         if (binary.isEmpty()) {
             if (Files.isRegularFile(directory.resolve(PackageManagerType.YARN.getLockFile()))) {
-                resolved = PackageManagerType.YARN.getCommand();
-            } else if (Files.isRegularFile(directory.resolve(PackageManagerType.PNPM.getLockFile()))) {
-                resolved = PackageManagerType.PNPM.getCommand();
+                resolvedBinary = PackageManagerType.YARN.getBinary();
+            } else if (Files.isRegularFile(directory.resolve(PNPM.getLockFile()))) {
+                resolvedBinary = PNPM.getBinary();
             } else {
-                resolved = PackageManagerType.NPM.getCommand();
+                resolvedBinary = PackageManagerType.NPM.getBinary();
             }
             if (isWindows()) {
-                resolved = resolved + ".cmd";
+                resolvedBinary = resolvedBinary + ".cmd";
             }
         } else {
-            resolved = binary.get();
+            resolvedBinary = binary.get();
         }
-        return new PackageManager(directory, resolveCommands(resolved, packageManagerCommands, paths));
+        return new PackageManagerRunner(directory, PackageManager.resolve(resolvedBinary, packageManagerCommands, paths));
     }
 
     public static boolean isWindows() {
         return QuarkusConsole.IS_WINDOWS;
     }
 
-    static PackageManagerCommands resolveCommands(String binary, PackageManagerCommandConfig packageManagerCommands,
-            List<String> paths) {
-        if (binary.contains(PackageManagerType.PNPM.getCommand())) {
-            return new EffectiveCommands(new PNPMPackageManagerCommands(binary), packageManagerCommands, paths);
-        }
-        if (binary.contains(PackageManagerType.NPM.getCommand())) {
-            return new EffectiveCommands(new NPMPackageManagerCommands(binary), packageManagerCommands, paths);
-        }
-        if (binary.contains(PackageManagerType.YARN.getCommand())) {
-            return new EffectiveCommands(new YarnPackageManagerCommands(binary), packageManagerCommands, paths);
-        }
-        throw new UnsupportedOperationException("Unsupported package manager binary: " + binary);
-    }
-
-    private Process process(Command command) {
+    private Process process(PackageManager.Command command) {
         Process process = null;
         final ProcessBuilder builder = new ProcessBuilder()
                 .directory(directory.toFile())
@@ -203,7 +214,7 @@ public class PackageManager {
         return process;
     }
 
-    private boolean exec(Command command) {
+    private boolean exec(PackageManager.Command command) {
         Process process = null;
         try {
             final ProcessBuilder processBuilder = new ProcessBuilder();
@@ -225,7 +236,7 @@ public class PackageManager {
         return process != null && process.exitValue() == 0;
     }
 
-    private String[] runner(Command command) {
+    private String[] runner(PackageManager.Command command) {
         if (isWindows()) {
             return new String[] { "cmd.exe", "/c", command.commandWithArguments };
         } else {
@@ -266,6 +277,9 @@ public class PackageManager {
     }
 
     public static String isDevServerUp(String host, int port, String path) {
+        if (path == null) {
+            return host;
+        }
         final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
         try {
             InetAddress[] addresses = InetAddress.getAllByName(host);
@@ -297,9 +311,12 @@ public class PackageManager {
         private final Process process;
         private final String hostAddress;
 
-        public DevServer(Process process, String hostAddress) {
+        private final StartupLogCompressor logCompressor;
+
+        public DevServer(Process process, String hostAddress, StartupLogCompressor logCompressor) {
             this.process = process;
             this.hostAddress = hostAddress;
+            this.logCompressor = logCompressor;
         }
 
         public Process process() {
@@ -308,6 +325,10 @@ public class PackageManager {
 
         public String hostAddress() {
             return hostAddress;
+        }
+
+        public StartupLogCompressor logCompressor() {
+            return logCompressor;
         }
     }
 }

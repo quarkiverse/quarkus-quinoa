@@ -1,1 +1,9 @@
-* xref:index.adoc[Quarkus - Quinoa]
+include::./includes/attributes.adoc[]
+:config-file: application.properties
+
+* xref:index.adoc[Getting started]
+* xref:main-concepts.adoc[Main Concepts]
+* xref:web-frameworks.adoc[Web Frameworks]
+* xref:advanced-guides.adoc[Advanced Guides]
+* xref:advanced-guides.adoc[Testing]
+* xref:config-reference.adoc[Config Reference]

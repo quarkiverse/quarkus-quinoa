@@ -1,4 +1,4 @@
-package io.quarkiverse.quinoa.deployment;
+package io.quarkiverse.quinoa.deployment.items;
 
 import io.quarkus.builder.item.SimpleBuildItem;
 

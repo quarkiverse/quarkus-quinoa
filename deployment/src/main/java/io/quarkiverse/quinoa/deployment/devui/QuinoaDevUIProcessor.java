@@ -2,13 +2,12 @@ package io.quarkiverse.quinoa.deployment.devui;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.function.Function;
 
-import io.quarkiverse.quinoa.deployment.QuinoaConfig;
-import io.quarkiverse.quinoa.deployment.QuinoaDirectoryBuildItem;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManager;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstallConfig;
+import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
+import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
+import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
+import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.devui.QuinoaJsonRpcService;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -32,11 +31,11 @@ public class QuinoaDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     void createCard(BuildProducer<CardPageBuildItem> cardPageBuildItemBuildProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
-            Optional<QuinoaDirectoryBuildItem> quinoaDirectoryBuildItem,
-            QuinoaConfig quinoaConfig) {
+            Optional<ConfiguredQuinoaBuildItem> configuredQuinoa) {
+        QuinoaConfig quinoaConfig = configuredQuinoa.get().resolvedConfig();
         final CardPageBuildItem card = new CardPageBuildItem();
 
-        final Optional<String> node = quinoaConfig.packageManagerInstall.nodeVersion;
+        final Optional<String> node = quinoaConfig.packageManagerInstall().nodeVersion();
         if (node.isPresent()) {
             final String nodeVersion = node.get();
             final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("Node.js")
@@ -47,7 +46,7 @@ public class QuinoaDevUIProcessor {
             card.addPage(nodejsPage);
         }
 
-        final String npmVersion = quinoaConfig.packageManagerInstall.npmVersion;
+        final String npmVersion = quinoaConfig.packageManagerInstall().npmVersion();
         if (!PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion)) {
             final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("NPM")
                     .icon("font-awesome-brands:square-js")
@@ -56,7 +55,7 @@ public class QuinoaDevUIProcessor {
                     .staticLabel(npmVersion);
             card.addPage(nodejsPage);
         } else {
-            final Optional<String> pnpmVersion = quinoaConfig.packageManagerInstall.pnpmVersion;
+            final Optional<String> pnpmVersion = quinoaConfig.packageManagerInstall().pnpmVersion();
             if (pnpmVersion.isPresent()) {
                 final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("PNPM")
                         .icon("font-awesome-brands:square-js")
@@ -65,7 +64,7 @@ public class QuinoaDevUIProcessor {
                         .staticLabel(pnpmVersion.get());
                 card.addPage(nodejsPage);
             }
-            final Optional<String> yarnVersion = quinoaConfig.packageManagerInstall.yarnVersion;
+            final Optional<String> yarnVersion = quinoaConfig.packageManagerInstall().yarnVersion();
             if (yarnVersion.isPresent()) {
                 final PageBuilder<ExternalPageBuilder> nodejsPage = Page.externalPageBuilder("Yarn")
                         .icon("font-awesome-brands:square-js")
@@ -76,14 +75,14 @@ public class QuinoaDevUIProcessor {
             }
         }
 
-        if (quinoaDirectoryBuildItem.isPresent()) {
-            final OptionalInt port = quinoaDirectoryBuildItem.get().getDevServerPort();
-            if (port.isPresent() && port.getAsInt() > 0) {
+        if (configuredQuinoa.isPresent()) {
+            final Optional<Integer> port = configuredQuinoa.get().resolvedConfig().devServer().port();
+            if (port.isPresent() && port.get() > 0) {
                 final PageBuilder<ExternalPageBuilder> portPage = Page.externalPageBuilder("Port")
                         .icon("font-awesome-solid:plug")
-                        .url(String.format("https://localhost:%d", port.getAsInt()))
+                        .url(String.format("https://localhost:%d", port.get()))
                         .doNotEmbed()
-                        .staticLabel(String.valueOf(port.getAsInt()));
+                        .staticLabel(String.valueOf(port.get()));
                 card.addPage(portPage);
             }
         }
@@ -101,21 +100,21 @@ public class QuinoaDevUIProcessor {
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
-    JsonRPCProvidersBuildItem registerJsonRpcBackend(Optional<QuinoaDirectoryBuildItem> quinoaDirectoryBuildItem,
+    JsonRPCProvidersBuildItem registerJsonRpcBackend(Optional<ConfiguredQuinoaBuildItem> quinoaDirectoryBuildItem,
             QuinoaConfig quinoaConfig) {
         DevConsoleManager.register("quinoa-install-action",
                 install(quinoaDirectoryBuildItem, quinoaConfig));
         return new JsonRPCProvidersBuildItem(QuinoaJsonRpcService.class);
     }
 
-    private Function<Map<String, String>, String> install(Optional<QuinoaDirectoryBuildItem> quinoaDirectoryBuildItem,
+    private Function<Map<String, String>, String> install(Optional<ConfiguredQuinoaBuildItem> quinoaDirectoryBuildItem,
             QuinoaConfig quinoaConfig) {
         return (map -> {
             try {
-                final PackageManager packageManager = quinoaDirectoryBuildItem.orElseThrow().getPackageManager();
+                final PackageManagerRunner packageManagerRunner = quinoaDirectoryBuildItem.orElseThrow().getPackageManager();
 
                 // install or update packages
-                packageManager.install(false);
+                packageManagerRunner.install();
 
                 return "installed";
             } catch (Exception e) {

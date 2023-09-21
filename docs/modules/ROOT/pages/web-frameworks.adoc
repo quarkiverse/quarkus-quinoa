@@ -1,0 +1,325 @@
+= Quarkus Quinoa - Web Frameworks
+
+include::./includes/attributes.adoc[]
+
+Quinoa attempts to automatically determine which framework you are using by reading your package.json file and auto-configure settings for that framework. When possible, if some changes are required in the Web UI, it will try to help you configure it.
+
+For developers, this provides more "convention over configuration" approach for a smoother experience.
+
+== Detected Frameworks
+
+[cols="^.^2,^.^1,3,1,1"]
+|===
+|Name|Preconfigured|Starter|Guides|Config
+
+a|
+[#react]
+=== React
+|✓
+a|
+[source,bash]
+----
+npx create-react-app my-app
+----
+a|
+- https://create-react-app.dev/docs/getting-started[Create React App]
+- https://github.com/timarney/react-app-rewired[React App Rewired]
+- https://craco.js.org/[CRACO]
+|
+
+a|
+[#vue]
+=== Vue
+|✓
+a|
+[source,bash]
+----
+npm create vue@latest
+----
+a|
+- https://cli.vuejs.org/guide/cli-service.html[Vue CLI Service]
+- https://github.com/vuejs/create-vue[Create Vue]
+|
+
+a|
+[#angular]
+=== Angular
+|✓*
+a|
+[source,bash]
+----
+npm install -g @angular/cli
+ng new my-first-project
+----
+a|
+- https://angular.io/guide/setup-local[ng]
+| <<angular-test-config>>
+
+a|
+[#nextjs]
+=== Next.js
+|~
+a|
+[source,bash]
+----
+npx create-next-app@latest
+----
+a|
+- https://nextjs.org/docs[Next]
+| <<nextjs-config>>
+
+a|
+[#vite]
+=== Vite
+|✓
+a|
+[source,bash]
+----
+npm create vite@latest
+----
+a|
+- https://vitejs.dev/guide/[Vite]
+|
+
+a|
+[#svelte-kit]
+=== Svelte Kit
+|~
+a|
+[source,bash]
+----
+npm create svelte@latest myapp
+----
+a|
+- https://kit.svelte.dev/[Svelte Kit]
+| <<svelte-kit-config>>
+
+a|
+[#nuxt]
+=== Nuxt
+|✓
+a|
+[source,bash]
+----
+npm init nuxt-app <project-name>
+----
+a|
+- https://v2.nuxt.com/docs/get-started/installation#set-up-your-project[Nuxt]
+|
+
+a|
+[#solidstart]
+=== Solid Start
+|✓
+a|
+[source,bash]
+----
+mkdir my-app && cd my-app
+npm init solid@latest
+----
+a|
+- https://start.solidjs.com/getting-started/what-is-solidstart[SolidStart]
+|
+
+a|
+[#astro]
+=== Astro
+|✓
+a|
+[source,bash]
+----
+npm create astro@latest
+----
+a|
+- https://astro.build/[Astro]
+|
+
+a|
+[#gatsby]
+=== Gatsby
+|✓
+a|
+[source,bash]
+----
+npm init gatsby@latest
+----
+a|
+- https://www.gatsbyjs.com/docs/quick-start/[Gatsby]
+|
+
+a|
+[#ember]
+=== Ember
+|✓
+a|
+[source,bash]
+----
+npm install -g ember-cli
+ember new ember-quickstart
+----
+a|
+- https://guides.emberjs.com/release/getting-started/[Ember]
+|
+
+a|
+[#aurelia]
+=== Aurelia
+|✓
+a|
+[source,bash]
+----
+npm install -g aurelia-cli
+au new
+----
+a|
+- https://aurelia.io/docs/tutorials/creating-a-todo-app#setup[Aurelia]
+|
+
+a|
+[#polymer]
+=== Polymer
+|✓
+a|
+[source,bash]
+----
+npm install -g polymer-cli
+git clone https://github.com/PolymerLabs/polymer-3-first-element.git
+----
+a|
+- https://polymer-library.polymer-project.org/3.0/docs/first-element/intro[Polymer]
+|
+
+a|
+[#qwik]
+=== Qwik
+|✓
+a|
+[source,bash]
+----
+npm create qwik@latest
+----
+a|
+- https://qwik.builder.io/docs/getting-started/[Qwik]
+|
+
+a|
+[#cycle]
+=== Cycle
+|✓
+a|
+[source,bash]
+----
+npm install --global create-cycle-app
+create-cycle-app my-awesome-app
+----
+a|
+- https://cycle.js.org/getting-started.html[Cycle]
+|
+
+a|
+[#riotjs]
+=== Riot.js
+|✓
+a|
+[source,bash]
+----
+npm init riot@latest
+----
+a|
+- https://riot.js.org/[Riot.js]
+|
+
+a|
+[#refine]
+=== Refine
+|✓
+a|
+[source,bash]
+----
+npm create refine-app@latest
+----
+a|
+- https://refine.dev/docs/getting-started/quickstart/[Refine]
+|
+
+a|
+[#midwayjs]
+=== Midway.js
+|✓
+| No
+a|
+- https://www.midwayjs.org/[Midway.js]
+|
+
+|===
+
+== Required Configuration
+
+[#angular-test-config]
+=== Angular Test Configuration
+
+If you want to use the Angular tests (instead of Playwright from the @QuarkusTest):
+
+.karma.conf.js:
+[source,javascript]
+----
+  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessCI'],
+  customLaunchers: {
+    ChromeHeadlessCI: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox']
+    }
+},
+----
+
+[#nextjs-config]
+=== Next.js Configuration
+
+This will configure the build to export the static files:
+.package.json:
+[source,json]
+----
+  "scripts": {
+    ...
+    "build": "next build && next export",
+  }
+----
+
+[#svelte-kit-config]
+=== Svelte Kit Configuration
+
+It will work in production mode though with the following chnages:
+
+Install Svelte Static adapter:
+
+[source,shell]
+----
+npm i -D @sveltejs/adapter-static
+----
+
+Configure `svelte.config` file with the following changes:
+
+[source,json]
+----
+import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/kit/vite';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+    preprocess: vitePreprocess(),
+    kit: {
+        adapter: adapter({
+            fallback: 'index.html'
+        })
+    }
+};
+
+export default config;
+----
+
+In `application.properties` add:
+[source,properties]
+----
+quarkus.quinoa.dev-server=false
+quarkus.quinoa.build-dir=build
+----

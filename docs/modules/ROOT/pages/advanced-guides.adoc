@@ -1,0 +1,201 @@
+= Quarkus Quinoa - Advanced Guides
+
+[#how-to]
+== How to use the extension.
+
+=== Configure the build
+Add a `build` script in the `package.json` to generate your web application index.html, scripts and assets (styles, images, ...) in some `build` directory (configurable link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.build-dir[Build Dir]).
+[source,json]
+----
+ "scripts": {
+    "start": "[start the Web UI live coding server]",
+    "build": "[build the Web UI]",
+    "test": "[test the Web UI]"
+  },
+----
+
+NOTE: The build directory will automatically be *moved* by Quinoa to `target/quinoa-build` when using Maven (`build/quinoa-build` with Gradle) in order to be served.
+
+[#build-mode]
+You can differentiate development from production builds using the environment variable `NODE_ENV` (`production`/`development`). https://www.npmjs.com/package/by-node-env[by-node-env] can help you if you have different build commands:
+[source,json]
+----
+"scripts": {
+  "build": "by-node-env",
+  "build:development": "...",
+  "build:production": "...",
+},
+"devDependencies": {
+  "by-node-env": "~2.0.1"
+}
+----
+
+[#package-manager]
+=== Package manager
+
+[#package-manager-install]
+Quinoa can be configured to install NodeJS and NPM in the project directory:
+[source,properties]
+----
+quarkus.quinoa.package-manager-install=true <1>
+quarkus.quinoa.package-manager-install.node-version=18.17.0 <2>
+----
+
+<1> Enable package manager install
+<2> Define the version of NodeJS to install
+
+NOTE: By default, NodeJS and NPM will be installed in `pass:[{project-dir}]/.quinoa/` (can be link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.package-manager-install.install-dir[configured]). If not specified, it will use the NPM version provided by NodeJS.
+
+If NodeJS and NPM are not installed by Quinoa, it is possible to override the package manager (NPM, Yarn or PNPM), otherwise, it will be auto-detected depending on the project lockfile (NPM is the fallback):
+
+* Use `quarkus.quinoa.package-manager` if present
+* Else if `yarn.lock` then *Yarn*
+* Else if `pnpm-lock.yaml` then *PNPM*
+* Else *NPM*
+
+NOTE: By default, Quinoa is configured with the commands to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
+
+[#install-packages]
+=== Node packages installation (node_modules)
+
+By default, Quinoa will call the appropriate package manager install command (before building or starting) *only if* the `node_modules` directory doesn't exist.
+
+You may force a new installation using `-Dquarkus.quinoa.force-install=true`.
+
+[#frozen-lockfile]
+NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
+
+[#package-manager-commands]
+=== Package manager commands
+
+By default, the following commands and environment variables are used in the different faces for each of the supported package managers.
+
+*Install:*
+
+* `npm install` (`npm ci` if `quarkus.quinoa.frozen-lockfile=true`).
+* `pnpm install` (`pnpm install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`).
+* `yarn install` (`yarn install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`).
+
+*Build:*
+
+`(npm|pnpm|yarn) run build`, with environment `MODE=pass:[${mode}]` (https://quarkus.io/guides/lifecycle#launch-modes[`dev`, `test` or `prod`])
+
+*Test:*
+
+`(npm|pnpm|yarn) test`, with environment `CI=true`
+
+*Dev:*
+
+`(npm|pnpm|yarn) start`, with environment `BROWSER=none`
+
+[#override-commands]
+=== Override package manager commands
+
+By default, Quinoa uses sensible default commands when executing the different phases, `install`, `build`, `test`, `dev`.
+It is possible to override one or more of them from the link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.package-manager-command.install[package manager command configuration]:
+
+[source,properties]
+----
+quarkus.quinoa.package-manager-command.install=npm ci --cache $CACHE_DIR/.npm --prefer-offline # <1>
+quarkus.quinoa.package-manager-command.build-env.BUILD=value # <2>
+----
+
+<1> This makes `npm ci --cache $CACHE_DIR/.npm --prefer-offline` the command executed in the `install` phase.
+(overriding `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile=true`).
+<2> set environment variable `BUILD` with value `value`. Environment variables set in config can be added to the  link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.package-manager-command.build-env-build-env[listed commands].
+
+WARNING: Using custom commands will override `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile`.
+
+WARNING: if NodeJS is installed by Quinoa, you need to enable: `quarkus.quinoa.package-manager-command.prepend-binary` and adapt the command to only specify the arguments (the binary to call will be prepended by Quinoa).
+
+
+[#dev-server]
+=== UI live-coding dev server (proxy mode)
+
+Quinoa provides two options for live-coding:
+
+* Delegate to the <<dev-server>>. To enable it, configure the port of the UI server. By convention Quinoa will call the `start` script from the `package.json` to start the UI server process. Then it will transparently proxy relevant requests to the given port.
+* Quarkus watches the files and Quinoa triggers a new Web UI build on changes (you can configure different builds for dev and prod).
+
+To enable the UI live-coding dev server, set a `start` script and set the port in the app config. Quinoa will transparently proxy relevant requests to the given port:
+[source,properties]
+----
+quarkus.quinoa.dev-server.port=3000
+----
+
+NOTE: Quinoa relies on the dev server returning a 404 when the file is not found (See link:main-concepts.adoc#how-dev-server[How it works]). This is not the case on some dev servers configured with SPA routing. Make sure it is disabled in the dev server configuration (for React Create App, see https://github.com/quarkiverse/quarkus-quinoa/issues/91[#91]). Another option, when possible, is to use link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.ignored-path-prefixes[Ignored Path Prefixes].
+
+[#spa-routing]
+=== Single Page application routing
+
+Client-side/Browser/SPA routing is the internal handling of a route from the javascript in the browser. It uses the https://developer.mozilla.org/en-US/docs/Web/API/History[HTML5 History API]
+
+When enabled, to allow SPA routing, all relevant requests will be internally re-routed to index.html, this way the javascript can take care of the route inside the web-application.
+
+To enable Single Page application routing:
+[source,properties]
+----
+quarkus.quinoa.enable-spa-routing=true
+----
+
+NOTE: By default, Quinoa will ignore `quarkus.resteasy-reactive.path`, `quarkus.resteasy.path` and `quarkus.http.non-application-root-path` path prefixes. You can specify different path prefixes to ignore using `quarkus.quinoa.ignored-path-prefixes`.
+
+WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. Instead, you may use a workaround (if your app has all the rest resources under the same path prefix):
+[source,java]
+----
+@ApplicationScoped
+public class SPARouting {
+    private static final String[] PATH_PREFIXES = { "/api/", "/q/" };
+    private static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(".*[.][a-zA-Z\\d]+").asMatchPredicate();
+
+    public void init(@Observes Router router) {
+        router.get("/*").handler(rc -> {
+            final String path = rc.normalizedPath();
+            if (!path.equals("/")
+                    && Stream.of(PATH_PREFIXES).noneMatch(path::startsWith)
+                    && !FILE_NAME_PREDICATE.test(path)) {
+                rc.reroute("/");
+            } else {
+                rc.next();
+            }
+        });
+    }
+}
+----
+
+[#headers]
+=== Http Headers
+
+It's very common to set up headers for caching on static resources, for example React proposes https://create-react-app.dev/docs/production-build/#static-file-caching[this configuration]:
+
+To configure Quarkus with those headers :
+[source,properties]
+----
+quarkus.http.filter.others.header.Cache-Control=no-cache
+quarkus.http.filter.others.matches=/.*
+quarkus.http.filter.others.methods=GET
+quarkus.http.filter.others.order=0
+quarkus.http.filter.static.header.Cache-Control=max-age=31536000
+quarkus.http.filter.static.matches=/static/.+
+quarkus.http.filter.static.methods=GET
+quarkus.http.filter.static.order=1
+----
+
+[#http-compression]
+=== Http Compression
+
+To enable server Http compression:
+[source,properties]
+----
+quarkus.http.enable-compression=true
+----
+
+=== CI
+
+Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven/Gradle (and Yarn/PNPM if needed). Then you can use it like any Maven/Gradle project.
+
+Quinoa can be configured to install packages with a link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.frozen-lockfile[frozen lockfile].
+
+On compatible CIs, don't forget to enable the Maven/Gradle and NPM/Yarn repository caching.
+
+
