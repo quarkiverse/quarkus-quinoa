@@ -1,22 +1,24 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
+import static io.vertx.core.spi.resolver.ResolverProvider.DISABLE_DNS_RESOLVER_PROP_NAME;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
 
-import com.github.eirslett.maven.plugins.frontend.lib.FrontendPluginFactory;
 import com.github.eirslett.maven.plugins.frontend.lib.InstallationException;
-import com.github.eirslett.maven.plugins.frontend.lib.ProxyConfig;
+import com.github.eirslett.maven.plugins.frontend.lib.PackageManagerInstallFactory;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.configuration.ConfigurationException;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 
 public final class PackageManagerInstall {
 
@@ -33,7 +35,6 @@ public final class PackageManagerInstall {
 
     public static Installation install(PackageManagerInstallConfig config, final Path projectDir) {
         Path installDir = resolveInstallDir(config, projectDir).normalize();
-        FrontendPluginFactory factory = new FrontendPluginFactory(null, installDir.toFile());
         if (config.nodeVersion().isEmpty()) {
             throw new ConfigurationException("node-version is required to install package manager",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
@@ -44,29 +45,53 @@ public final class PackageManagerInstall {
         }
         int i = 0;
         Exception thrown = null;
-        while (i < 5) {
-            try {
-                if (i > 0) {
-                    LOG.warnf("An error occurred '%s' during the previous Node.js install, retrying (%s/5)",
-                            thrown.getCause().getMessage(), i + 1);
-                    FileUtil.deleteDirectory(installDir);
+        Vertx vertx = null;
+        try {
+            vertx = createVertxInstance();
+            PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, installDir);
+            while (i < 5) {
+                try {
+                    if (i > 0) {
+                        LOG.warnf("An error occurred '%s' during the previous Node.js install, retrying (%s/5)",
+                                thrown.getCause().getMessage(), i + 1);
+                        FileUtil.deleteDirectory(installDir);
+                    }
+                    return attemptInstall(config, installDir, factory);
+                } catch (InstallationException e) {
+                    thrown = e;
+                    i++;
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
-                return attemptInstall(config, installDir, factory);
-            } catch (InstallationException e) {
-                thrown = e;
-                i++;
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
             }
+        } finally {
+            vertx.close();
         }
+
         throw new RuntimeException("Error while installing NodeJS", thrown);
     }
 
-    private static Installation attemptInstall(PackageManagerInstallConfig config, Path installDir,
-            FrontendPluginFactory factory) throws InstallationException {
-        final ProxyConfig proxy = new ProxyConfig(Collections.emptyList());
+    private static Vertx createVertxInstance() {
+        String originalValue = System.getProperty(DISABLE_DNS_RESOLVER_PROP_NAME);
+        Vertx vertx;
         try {
-            factory.getNodeInstaller(proxy)
+            System.setProperty(DISABLE_DNS_RESOLVER_PROP_NAME, "true");
+            vertx = Vertx.vertx(new VertxOptions());
+        } finally {
+            // Restore the original value
+            if (originalValue == null) {
+                System.clearProperty(DISABLE_DNS_RESOLVER_PROP_NAME);
+            } else {
+                System.setProperty(DISABLE_DNS_RESOLVER_PROP_NAME, originalValue);
+            }
+        }
+        return vertx;
+    }
+
+    private static Installation attemptInstall(PackageManagerInstallConfig config, Path installDir,
+            PackageManagerInstallFactory factory) throws InstallationException {
+        try {
+            factory.getNodeInstaller()
                     .setNodeVersion("v" + config.nodeVersion().get())
                     .setNodeDownloadRoot(config.nodeDownloadRoot())
                     .setNpmVersion(config.npmVersion())
@@ -85,7 +110,7 @@ public final class PackageManagerInstall {
         final String npmVersion = config.npmVersion();
         boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
         if (!isNpmProvided) {
-            factory.getNPMInstaller(proxy)
+            factory.getNPMInstaller()
                     .setNodeVersion("v" + config.nodeVersion().get())
                     .setNpmVersion(npmVersion)
                     .setNpmDownloadRoot(config.npmDownloadRoot())
@@ -96,7 +121,7 @@ public final class PackageManagerInstall {
         final Optional<String> yarnVersion = config.yarnVersion();
         if (yarnVersion.isPresent() && isNpmProvided) {
             executionPath = YARN_PATH;
-            factory.getYarnInstaller(proxy)
+            factory.getYarnInstaller()
                     .setYarnVersion("v" + config.yarnVersion().get())
                     .setYarnDownloadRoot(config.yarnDownloadRoot())
                     .setIsYarnBerry(true)
@@ -107,7 +132,7 @@ public final class PackageManagerInstall {
         final Optional<String> pnpmVersion = config.pnpmVersion();
         if (pnpmVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty()) {
             executionPath = PNPM_PATH;
-            factory.getPnpmInstaller(proxy)
+            factory.getPnpmInstaller()
                     .setNodeVersion("v" + config.nodeVersion().get())
                     .setPnpmVersion(pnpmVersion.get())
                     .setPnpmDownloadRoot(config.pnpmDownloadRoot())
