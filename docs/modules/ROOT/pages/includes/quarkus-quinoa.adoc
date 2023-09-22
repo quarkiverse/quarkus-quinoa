@@ -15,6 +15,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa]]`link:#q
 
 [.description]
 --
+Indicate if the extension should be enabled.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA+++[]
 endif::add-copy-button-to-env-var[]
@@ -30,6 +32,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.just-buil
 
 [.description]
 --
+Indicate if Quinoa should just do the build part. If true, Quinoa will NOT serve the Web UI built resources. This is handy when the output of the build is used to be served via something else (nginx, cdn, ...) Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build with Gradle).
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_JUST_BUILD+++[]
 endif::add-copy-button-to-env-var[]
@@ -45,6 +49,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ui-dir]]`
 
 [.description]
 --
+Path to the Web UI (NodeJS) root directory (relative to the project root).
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_UI_DIR+++[]
 endif::add-copy-button-to-env-var[]
@@ -60,6 +66,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.build-dir
 
 [.description]
 --
+This the Web UI internal build system (webpack, ...) output directory. After the build, Quinoa will take the files from this directory, move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and serve them at runtime. The path is relative to the Web UI path.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_BUILD_DIR+++[]
 endif::add-copy-button-to-env-var[]
@@ -75,6 +83,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
+Name of the package manager binary. Only npm, pnpm and yarn are supported for the moment.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER+++[]
 endif::add-copy-button-to-env-var[]
@@ -260,7 +270,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-m
 
 [.description]
 --
-Custom command for installing all dependencies. e.g. «ci --cache $CACHE_DIR/.npm --prefer-offline»
+Custom command for installing all packages. e.g. «ci --cache $CACHE_DIR/.npm --prefer-offline»
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL+++[]
@@ -269,7 +279,24 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL+++`
 endif::add-copy-button-to-env-var[]
 --|string 
-|
+|`install`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.ci]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.ci[quarkus.quinoa.package-manager-command.ci]`
+
+
+[.description]
+--
+Custom command for installing all the packages without generating a lockfile (frozen lockfile) and failing if an update is needed (useful in CI).
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`Detected based on package manager`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.build]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.build[quarkus.quinoa.package-manager-command.build]`
@@ -286,7 +313,7 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD+++`
 endif::add-copy-button-to-env-var[]
 --|string 
-|`build`
+|`run build`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.test]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.test[quarkus.quinoa.package-manager-command.test]`
@@ -303,7 +330,7 @@ ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST+++`
 endif::add-copy-button-to-env-var[]
 --|string 
-|`test`
+|`run test`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.dev]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.dev[quarkus.quinoa.package-manager-command.dev]`
@@ -328,6 +355,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.index-pag
 
 [.description]
 --
+Name of the index page.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_INDEX_PAGE+++[]
 endif::add-copy-button-to-env-var[]
@@ -343,6 +372,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.run-tests
 
 [.description]
 --
+Indicate if the Web UI should also be tested during the build phase (i.e: npm test). To be used in a `io.quarkus.test.junit.QuarkusTestProfile` to have Web UI test running during a `io.quarkus.test.junit.QuarkusTest`
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_RUN_TESTS+++[]
 endif::add-copy-button-to-env-var[]
@@ -353,16 +384,18 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.frozen-lockfile]]`link:#quarkus-quinoa_quarkus.quinoa.frozen-lockfile[quarkus.quinoa.frozen-lockfile]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ci]]`link:#quarkus-quinoa_quarkus.quinoa.ci[quarkus.quinoa.ci]`
 
 
 [.description]
 --
+Install the packages without generating a lockfile (frozen lockfile) and failing if an update is needed (useful in CI).
+
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_FROZEN_LOCKFILE+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_CI+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_FROZEN_LOCKFILE+++`
+Environment variable: `+++QUARKUS_QUINOA_CI+++`
 endif::add-copy-button-to-env-var[]
 --|boolean 
 |`true if environment CI=true`
@@ -373,6 +406,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.force-ins
 
 [.description]
 --
+Force install packages before building. It will install packages only if the node_modules directory is absent or when the package.json is modified in dev-mode.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_FORCE_INSTALL+++[]
 endif::add-copy-button-to-env-var[]
@@ -383,11 +418,30 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.framework.detection]]`link:#quarkus-quinoa_quarkus.quinoa.framework.detection[quarkus.quinoa.framework.detection]`
+
+
+[.description]
+--
+When true, the UI Framework will be auto-detected if possible
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_FRAMEWORK_DETECTION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_FRAMEWORK_DETECTION+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`true`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.enable-spa-routing]]`link:#quarkus-quinoa_quarkus.quinoa.enable-spa-routing[quarkus.quinoa.enable-spa-routing]`
 
 
 [.description]
 --
+Enable SPA (Single Page Application) routing, all relevant requests will be re-routed to the index page. Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_ENABLE_SPA_ROUTING+++[]
 endif::add-copy-button-to-env-var[]
@@ -403,6 +457,8 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.ignored-p
 
 [.description]
 --
+List of path prefixes to be ignored by Quinoa.
+
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_IGNORED_PATH_PREFIXES+++[]
 endif::add-copy-button-to-env-var[]
@@ -549,6 +605,23 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.index-page]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.index-page[quarkus.quinoa.dev-server.index-page]`
+
+
+[.description]
+--
+Set this value if the index page is different for the dev-server
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_INDEX_PAGE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_INDEX_PAGE+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`auto-detected falling back to the quinoa.index-page`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env[quarkus.quinoa.package-manager-command.install-env]`
 
 
@@ -561,6 +634,23 @@ Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
 Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV+++`
+endif::add-copy-button-to-env-var[]
+--|`Map<String,String>` 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.ci-env-ci-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.ci-env-ci-env[quarkus.quinoa.package-manager-command.ci-env]`
+
+
+[.description]
+--
+Environment variables for ci command execution.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV+++`
 endif::add-copy-button-to-env-var[]
 --|`Map<String,String>` 
 |

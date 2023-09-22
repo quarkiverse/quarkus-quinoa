@@ -7,6 +7,7 @@ import java.util.function.Function;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
+import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.devui.QuinoaJsonRpcService;
 import io.quarkus.deployment.IsDevelopment;
@@ -100,18 +101,18 @@ public class QuinoaDevUIProcessor {
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
-    JsonRPCProvidersBuildItem registerJsonRpcBackend(Optional<ConfiguredQuinoaBuildItem> quinoaDirectoryBuildItem,
+    JsonRPCProvidersBuildItem registerJsonRpcBackend(InstalledPackageManagerBuildItem installedPackageManager,
             QuinoaConfig quinoaConfig) {
         DevConsoleManager.register("quinoa-install-action",
-                install(quinoaDirectoryBuildItem, quinoaConfig));
+                install(installedPackageManager, quinoaConfig));
         return new JsonRPCProvidersBuildItem(QuinoaJsonRpcService.class);
     }
 
-    private Function<Map<String, String>, String> install(Optional<ConfiguredQuinoaBuildItem> quinoaDirectoryBuildItem,
+    private Function<Map<String, String>, String> install(InstalledPackageManagerBuildItem installedPackageManager,
             QuinoaConfig quinoaConfig) {
         return (map -> {
             try {
-                final PackageManagerRunner packageManagerRunner = quinoaDirectoryBuildItem.orElseThrow().getPackageManager();
+                final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
 
                 // install or update packages
                 packageManagerRunner.install();
