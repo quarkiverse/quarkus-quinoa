@@ -34,6 +34,7 @@ import io.quarkiverse.quinoa.deployment.config.DevServerConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
 import io.quarkiverse.quinoa.deployment.items.ForwardedDevServerBuildItem;
+import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -63,6 +64,7 @@ public class ForwardedDevProcessor {
     public ForwardedDevServerBuildItem prepareDevService(
             LaunchModeBuildItem launchMode,
             ConfiguredQuinoaBuildItem configuredQuinoa,
+            InstalledPackageManagerBuildItem installedPackageManager,
             QuinoaConfig userConfig,
             BuildProducer<DevServicesResultBuildItem> devServices,
             Optional<ConsoleInstalledBuildItem> consoleInstalled,
@@ -77,7 +79,7 @@ public class ForwardedDevProcessor {
         final DevServerConfig devServerConfig = resolvedConfig.devServer();
         liveReload.setContextObject(QuinoaConfig.class, resolvedConfig);
         final String configuredDevServerHost = devServerConfig.host();
-        final PackageManagerRunner packageManagerRunner = configuredQuinoa.getPackageManager();
+        final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         final String checkPath = resolvedConfig.devServer().checkPath().orElse(null);
         if (devService != null) {
             boolean shouldShutdownTheBroker = !resolvedConfig.equals(oldConfig);

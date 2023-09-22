@@ -7,7 +7,6 @@ import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMo
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toHandlerConfig;
 import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
-import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall.install;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
@@ -35,6 +34,7 @@ import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.framework.FrameworkType;
 import io.quarkiverse.quinoa.deployment.items.BuiltResourcesBuildItem;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
+import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
@@ -78,7 +78,6 @@ public class QuinoaProcessor {
     @BuildStep
     public ConfiguredQuinoaBuildItem prepareQuinoaDirectory(
             LaunchModeBuildItem launchMode,
-            LiveReloadBuildItem liveReload,
             QuinoaConfig userConfig,
             OutputTargetBuildItem outputTarget) {
         if (!isEnabled(userConfig)) {
@@ -95,44 +94,56 @@ public class QuinoaProcessor {
         if (projectDirs == null) {
             return null;
         }
-        final Path packageJsonFile = projectDirs.uiDir.resolve("package.json");
-        if (!Files.isRegularFile(packageJsonFile)) {
+        final Path packageJson = projectDirs.uiDir.resolve("package.json");
+        if (!Files.isRegularFile(packageJson)) {
             throw new ConfigurationException("No package.json found in Web UI directory: '" + configuredDir + "'");
         }
 
-        final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJsonFile);
+        final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson);
 
-        Optional<String> packageManagerBinary = resolvedConfig.packageManager();
-        List<String> paths = new ArrayList<>();
-        if (resolvedConfig.packageManagerInstall().enabled()) {
-            final PackageManagerInstall.Installation result = install(resolvedConfig.packageManagerInstall(),
-                    projectDirs);
-            packageManagerBinary = Optional.of(result.getPackageManagerBinary());
-            paths.add(result.getNodeDirPath());
-        }
+        return new ConfiguredQuinoaBuildItem(projectDirs.projectRootDir, projectDirs.uiDir, packageJson, resolvedConfig);
+    }
 
-        final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
-                resolvedConfig.packageManagerCommand(), projectDirs.getUIDir(), paths);
-        final boolean alreadyInstalled = Files.isDirectory(packageManagerRunner.getDirectory().resolve("node_modules"));
-        final boolean packageFileModified = liveReload.isLiveReload()
-                && liveReload.getChangedResources().stream().anyMatch(r -> r.equals(packageJsonFile.toString()));
-        if (resolvedConfig.forceInstall() || !alreadyInstalled || packageFileModified) {
-            final boolean ci = resolvedConfig.ci().orElseGet(QuinoaProcessor::isCI);
-            if (ci) {
-                packageManagerRunner.ci();
-            } else {
-                packageManagerRunner.install();
+    @BuildStep
+    public InstalledPackageManagerBuildItem install(
+            ConfiguredQuinoaBuildItem configuredQuinoa,
+            LiveReloadBuildItem liveReload) {
+        if (configuredQuinoa != null) {
+            final QuinoaConfig resolvedConfig = configuredQuinoa.resolvedConfig();
+            Optional<String> packageManagerBinary = resolvedConfig.packageManager();
+            List<String> paths = new ArrayList<>();
+            if (resolvedConfig.packageManagerInstall().enabled()) {
+                final PackageManagerInstall.Installation result = PackageManagerInstall.install(
+                        resolvedConfig.packageManagerInstall(),
+                        configuredQuinoa.projectDir());
+                packageManagerBinary = Optional.of(result.getPackageManagerBinary());
+                paths.add(result.getNodeDirPath());
             }
 
-        }
+            final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
+                    resolvedConfig.packageManagerCommand(), configuredQuinoa.uiDir(), paths);
+            final boolean alreadyInstalled = Files.isDirectory(packageManagerRunner.getDirectory().resolve("node_modules"));
+            final boolean packageFileModified = liveReload.isLiveReload()
+                    && liveReload.getChangedResources().stream()
+                            .anyMatch(r -> r.equals(configuredQuinoa.packageJson().toString()));
+            if (resolvedConfig.forceInstall() || !alreadyInstalled || packageFileModified) {
+                final boolean ci = resolvedConfig.ci().orElseGet(QuinoaProcessor::isCI);
+                if (ci) {
+                    packageManagerRunner.ci();
+                } else {
+                    packageManagerRunner.install();
+                }
 
-        // attempt to autoconfigure settings based on the framework being used
-        return new ConfiguredQuinoaBuildItem(packageManagerRunner, resolvedConfig);
+            }
+            return new InstalledPackageManagerBuildItem(packageManagerRunner);
+        }
+        return null;
     }
 
     @BuildStep
     public TargetDirBuildItem processBuild(
             ConfiguredQuinoaBuildItem configuredQuinoa,
+            InstalledPackageManagerBuildItem installedPackageManager,
             OutputTargetBuildItem outputTarget,
             LaunchModeBuildItem launchMode,
             LiveReloadBuildItem liveReload) throws IOException {
@@ -140,7 +151,7 @@ public class QuinoaProcessor {
             return null;
         }
 
-        final PackageManagerRunner packageManagerRunner = configuredQuinoa.getPackageManager();
+        final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         final QuinoaLiveContext contextObject = liveReload.getContextObject(QuinoaLiveContext.class);
         if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT
                 && isDevServerMode(configuredQuinoa.resolvedConfig())) {
@@ -200,7 +211,7 @@ public class QuinoaProcessor {
         if (quinoaDir.isEmpty() || isDevServerMode(quinoaDir.get().resolvedConfig())) {
             return;
         }
-        scan(quinoaDir.get().getPackageManager().getDirectory(), watchedPaths);
+        scan(quinoaDir.get().uiDir(), watchedPaths);
     }
 
     @BuildStep
@@ -247,7 +258,7 @@ public class QuinoaProcessor {
         }
 
         for (PackageManagerType pm : PackageManagerType.values()) {
-            final String watchFile = configuredQuinoa.get().getDirectory().resolve(pm.getLockFile()).toString();
+            final String watchFile = configuredQuinoa.get().uiDir().resolve(pm.getLockFile()).toString();
             watchedFiles.add(new HotDeploymentWatchedFileBuildItem(watchFile));
         }
         return watchedFiles;
