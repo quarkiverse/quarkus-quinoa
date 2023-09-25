@@ -1,4 +1,4 @@
-= Quarkus image:logo.svg[width=25em] Web Bundler - Configuration Reference
+= Quarkus image:logo.svg[width=25em] Web Quinoa - Configuration Reference
 
 include::./includes/attributes.adoc[]
 
