@@ -28,6 +28,8 @@ hs_err_pid*
 .settings/
 bin/
 
+.quarkus/
+
 # IntelliJ
 .idea
 *.ipr
