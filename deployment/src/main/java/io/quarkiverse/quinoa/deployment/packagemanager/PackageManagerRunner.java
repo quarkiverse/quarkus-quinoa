@@ -309,13 +309,13 @@ public class PackageManagerRunner {
 
     public static class DevServer {
         private final Process process;
-        private final String hostAddress;
+        private final String hostIPAddress;
 
         private final StartupLogCompressor logCompressor;
 
-        public DevServer(Process process, String hostAddress, StartupLogCompressor logCompressor) {
+        public DevServer(Process process, String hostIPAddress, StartupLogCompressor logCompressor) {
             this.process = process;
-            this.hostAddress = hostAddress;
+            this.hostIPAddress = hostIPAddress;
             this.logCompressor = logCompressor;
         }
 
@@ -323,8 +323,8 @@ public class PackageManagerRunner {
             return process;
         }
 
-        public String hostAddress() {
-            return hostAddress;
+        public String hostIPAddress() {
+            return hostIPAddress;
         }
 
         public StartupLogCompressor logCompressor() {

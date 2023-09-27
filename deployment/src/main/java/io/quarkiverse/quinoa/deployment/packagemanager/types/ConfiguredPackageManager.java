@@ -79,7 +79,12 @@ class ConfiguredPackageManager implements PackageManager {
     }
 
     private String prepareCommandWithArguments(String command) {
-        return String.format("%s %s", binary(), command);
+        // Fix https://github.com/quarkiverse/quarkus-quinoa/issues/519 pnpm pass args to scripts without "--"
+        String c = command;
+        if (PackageManagerType.PNPM.equals(type)) {
+            c = c.replace("-- ", "");
+        }
+        return String.format("%s %s", binary(), c);
     }
 
     private Map<String, String> environment(final Map<String, String> configuredEnvs,

@@ -116,9 +116,9 @@ public class ForwardedDevProcessor {
         if (!devServerConfig.managed()) {
             // No need to start the dev-service it is not managed by Quinoa
             // We just check that it is up
-            final String resolvedHostAddress = PackageManagerRunner.isDevServerUp(configuredDevServerHost, port, checkPath);
-            if (resolvedHostAddress != null) {
-                return new ForwardedDevServerBuildItem(resolvedHostAddress, port);
+            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredDevServerHost, port, checkPath);
+            if (resolvedHostIPAddress != null) {
+                return new ForwardedDevServerBuildItem(resolvedHostIPAddress, port);
             } else {
                 throw new IllegalStateException(
                         "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + port);
@@ -153,7 +153,7 @@ public class ForwardedDevProcessor {
             devService = new DevServicesResultBuildItem.RunningDevService(
                     DEV_SERVICE_NAME, null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
-            return new ForwardedDevServerBuildItem(devServer.hostAddress(), port);
+            return new ForwardedDevServerBuildItem(devServer.hostIPAddress(), port);
         } catch (Throwable t) {
             packageManagerRunner.stopDev(dev.get());
             if (devServer != null) {
