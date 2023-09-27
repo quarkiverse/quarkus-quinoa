@@ -14,11 +14,13 @@ import org.jboss.logging.Logger;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.web.client.HttpRequest;
+import io.vertx.core.file.AsyncFile;
+import io.vertx.core.file.OpenOptions;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
+import io.vertx.ext.web.client.predicate.ResponsePredicate;
+import io.vertx.ext.web.codec.BodyCodec;
 
 public class VertxFileDownloader implements FileDownloader {
     private static final Logger LOG = Logger.getLogger(VertxFileDownloader.class);
@@ -45,18 +47,19 @@ public class VertxFileDownloader implements FileDownloader {
             if ("file".equalsIgnoreCase(downloadURI.getScheme())) {
                 Files.copy(Paths.get(downloadURI), destinationPath);
             } else {
-                final HttpRequest<Buffer> request = webClient.getAbs(downloadUrl);
                 final CountDownLatch latch = new CountDownLatch(1);
-                Future<HttpResponse<Buffer>> future = request.send();
+                Files.deleteIfExists(destinationPath);
+                final AsyncFile destinationFile = vertx.fileSystem().openBlocking(destination, new OpenOptions());
+                final Future<HttpResponse<Void>> future = webClient.getAbs(downloadUrl)
+                        .expect(ResponsePredicate.SC_SUCCESS)
+                        .as(BodyCodec.pipe(destinationFile))
+                        .send();
                 future.onComplete((r) -> latch.countDown());
                 latch.await(5, TimeUnit.MINUTES);
-                if (future.succeeded()) {
-                    Files.write(destinationPath, future.result().body().getBytes());
-                } else {
+                if (!future.succeeded()) {
                     throw new DownloadException("Could not download " + downloadUrl, future.cause());
                 }
             }
-
         } catch (URISyntaxException | IOException e) {
             throw new DownloadException("Could not download " + downloadUrl, e);
         } catch (InterruptedException e) {
