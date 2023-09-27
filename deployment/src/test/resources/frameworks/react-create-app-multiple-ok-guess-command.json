@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "develop": "react-scripts start",
+    "dev": "react-scripts start --something"
+  }
+}

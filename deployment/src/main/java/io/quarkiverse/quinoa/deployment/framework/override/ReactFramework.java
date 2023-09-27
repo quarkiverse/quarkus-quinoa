@@ -18,8 +18,9 @@ public class ReactFramework extends GenericFramework {
     }
 
     @Override
-    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson) {
-        return new QuinoaConfigDelegate(super.override(delegate, packageJson)) {
+    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson, Optional<String> detectedDevScript,
+            boolean isCustomized) {
+        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized)) {
 
             @Override
             public PackageManagerCommandConfig packageManagerCommand() {

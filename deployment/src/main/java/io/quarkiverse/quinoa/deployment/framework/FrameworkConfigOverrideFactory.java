@@ -8,9 +8,10 @@ import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 
 public interface FrameworkConfigOverrideFactory {
 
-    String getFrameworkBuildDir();
+    String getDefaultBuildDir();
 
-    String getFrameworkDevScriptName();
+    String getDefaultDevScriptName();
 
-    QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson);
+    QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson, Optional<String> detectedDevScript,
+            boolean isCustomized);
 }

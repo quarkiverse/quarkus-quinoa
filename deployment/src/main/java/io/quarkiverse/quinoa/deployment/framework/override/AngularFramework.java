@@ -16,14 +16,16 @@ public class AngularFramework extends GenericFramework {
     }
 
     @Override
-    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson) {
-        return new QuinoaConfigDelegate(super.override(delegate, packageJson)) {
+    public QuinoaConfig override(QuinoaConfig originalConfig, Optional<JsonObject> packageJson,
+            Optional<String> detectedDevScript, boolean isCustomized) {
+        final String devScript = detectedDevScript.orElse(getDefaultDevScriptName());
+        return new QuinoaConfigDelegate(super.override(originalConfig, packageJson, detectedDevScript, isCustomized)) {
             @Override
             public Optional<String> buildDir() {
                 // Angular builds a custom directory "dist/[appname]"
                 String applicationName = packageJson.map(p -> p.getString("name")).orElse("quinoa");
-                final String fullBuildDir = String.format("%s/%s", getFrameworkBuildDir(), applicationName);
-                return Optional.of(delegate.buildDir().orElse(fullBuildDir));
+                final String fullBuildDir = String.format("%s/%s", getDefaultBuildDir(), applicationName);
+                return Optional.of(originalConfig.buildDir().orElse(fullBuildDir));
             }
 
             @Override
@@ -31,14 +33,16 @@ public class AngularFramework extends GenericFramework {
                 return new PackageManagerCommandConfigDelegate(super.packageManagerCommand()) {
                     @Override
                     public Optional<String> dev() {
-                        return Optional.of(delegate.packageManagerCommand().dev()
-                                .orElse("run " + getFrameworkDevScriptName() + " -- --disable-host-check"));
+                        final String extraArgs = isCustomized ? "" : " -- --disable-host-check --hmr";
+                        return Optional.of(originalConfig.packageManagerCommand().dev()
+                                .orElse("run " + devScript + extraArgs));
                     }
 
                     @Override
                     public Optional<String> test() {
-                        return Optional.of(delegate.packageManagerCommand().test()
-                                .orElse(DEFAULT_BUILD_COMMAND + " -- --no-watch --no-progress --browsers=ChromeHeadlessCI"));
+                        final String extraArgs = isCustomized ? "" : " -- --no-watch --no-progress --browsers=ChromeHeadlessCI";
+                        return Optional.of(originalConfig.packageManagerCommand().test()
+                                .orElse(DEFAULT_TEST_COMMAND + extraArgs));
                     }
                 };
             }

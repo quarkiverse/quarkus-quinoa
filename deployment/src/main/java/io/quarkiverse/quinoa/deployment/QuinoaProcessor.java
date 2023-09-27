@@ -63,7 +63,7 @@ public class QuinoaProcessor {
     private static final Logger LOG = Logger.getLogger(QuinoaProcessor.class);
     private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "target");
     private static final Set<String> IGNORE_WATCH_BUILD_DIRS = Arrays.stream(FrameworkType.values()).sequential()
-            .map(frameworkType -> frameworkType.factory().getFrameworkBuildDir())
+            .map(frameworkType -> frameworkType.factory().getDefaultBuildDir())
             .collect(Collectors.toSet());
     private static final Pattern IGNORE_WATCH_REGEX = Pattern.compile("^[.].+$"); // ignore "." directories
 

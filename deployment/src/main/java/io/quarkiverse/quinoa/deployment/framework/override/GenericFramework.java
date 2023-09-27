@@ -19,22 +19,22 @@ public class GenericFramework implements FrameworkConfigOverrideFactory {
 
     public static FrameworkConfigOverrideFactory UNKNOWN_FRAMEWORK = new GenericFramework(DEFAULT_BUILD_DIR,
             DEFAULT_DEV_SCRIPT_NAME);
-    private final String buildDir;
-    private final String scriptName;
-    private final Optional<Integer> devServerPort;
+    private final String defaultBuildDir;
+    private final String defaultScriptName;
+    private final Optional<Integer> defaultDevServerPort;
 
-    protected GenericFramework(String buildDir, String scriptName, Optional<Integer> devServerPort) {
-        this.buildDir = buildDir;
-        this.scriptName = scriptName;
-        this.devServerPort = devServerPort;
+    protected GenericFramework(String defaultBuildDir, String defaultScriptName, Optional<Integer> defaultDevServerPort) {
+        this.defaultBuildDir = defaultBuildDir;
+        this.defaultScriptName = defaultScriptName;
+        this.defaultDevServerPort = defaultDevServerPort;
     }
 
-    protected GenericFramework(String buildDir, String scriptName) {
-        this(buildDir, scriptName, Optional.empty());
+    protected GenericFramework(String defaultBuildDir, String defaultScriptName) {
+        this(defaultBuildDir, defaultScriptName, Optional.empty());
     }
 
-    protected GenericFramework(String buildDir, String scriptName, int devServerPort) {
-        this(buildDir, scriptName, Optional.of(devServerPort));
+    protected GenericFramework(String defaultBuildDir, String defaultScriptName, int defaultDevServerPort) {
+        this(defaultBuildDir, defaultScriptName, Optional.of(defaultDevServerPort));
     }
 
     public static GenericFramework generic(String buildDir, String scriptName, int devServerPort) {
@@ -42,21 +42,23 @@ public class GenericFramework implements FrameworkConfigOverrideFactory {
     }
 
     @Override
-    public String getFrameworkBuildDir() {
-        return buildDir;
+    public String getDefaultBuildDir() {
+        return defaultBuildDir;
     }
 
     @Override
-    public String getFrameworkDevScriptName() {
-        return scriptName;
+    public String getDefaultDevScriptName() {
+        return defaultScriptName;
     }
 
     @Override
-    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson) {
-        return new QuinoaConfigDelegate(delegate) {
+    public QuinoaConfig override(QuinoaConfig originalConfig, Optional<JsonObject> packageJson,
+            Optional<String> detectedDevScript, boolean isCustomized) {
+        final String devScript = detectedDevScript.orElse(defaultScriptName);
+        return new QuinoaConfigDelegate(originalConfig) {
             @Override
             public Optional<String> buildDir() {
-                return Optional.of(super.buildDir().orElse(buildDir));
+                return Optional.of(super.buildDir().orElse(defaultBuildDir));
             }
 
             @Override
@@ -66,7 +68,7 @@ public class GenericFramework implements FrameworkConfigOverrideFactory {
                     public Optional<Integer> port() {
                         return Optional.ofNullable(
                                 super.port().orElse(
-                                        devServerPort.orElse(null)));
+                                        defaultDevServerPort.orElse(null)));
                     }
                 };
             }
@@ -76,7 +78,7 @@ public class GenericFramework implements FrameworkConfigOverrideFactory {
                 return new PackageManagerCommandConfigDelegate(super.packageManagerCommand()) {
                     @Override
                     public Optional<String> dev() {
-                        return Optional.of(super.dev().orElse("run " + scriptName));
+                        return Optional.of(super.dev().orElse("run " + devScript));
                     }
                 };
             }

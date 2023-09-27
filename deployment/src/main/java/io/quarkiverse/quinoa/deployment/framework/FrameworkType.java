@@ -6,11 +6,14 @@ import static io.quarkiverse.quinoa.deployment.framework.override.GenericFramewo
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -19,6 +22,7 @@ import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonString;
+import jakarta.json.JsonValue.ValueType;
 
 import org.jboss.logging.Logger;
 
@@ -33,31 +37,27 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
  */
 public enum FrameworkType {
 
-    REACT(Set.of("react-scripts", "react-app-rewired", "craco"), new ReactFramework()),
-    VUE_LEGACY(Set.of("vue-cli-service"), generic("dist", "serve", 3000)),
+    REACT(Set.of("react-scripts start", "react-app-rewired start", "craco start"), new ReactFramework()),
+    VUE_LEGACY(Set.of("vue-cli-service serve"), generic("dist", "serve", 3000)),
     VITE(Set.of("vite"), generic("dist", "dev", 5173)),
-    SOLID_START(Set.of("solid-start"), generic("dist", "dev", 3000)),
-    ASTRO(Set.of("astro"), generic("dist", "dev", 3000)),
-    NEXT(Set.of("next"), new NextFramework()),
-    NUXT(Set.of("nuxt"), generic("dist", "dev", 3000)),
+    SOLID_START(Set.of("solid-start dev"), generic("dist", "dev", 3000)),
+    ASTRO(Set.of("astro dev"), generic("dist", "dev", 3000)),
+    NEXT(Set.of("next dev"), new NextFramework()),
+    NUXT(Set.of("nuxt dev"), generic("dist", "dev", 3000)),
     ANGULAR(Set.of("ng serve"), new AngularFramework()),
-    EMBER(Set.of("ember-cli"), generic("dist", "serve", 4200)),
-    AURELIA(Set.of("aurelia-cli"), generic("dist", "start", 8080)),
-    POLYMER(Set.of("polymer-cli"), generic("build", "serve", 8080)),
-    QWIK(Set.of("qwik"), generic("dist", "start", 5173)),
-    GATSBY(Set.of("gatsby-cli"), generic("dist", "develop", 8000)),
-    CYCLEJS(Set.of("cycle"), generic("build", "start", 8000)),
-    RIOTJS(Set.of("riot-cli"), generic("build", "start", 3000)),
-    MIDWAYJS(Set.of("midway"), generic("dist", "dev", 7001)),
-    REFINE(Set.of("refine"), generic("build", "dev", 3000)),
-    WEB_COMPONENTS(Set.of("web-dev-server"), generic("dist", "start", 8003));
+    EMBER(Set.of("ember-cli serve"), generic("dist", "serve", 4200)),
+    GATSBY(Set.of("gatsby develop"), generic("dist", "develop", 8000)),
+    MIDWAYJS(Set.of("midway-bin dev"), generic("dist", "dev", 7001));
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
 
-    public static final Set<String> DEV_SCRIPTS = Arrays.stream(values())
-            .map(framework -> framework.factory.getFrameworkDevScriptName())
+    private static final Set<String> DEV_SCRIPTS = Arrays.stream(values())
+            .map(framework -> framework.factory.getDefaultDevScriptName())
             .collect(Collectors.toCollection(TreeSet::new));
 
+    private static final Map<String, FrameworkType> TYPE_START_DEV_COMMAND_MAPPING = Arrays.stream(values())
+            .flatMap(t -> t.cliStartDev.stream().map(c -> new SimpleImmutableEntry<>(c, t)))
+            .collect(Collectors.toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
     private final Set<String> cliStartDev;
     private final FrameworkConfigOverrideFactory factory;
 
@@ -72,53 +72,87 @@ public enum FrameworkType {
 
     public static QuinoaConfig overrideConfig(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
         if (!config.framework().detection()) {
-            return UNKNOWN_FRAMEWORK.override(config, Optional.empty());
+            return UNKNOWN_FRAMEWORK.override(config, Optional.empty(), Optional.empty(), true);
         }
 
-        JsonObject packageJson = null;
+        final JsonObject packageJson = readPackageJson(packageJsonFile);
+        final Optional<DetectedFramework> detectedFramework = detectFramework(packageJson);
+
+        if (detectedFramework.isEmpty()) {
+            LOG.trace("Quinoa could not auto-detect the frameworkType from package.json file.");
+            return UNKNOWN_FRAMEWORK.override(config, Optional.of(packageJson), Optional.empty(), true);
+        }
+
+        final FrameworkType frameworkType = detectedFramework.get().type;
+        LOG.infof("Quinoa detected '%s' frameworkType from package.json file.", frameworkType);
+
+        return frameworkType.factory.override(config, Optional.of(packageJson), Optional.of(detectedFramework.get().devScript),
+                detectedFramework.get().isCustomized);
+    }
+
+    private static JsonObject readPackageJson(Path packageJsonFile) {
         try (JsonReader reader = Json.createReader(Files.newInputStream(packageJsonFile))) {
-            packageJson = reader.readObject();
+            return reader.readObject();
         } catch (IOException | JsonException e) {
-            LOG.warnf("Quinoa failed to read the package.json file. %s", e.getMessage());
+            throw new RuntimeException("Quinoa failed to read the package.json file. %s", e);
         }
+    }
 
-        JsonString detectedDevScriptCommand = null;
-        String detectedDevScript = null;
+    static Optional<DetectedFramework> detectFramework(JsonObject packageJson) {
+        final JsonObject scripts = packageJson.getJsonObject("scripts");
+        if (scripts == null || scripts.isEmpty()) {
+            return Optional.empty();
+        }
+        final Map<String, String> projectDevScripts = scripts.entrySet().stream()
+                .filter(e -> DEV_SCRIPTS.contains(e.getKey()) && e.getValue() != null
+                        && ValueType.STRING.equals(e.getValue().getValueType()))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        e -> ((JsonString) e.getValue()).getString().trim().toLowerCase(Locale.US)));
 
-        if (packageJson != null) {
-            JsonObject scripts = packageJson.getJsonObject("scripts");
-            if (scripts != null) {
-                // loop over all possible start scripts until we find one
-                for (String devScript : FrameworkType.DEV_SCRIPTS) {
-                    detectedDevScriptCommand = scripts.getJsonString(devScript);
-                    if (detectedDevScriptCommand != null) {
-                        detectedDevScript = devScript;
-                        break;
+        for (Map.Entry<String, String> e : projectDevScripts.entrySet()) {
+            if (TYPE_START_DEV_COMMAND_MAPPING.containsKey(e.getValue())) {
+                final FrameworkType framework = TYPE_START_DEV_COMMAND_MAPPING.get(e.getValue());
+                final String frameworkDefaultDevScript = framework.factory().getDefaultDevScriptName();
+                LOG.debugf("Detected framework with dev command perfect match: %s", framework.toString());
+                final String projectDevScript = e.getKey();
+                final boolean isDefaultDevCommand = projectDevScript.equals(frameworkDefaultDevScript);
+                if (!isDefaultDevCommand) {
+                    LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
+                            framework, frameworkDefaultDevScript, projectDevScript);
+                }
+                return Optional.of(new DetectedFramework(framework, projectDevScript, !isDefaultDevCommand));
+            }
+        }
+        // Fallback to partial match
+        for (Map.Entry<String, String> projectDevScriptEntry : projectDevScripts.entrySet()) {
+            for (Map.Entry<String, FrameworkType> frameworksByCommand : TYPE_START_DEV_COMMAND_MAPPING.entrySet()) {
+                final FrameworkType framework = frameworksByCommand.getValue();
+                final String frameworkDefaultDevScript = framework.factory().getDefaultDevScriptName();
+                final String frameworkCommand = frameworksByCommand.getKey();
+                final String projectDevScript = projectDevScriptEntry.getKey();
+                final String projectDevCommand = projectDevScriptEntry.getValue();
+                final boolean detected = projectDevCommand.contains(frameworkCommand);
+                if (detected) {
+                    final boolean isDefaultDevCommand = projectDevScript.equals(frameworkDefaultDevScript);
+                    final boolean endsWith = projectDevCommand.endsWith(frameworkCommand);
+                    if (isDefaultDevCommand || projectDevScripts.size() == 1) {
+                        // We can assume this is the right dev script
+                        if (!isDefaultDevCommand) {
+                            LOG.warnf(
+                                    "%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
+                                    framework, frameworkDefaultDevScript, projectDevScript);
+                        }
+                        return Optional.of(new DetectedFramework(framework, projectDevScript,
+                                !isDefaultDevCommand || !endsWith));
+                    } else {
+                        LOG.errorf(
+                                "Framework detection failed: It is probably %s framework which typically defines a '%s' script in package.json but found multiple other dev scripts instead (%s).",
+                                framework, frameworkDefaultDevScript, String.join(", ", projectDevScripts.keySet()));
                     }
                 }
             }
         }
-
-        if (detectedDevScript == null) {
-            LOG.trace("Quinoa could not auto-detect the framework from package.json file.");
-            return UNKNOWN_FRAMEWORK.override(config, Optional.ofNullable(packageJson));
-        }
-
-        // check if we found a script to detect which framework
-        final FrameworkType frameworkType = resolveFramework(detectedDevScriptCommand.getString());
-        if (frameworkType == null) {
-            LOG.info("Quinoa could not auto-detect the framework from package.json file.");
-            return UNKNOWN_FRAMEWORK.override(config, Optional.ofNullable(packageJson));
-        }
-
-        String expectedScript = frameworkType.factory.getFrameworkDevScriptName();
-        if (launchMode.getLaunchMode().isDevOrTest() && !Objects.equals(detectedDevScript, expectedScript)) {
-            LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
-                    frameworkType, expectedScript, detectedDevScript);
-        }
-
-        LOG.infof("Quinoa detected '%s' framework from package.json file.", frameworkType);
-        return frameworkType.factory.override(config, Optional.ofNullable(packageJson));
+        return Optional.empty();
     }
 
     /**
@@ -128,15 +162,52 @@ public enum FrameworkType {
      * @return either NULL if no match or the matching framework if found
      */
     private static FrameworkType resolveFramework(String script) {
-        final String lowerScript = script.toLowerCase(Locale.ROOT);
+        final String normalizedScript = script.toLowerCase(Locale.ROOT).trim();
         for (FrameworkType value : values()) {
             for (String cliName : value.cliStartDev) {
-                if (lowerScript.contains(cliName)) {
+                if (normalizedScript.contains(cliName)) {
                     return value;
                 }
             }
         }
         return null;
+    }
+
+    static class DetectedFramework {
+        public final FrameworkType type;
+
+        public final String devScript;
+        public final boolean isCustomized;
+
+        public DetectedFramework(FrameworkType type, String devScript, boolean isCustomized) {
+            this.type = type;
+            this.devScript = devScript;
+            this.isCustomized = isCustomized;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            DetectedFramework that = (DetectedFramework) o;
+            return isCustomized == that.isCustomized && type == that.type && Objects.equals(devScript, that.devScript);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, devScript, isCustomized);
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", DetectedFramework.class.getSimpleName() + "[", "]")
+                    .add("type=" + type)
+                    .add("devScript='" + devScript + "'")
+                    .add("isCustomized=" + isCustomized)
+                    .toString();
+        }
     }
 
 }
