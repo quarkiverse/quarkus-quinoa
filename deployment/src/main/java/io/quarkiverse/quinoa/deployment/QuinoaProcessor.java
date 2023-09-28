@@ -175,7 +175,14 @@ public class QuinoaProcessor {
         }
         final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
-        Files.move(buildDir, targetBuildDir);
+        try {
+            Files.move(buildDir, targetBuildDir);
+        } catch (IOException e) {
+            String message = String.format(
+                    "Error moving directory '%s -> %s'. Please make sure no files are open such as in Files Explorer or other tools.",
+                    buildDir, targetBuildDir);
+            throw new IOException(message, e);
+        }
         liveReload.setContextObject(QuinoaLiveContext.class, new QuinoaLiveContext(targetBuildDir));
         return new TargetDirBuildItem(targetBuildDir);
     }
