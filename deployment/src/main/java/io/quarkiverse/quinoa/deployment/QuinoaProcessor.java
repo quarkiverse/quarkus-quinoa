@@ -11,9 +11,11 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunn
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -68,7 +70,9 @@ public class QuinoaProcessor {
     private static final Pattern IGNORE_WATCH_REGEX = Pattern.compile("^[.].+$"); // ignore "." directories
 
     private static final String FEATURE = "quinoa";
-    private static final String TARGET_DIR_NAME = "quinoa-build";
+    private static final String TARGET_DIR_NAME = "quinoa";
+    private static final String TARGET_BUILD_DIR_NAME = "build";
+    private static final String BUILD_FILE = "package.json";
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -79,7 +83,7 @@ public class QuinoaProcessor {
     public ConfiguredQuinoaBuildItem prepareQuinoaDirectory(
             LaunchModeBuildItem launchMode,
             QuinoaConfig userConfig,
-            OutputTargetBuildItem outputTarget) {
+            OutputTargetBuildItem outputTarget) throws IOException {
         if (!isEnabled(userConfig)) {
             LOG.info("Quinoa is disabled.");
             return null;
@@ -94,10 +98,12 @@ public class QuinoaProcessor {
         if (projectDirs == null) {
             return null;
         }
-        final Path packageJson = projectDirs.uiDir.resolve("package.json");
+        final Path packageJson = projectDirs.uiDir.resolve(BUILD_FILE);
         if (!Files.isRegularFile(packageJson)) {
-            throw new ConfigurationException("No package.json found in Web UI directory: '" + configuredDir + "'");
+            throw new ConfigurationException("No " + BUILD_FILE + " found in Web UI directory: '" + configuredDir + "'");
         }
+
+        initializeTargetDirectory(outputTarget);
 
         final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson);
 
@@ -107,7 +113,8 @@ public class QuinoaProcessor {
     @BuildStep
     public InstalledPackageManagerBuildItem install(
             ConfiguredQuinoaBuildItem configuredQuinoa,
-            LiveReloadBuildItem liveReload) {
+            LiveReloadBuildItem liveReload,
+            OutputTargetBuildItem outputTarget) throws IOException {
         if (configuredQuinoa != null) {
             final QuinoaConfig resolvedConfig = configuredQuinoa.resolvedConfig();
             Optional<String> packageManagerBinary = resolvedConfig.packageManager();
@@ -123,9 +130,16 @@ public class QuinoaProcessor {
             final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
                     resolvedConfig.packageManagerCommand(), configuredQuinoa.uiDir(), paths);
             final boolean alreadyInstalled = Files.isDirectory(packageManagerRunner.getDirectory().resolve("node_modules"));
-            final boolean packageFileModified = liveReload.isLiveReload()
+            boolean packageFileModified = liveReload.isLiveReload()
                     && liveReload.getChangedResources().stream()
                             .anyMatch(r -> r.equals(configuredQuinoa.packageJson().toString()));
+
+            final Path targetPackageJson = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME).resolve(BUILD_FILE);
+            final Path currentPackageJson = configuredQuinoa.packageJson();
+            if (!packageFileModified) {
+                // check for manual changes in package.json and trigger and automatic install
+                packageFileModified = !compareTextFiles(targetPackageJson, currentPackageJson);
+            }
             if (resolvedConfig.forceInstall() || !alreadyInstalled || packageFileModified) {
                 final boolean ci = resolvedConfig.ci().orElseGet(QuinoaProcessor::isCI);
                 if (ci) {
@@ -134,6 +148,8 @@ public class QuinoaProcessor {
                     packageManagerRunner.install();
                 }
 
+                // copy the package.json to build, so we can compare for next time
+                Files.copy(currentPackageJson, targetPackageJson, StandardCopyOption.REPLACE_EXISTING);
             }
             return new InstalledPackageManagerBuildItem(packageManagerRunner);
         }
@@ -173,7 +189,8 @@ public class QuinoaProcessor {
             throw new ConfigurationException("Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'",
                     Set.of("quarkus.quinoa.build-dir"));
         }
-        final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
+
+        final Path targetBuildDir = initializeTargetDirectory(outputTarget).resolve(TARGET_BUILD_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
         try {
             Files.move(buildDir, targetBuildDir);
@@ -380,6 +397,29 @@ public class QuinoaProcessor {
             ci = System.getenv().getOrDefault("CI", "false");
         }
         return Objects.equals(ci, "true");
+    }
+
+    public static Path initializeTargetDirectory(OutputTargetBuildItem outputTarget) throws IOException {
+        final Path targetBuildDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME);
+        Files.createDirectories(targetBuildDir);
+        return targetBuildDir;
+    }
+
+    public static boolean compareTextFiles(Path file1, Path file2) throws IOException {
+        if (!Files.exists(file1) || !Files.exists(file2)) {
+            LOG.info("Clean build forcing automatic install...");
+            return false;
+        }
+        // Read the contents of both files into strings
+        String content1 = new String(Files.readAllBytes(file1), StandardCharsets.UTF_8);
+        String content2 = new String(Files.readAllBytes(file2), StandardCharsets.UTF_8);
+
+        // Compare the contents
+        boolean equals = Objects.equals(content1, content2);
+        if (!equals) {
+            LOG.infof("'%s' has been modified forcing automatic install!", BUILD_FILE);
+        }
+        return equals;
     }
 
     private static class QuinoaLiveContext {
