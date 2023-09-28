@@ -179,9 +179,9 @@ public class QuinoaProcessor {
             Files.move(buildDir, targetBuildDir);
         } catch (IOException e) {
             String message = String.format(
-                    "Error moving directory '%s'. Please make sure no files are open such as in Windows Explorer or other tools. %s",
-                    buildDir, e.getMessage());
-            throw new ConfigurationException(message);
+                    "Error moving directory '%s -> %s'. Please make sure no files are open such as in Files Explorer or other tools.",
+                    buildDir, targetBuildDir);
+            throw new IOException(message, e);
         }
         liveReload.setContextObject(QuinoaLiveContext.class, new QuinoaLiveContext(targetBuildDir));
         return new TargetDirBuildItem(targetBuildDir);
