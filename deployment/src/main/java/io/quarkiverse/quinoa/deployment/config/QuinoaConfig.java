@@ -41,7 +41,7 @@ public interface QuinoaConfig {
      * If true, Quinoa will NOT serve the Web UI built resources.
      * This is handy when the output of the build is used
      * to be served via something else (nginx, cdn, ...)
-     * Quinoa put the built files in 'target/quinoa-build' (or 'build/quinoa-build with Gradle).
+     * Quinoa put the built files in 'target/quinoa/build' (or 'build/quinoa/build with Gradle).
      */
     @WithDefault("false")
     boolean justBuild();
@@ -55,7 +55,7 @@ public interface QuinoaConfig {
     /**
      * This the Web UI internal build system (webpack, ...) output directory.
      * After the build, Quinoa will take the files from this directory,
-     * move them to 'target/quinoa-build' (or build/quinoa-build with Gradle) and serve them at runtime.
+     * move them to 'target/quinoa/build' (or build/quinoa/build with Gradle) and serve them at runtime.
      * The path is relative to the Web UI path.
      */
     @ConfigDocDefault("framework detection with fallback to '" + DEFAULT_BUILD_DIR + "'")

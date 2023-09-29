@@ -82,7 +82,8 @@ public class ForwardedDevProcessor {
         final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         final String checkPath = resolvedConfig.devServer().checkPath().orElse(null);
         if (devService != null) {
-            boolean shouldShutdownTheBroker = !resolvedConfig.equals(oldConfig);
+            boolean shouldShutdownTheBroker = !resolvedConfig.equals(oldConfig)
+                    || QuinoaProcessor.isPackageJsonLiveReloadChanged(configuredQuinoa, liveReload);
             if (!shouldShutdownTheBroker) {
                 if (devServerConfig.port().isEmpty()) {
                     throw new IllegalStateException(

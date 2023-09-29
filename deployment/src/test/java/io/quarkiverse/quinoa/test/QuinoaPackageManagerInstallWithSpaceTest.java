@@ -32,7 +32,7 @@ public class QuinoaPackageManagerInstallWithSpaceTest {
 
     @Test
     public void testQuinoa() {
-        assertThat(Path.of("target/quinoa-build/index.html")).isRegularFile()
+        assertThat(Path.of("target/quinoa/build/index.html")).isRegularFile()
                 .hasContent("test");
         assertThat(getWebUITestDirPath(NAME).resolve("node_modules/installed")).isRegularFile()
                 .hasContent("hello");

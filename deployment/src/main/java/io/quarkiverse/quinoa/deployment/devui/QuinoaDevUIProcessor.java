@@ -1,20 +1,13 @@
 package io.quarkiverse.quinoa.deployment.devui;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
-import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
-import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
-import io.quarkiverse.quinoa.devui.QuinoaJsonRpcService;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.dev.console.DevConsoleManager;
-import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
 import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.ExternalPageBuilder;
 import io.quarkus.devui.spi.page.FooterPageBuildItem;
@@ -100,27 +93,4 @@ public class QuinoaDevUIProcessor {
         footerProducer.produce(new FooterPageBuildItem(nodeLogPageBuilder));
     }
 
-    @BuildStep(onlyIf = IsDevelopment.class)
-    JsonRPCProvidersBuildItem registerJsonRpcBackend(InstalledPackageManagerBuildItem installedPackageManager,
-            QuinoaConfig quinoaConfig) {
-        DevConsoleManager.register("quinoa-install-action",
-                install(installedPackageManager, quinoaConfig));
-        return new JsonRPCProvidersBuildItem(QuinoaJsonRpcService.class);
-    }
-
-    private Function<Map<String, String>, String> install(InstalledPackageManagerBuildItem installedPackageManager,
-            QuinoaConfig quinoaConfig) {
-        return (map -> {
-            try {
-                final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
-
-                // install or update packages
-                packageManagerRunner.install();
-
-                return "installed";
-            } catch (Exception e) {
-                return e.getMessage();
-            }
-        });
-    }
 }

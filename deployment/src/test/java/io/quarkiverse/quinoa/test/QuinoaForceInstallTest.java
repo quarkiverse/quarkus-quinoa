@@ -17,7 +17,7 @@ public class QuinoaForceInstallTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .nodeModules()
+            .alreadyInstalled()
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertLogRecords(l -> {
@@ -31,7 +31,7 @@ public class QuinoaForceInstallTest {
 
     @Test
     public void testQuinoa() {
-        assertThat(Path.of("target/quinoa-build/index.html")).isRegularFile()
+        assertThat(Path.of("target/quinoa/build/index.html")).isRegularFile()
                 .hasContent("test");
         assertThat(getWebUITestDirPath(NAME).resolve("node_modules/installed")).isRegularFile()
                 .hasContent("hello");
