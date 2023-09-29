@@ -43,7 +43,7 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -52,9 +52,7 @@
                             <resources>
                                 <resource>
                                     <directory>${project.basedir}/../target/asciidoc/generated/config/</directory>
-                                    <includes>
-                                        <include>quarkus-quinoa.adoc</include>
-                                    </includes>
+                                    <include>quarkus-quinoa.adoc</include>
                                     <filtering>false</filtering>
                                 </resource>
                                 <resource>
