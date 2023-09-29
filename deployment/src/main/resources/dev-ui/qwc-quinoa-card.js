@@ -46,10 +46,7 @@ export class QwcQuinoaCard extends LitElement {
       .button {
         cursor: pointer;
       }
-
-      .installIcon {
-        color: var(--lumo-primary-text-colo);
-      }
+      
 
       .restartIcon {
         color: var(--lumo-primary-text-colo);
@@ -109,46 +106,9 @@ export class QwcQuinoaCard extends LitElement {
                     <div class="description">${DESCRIPTION}</div>
                 </div>
                 ${this._renderCardLinks()}
-                ${this._renderActions()}
                 ${progress}
             </div>
         `;
-    }
-
-    _renderActions() {
-        return html`
-            <vaadin-button theme="small" @click=${() => this._install()} class="button"
-                           title="Run package manager 'install' command to update packages and restart the Node server">
-                <vaadin-icon class="installIcon" icon="font-awesome-solid:cloud-arrow-down"></vaadin-icon>
-                Install/Update Packages
-            </vaadin-button>
-        `;
-    }
-
-    _install() {
-        this.build_complete = false;
-        this.build_in_progress = true;
-        this.build_error = false;
-        this.result = "";
-        this.jsonRpc.install()
-            .onNext(jsonRpcResponse => {
-                const msg = jsonRpcResponse.result;
-                if (msg === "started") {
-                    this.build_complete = false;
-                    this.build_in_progress = true;
-                    this.build_error = false;
-                } else if (msg.includes("installed")) {
-                    this.build_complete = true;
-                    this.build_in_progress = false;
-                    this.result = msg;
-                    this._success('Packages updated or installed successfully.');
-                } else {
-                    this.build_complete = true;
-                    this.build_in_progress = false;
-                    this.build_error = true;
-                    this._error(msg)
-                }
-            });
     }
 
     _success(message) {
