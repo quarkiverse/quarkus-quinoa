@@ -1,7 +1,6 @@
 package io.quarkiverse.quinoa.test;
 
 import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.getWebUITestDirPath;
-import static io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest.systemBinary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -21,10 +20,13 @@ public class QuinoaCIConfigTest {
             .ci(null)
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ci", "true")
+            .assertException(e -> {
+                assertThat(e)
+                        .hasMessage("Error in Quinoa while running package manager ci command: yarn.cmd install --immutable");
+            })
             .assertLogRecords(l -> assertThat(l)
-                    .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager ci command: %s") &&
-                            s.getParameters()[0].equals(
-                                    systemBinary(PackageManagerType.YARN.getBinary()) + " install --frozen-lockfile")));
+                    .anyMatch(s -> s.getMessage().contains(
+                            "The lockfile would have been modified by this install, which is explicitly forbidden.")));
 
     @Test
     public void testQuinoa() {

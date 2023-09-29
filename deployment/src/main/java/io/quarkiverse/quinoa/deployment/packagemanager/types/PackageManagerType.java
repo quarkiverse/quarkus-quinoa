@@ -10,7 +10,7 @@ public enum PackageManagerType {
     // Order matters for detection
     PNPM("pnpm", "pnpm-lock.yaml", "install --frozen-lockfile"),
     NPM("npm", "package-lock.json", "ci"),
-    YARN("yarn", "yarn.lock", "install --frozen-lockfile"),
+    YARN("yarn", "yarn.lock", "install --immutable"),
     ;
 
     private static final Map<String, PackageManagerType> TYPES = Arrays.stream(values()).sequential()
