@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.dev.console.QuarkusConsole;
@@ -21,7 +22,7 @@ public class QuinoaQuarkusUnitTest {
     private static final String CI = System.getProperty("CI");
 
     private final Path testDir;
-    private boolean nodeModules = false;
+    private boolean alreadyInstalled = false;
     private String initialLockfile = "package-lock.json";
     private Boolean ci = false;
 
@@ -42,8 +43,8 @@ public class QuinoaQuarkusUnitTest {
         return this;
     }
 
-    public QuinoaQuarkusUnitTest nodeModules() {
-        this.nodeModules = true;
+    public QuinoaQuarkusUnitTest alreadyInstalled() {
+        this.alreadyInstalled = true;
         return this;
     }
 
@@ -63,7 +64,7 @@ public class QuinoaQuarkusUnitTest {
                 .setBeforeAllCustomizer(new Runnable() {
                     @Override
                     public void run() {
-                        prepareTestWebUI(testDir, nodeModules);
+                        prepareTestWebUI(testDir, alreadyInstalled);
                         prepareLockFile(testDir, initialLockfile);
                         if (ci != null) {
                             System.setProperty("CI", ci.toString());
@@ -92,14 +93,18 @@ public class QuinoaQuarkusUnitTest {
         return QuarkusConsole.IS_WINDOWS;
     }
 
-    public static void prepareTestWebUI(Path testDir, boolean nodeModules) {
+    public static void prepareTestWebUI(Path testDir, boolean installed) {
         final Path webUI = Path.of("src/test/webui/");
         try {
             FileUtil.deleteDirectory(testDir);
             Files.createDirectories(testDir);
             copyDirectory(webUI, testDir);
-            if (nodeModules) {
+            if (installed) {
                 Files.createDirectory(testDir.resolve("node_modules"));
+                final Path targetQuinoaDir = Path.of("target/quinoa/");
+                Files.createDirectories(targetQuinoaDir);
+                Files.copy(testDir.resolve("package.json"), targetQuinoaDir.resolve("package.json"),
+                        StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             throw new IllegalStateException("Error while preparing the test web ui directory.", e);

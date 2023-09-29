@@ -14,10 +14,12 @@ public class QuinoaAlreadyInstalledTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .nodeModules()
+            .alreadyInstalled()
             .toQuarkusUnitTest()
             .assertLogRecords(l -> {
                 assertThat(l)
+                        .anyMatch(s -> s.getMessage().equals(
+                                "package.json seems to be the same as previous Quinoa install, skipping packages install"))
                         .noneMatch(s -> s.getMessage().equals("Running Quinoa package manager install command: %s") &&
                                 s.getParameters()[0].equals(systemBinary("npm") + " install"));
             }).assertException(e -> {

@@ -17,7 +17,7 @@ public class QuinoaForceInstallTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .nodeModules()
+            .alreadyInstalled()
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.force-install", "true")
             .assertLogRecords(l -> {
