@@ -39,6 +39,7 @@ import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
+import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -62,6 +63,8 @@ public class QuinoaProcessor {
 
     private static final Logger LOG = Logger.getLogger(QuinoaProcessor.class);
     private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "target");
+    private static final Set<String> IGNORE_WATCH_LOCKFILES = Arrays.stream(PackageManagerType.values())
+            .map(PackageManagerType::getLockFile).collect(Collectors.toSet());
     private static final Set<String> IGNORE_WATCH_BUILD_DIRS = Arrays.stream(FrameworkType.values()).sequential()
             .map(frameworkType -> frameworkType.factory().getDefaultBuildDir())
             .collect(Collectors.toSet());
@@ -232,7 +235,7 @@ public class QuinoaProcessor {
             watchedPaths.produce(watchPackageJson);
             return;
         }
-        scan(quinoaDir.get().uiDir(), watchedPaths);
+        scan(quinoaDir.get().uiDir(), quinoaDir.get().uiDir(), watchedPaths);
     }
 
     @BuildStep
@@ -291,18 +294,23 @@ public class QuinoaProcessor {
         return entries;
     }
 
-    private void scan(Path directory, BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths)
+    private void scan(Path uiDir, Path directory, BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths)
             throws IOException {
         try (Stream<Path> files = Files.list(directory)) {
             Iterator<Path> iter = files.iterator();
             while (iter.hasNext()) {
                 Path filePath = iter.next();
-                if (Files.isRegularFile(filePath)) {
-                    LOG.debugf("Quinoa is watching: %s", filePath);
-                    watchedPaths.produce(new HotDeploymentWatchedFileBuildItem(filePath.toString()));
-                } else if (shouldScanPath(filePath)) {
-                    LOG.debugf("Quinoa is scanning directory: %s", filePath);
-                    scan(filePath, watchedPaths);
+                final String relativePath = uiDir.relativize(filePath).toString();
+                if (shouldWatch(relativePath)) {
+                    if (Files.isRegularFile(filePath)) {
+                        LOG.debugf("Quinoa is watching: %s", filePath);
+                        watchedPaths.produce(new HotDeploymentWatchedFileBuildItem(filePath.toString()));
+                    } else {
+                        LOG.debugf("Quinoa is scanning directory: %s", filePath);
+                        scan(uiDir, filePath, watchedPaths);
+                    }
+                } else {
+                    LOG.debugf("'%s' is set to be ignored by dev-mode watch", relativePath);
                 }
             }
         }
@@ -344,27 +352,19 @@ public class QuinoaProcessor {
     }
 
     /**
-     * Check whether this path should be scanned for changes by comparing against known directories that should be ignored.
+     * Check whether this path should be scanned for changes by comparing against known files that should be ignored.
      * Ignored directories include any that start with DOT "." like ".next" or ".svelte", also "node_modules" and any
      * of the framework build directories.
      *
      * @param filePath the file path to check
      * @return true if it is a directory that should be scanned for changes, false if it should be ignored
      */
-    private static boolean shouldScanPath(Path filePath) {
-        if (!Files.isDirectory(filePath)) {
-            // not a directory so do not scan
-            return false;
-        }
-
+    private static boolean shouldWatch(String relativeFilePath) {
         final Set<String> ignoreSet = new HashSet<>();
         ignoreSet.addAll(IGNORE_WATCH);
+        ignoreSet.addAll(IGNORE_WATCH_LOCKFILES);
         ignoreSet.addAll(IGNORE_WATCH_BUILD_DIRS);
-        final String directory = filePath.getFileName().toString();
-        if (ignoreSet.contains(directory) || IGNORE_WATCH_REGEX.matcher(directory).matches()) {
-            return false;
-        }
-        return true;
+        return !ignoreSet.contains(relativeFilePath) && !IGNORE_WATCH_REGEX.matcher(relativeFilePath).matches();
     }
 
     private static ProjectDirs resolveProjectDirs(QuinoaConfig config,
