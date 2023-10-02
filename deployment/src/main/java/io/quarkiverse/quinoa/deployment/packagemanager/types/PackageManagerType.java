@@ -1,5 +1,9 @@
 package io.quarkiverse.quinoa.deployment.packagemanager.types;
 
+import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.isWindows;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,12 +15,16 @@ public enum PackageManagerType {
     PNPM("pnpm", "pnpm-lock.yaml", "install --frozen-lockfile"),
     NPM("npm", "package-lock.json", "ci"),
     YARN("yarn", "yarn.lock", "install --frozen-lockfile"),
+    YARN_BERRY("yarn", "yarn.lock", "install --immutable"),
     ;
+
+    public static final String YARN_BERRY_CONFIG_FILE = ".yarnrc.yml";
 
     private static final Map<String, PackageManagerType> TYPES = Arrays.stream(values()).sequential()
             .collect(Collectors.toMap(PackageManagerType::getBinary, Function.identity(), (x, y) -> x, LinkedHashMap::new));
 
     private final String binary;
+
     private final String lockFile;
 
     private final String ciCommand;
@@ -31,6 +39,10 @@ public enum PackageManagerType {
         return binary;
     }
 
+    public String getOSBinary() {
+        return isWindows() ? binary + ".cmd" : binary;
+    }
+
     public String getLockFile() {
         return lockFile;
     }
@@ -39,7 +51,30 @@ public enum PackageManagerType {
         return ciCommand;
     }
 
-    public static PackageManagerType resolveType(String binary) {
+    public static PackageManagerType resolveConfiguredPackageManagerType(String configuredBinary,
+            PackageManagerType detectedType) {
+        final PackageManagerType configuredBinaryType = resolveBinaryType(configuredBinary);
+        if (YARN_BERRY.equals(detectedType) && configuredBinaryType.equals(YARN)) {
+            return YARN_BERRY;
+        }
+        return configuredBinaryType;
+    }
+
+    public static PackageManagerType detectPackageManagerType(Path directory) {
+        if (Files.isRegularFile(directory.resolve(PackageManagerType.YARN.getLockFile()))) {
+            return isYarnBerry(directory) ? YARN_BERRY : YARN;
+        } else if (Files.isRegularFile(directory.resolve(PNPM.getLockFile()))) {
+            return PNPM;
+        } else {
+            return NPM;
+        }
+    }
+
+    public static boolean isYarnBerry(Path directory) {
+        return Files.isRegularFile(directory.resolve(YARN_BERRY_CONFIG_FILE));
+    }
+
+    public static PackageManagerType resolveBinaryType(String binary) {
         for (Map.Entry<String, PackageManagerType> e : TYPES.entrySet()) {
             if (binary.contains(e.getKey())) {
                 return e.getValue();

@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
-import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.PNPM;
+import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.detectPackageManagerType;
+import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.resolveConfiguredPackageManagerType;
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
@@ -14,7 +15,6 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -174,24 +174,17 @@ public class PackageManagerRunner {
         return new DevServer(p, ipAddress, logCompressor);
     }
 
-    public static PackageManagerRunner autoDetectPackageManager(Optional<String> binary,
+    public static PackageManagerRunner autoDetectPackageManager(Optional<String> configuredBinary,
             PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths) {
-        String resolvedBinary = null;
-        if (binary.isEmpty()) {
-            if (Files.isRegularFile(directory.resolve(PackageManagerType.YARN.getLockFile()))) {
-                resolvedBinary = PackageManagerType.YARN.getBinary();
-            } else if (Files.isRegularFile(directory.resolve(PNPM.getLockFile()))) {
-                resolvedBinary = PNPM.getBinary();
-            } else {
-                resolvedBinary = PackageManagerType.NPM.getBinary();
-            }
-            if (isWindows()) {
-                resolvedBinary = resolvedBinary + ".cmd";
-            }
+        String binary;
+        PackageManagerType type = detectPackageManagerType(directory);
+        if (configuredBinary.isEmpty()) {
+            binary = type.getOSBinary();
         } else {
-            resolvedBinary = binary.get();
+            binary = configuredBinary.get();
+            type = resolveConfiguredPackageManagerType(binary, type);
         }
-        return new PackageManagerRunner(directory, PackageManager.resolve(resolvedBinary, packageManagerCommands, paths));
+        return new PackageManagerRunner(directory, PackageManager.resolve(type, binary, packageManagerCommands, paths));
     }
 
     public static boolean isWindows() {

@@ -1,6 +1,5 @@
 package com.github.eirslett.maven.plugins.frontend.lib;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import io.vertx.core.Vertx;
@@ -10,14 +9,17 @@ public class PackageManagerInstallFactory {
     private static final Platform defaultPlatform = Platform.guess();
     private static final String DEFAULT_CACHE_PATH = "cache";
     private final Vertx vertx;
-    private final Path installDirectory;
+
+    private final Path uiDir;
+    private final Path installDir;
     private final CacheResolver cacheResolver;
     private final VertxFileDownloader fileDownloader;
 
-    public PackageManagerInstallFactory(Vertx vertx, Path installDirectory) {
+    public PackageManagerInstallFactory(Vertx vertx, Path uiDir, Path installDir) {
         this.vertx = vertx;
-        this.installDirectory = installDirectory;
-        this.cacheResolver = getDefaultCacheResolver(installDirectory);
+        this.uiDir = uiDir;
+        this.installDir = installDir;
+        this.cacheResolver = getDefaultCacheResolver(installDir);
         fileDownloader = new VertxFileDownloader(vertx);
     }
 
@@ -43,8 +45,7 @@ public class PackageManagerInstallFactory {
     }
 
     private InstallConfig getInstallConfig() {
-        final File installDirFile = this.installDirectory.toFile();
-        return new DefaultInstallConfig(installDirFile, installDirFile, this.cacheResolver, defaultPlatform);
+        return new DefaultInstallConfig(installDir.toFile(), uiDir.toFile(), this.cacheResolver, defaultPlatform);
     }
 
     private static final CacheResolver getDefaultCacheResolver(Path root) {
