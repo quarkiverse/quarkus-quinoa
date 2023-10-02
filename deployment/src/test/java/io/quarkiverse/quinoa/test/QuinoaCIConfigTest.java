@@ -17,14 +17,14 @@ public class QuinoaCIConfigTest {
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .initialLockfile(PackageManagerType.YARN.getLockFile())
+            .initialLockfile(PackageManagerType.NPM.getLockFile())
             .ci(null)
             .toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ci", "true")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager ci command: %s") &&
                             s.getParameters()[0].equals(
-                                    systemBinary(PackageManagerType.YARN.getBinary()) + " install --frozen-lockfile")));
+                                    systemBinary(PackageManagerType.NPM.getBinary()) + " ci")));
 
     @Test
     public void testQuinoa() {

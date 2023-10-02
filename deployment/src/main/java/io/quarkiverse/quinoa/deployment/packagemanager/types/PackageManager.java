@@ -1,7 +1,5 @@
 package io.quarkiverse.quinoa.deployment.packagemanager.types;
 
-import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.resolveType;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +21,10 @@ public interface PackageManager {
 
     Command dev();
 
-    public static PackageManager resolve(String binary, PackageManagerCommandConfig packageManagerCommands,
+    public static PackageManager resolve(PackageManagerType type, String binary,
+            PackageManagerCommandConfig packageManagerCommands,
             List<String> paths) {
-        return configure(resolveType(binary), binary, packageManagerCommands, paths);
+        return configure(type, binary, packageManagerCommands, paths);
     }
 
     private static PackageManager configure(PackageManagerType type, String binary, PackageManagerCommandConfig commandsConfig,

@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
+import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.isYarnBerry;
 import static io.vertx.core.spi.resolver.ResolverProvider.DISABLE_DNS_RESOLVER_PROP_NAME;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public final class PackageManagerInstall {
 
     }
 
-    public static Installation install(PackageManagerInstallConfig config, final Path projectDir) {
+    public static Installation install(PackageManagerInstallConfig config, final Path projectDir, final Path uiDir) {
         Path installDir = resolveInstallDir(config, projectDir).normalize();
         if (config.nodeVersion().isEmpty()) {
             throw new ConfigurationException("node-version is required to install package manager",
@@ -48,7 +49,7 @@ public final class PackageManagerInstall {
         Vertx vertx = null;
         try {
             vertx = createVertxInstance();
-            PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, installDir);
+            PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, uiDir, installDir);
             while (i < 5) {
                 try {
                     if (i > 0) {
@@ -56,7 +57,7 @@ public final class PackageManagerInstall {
                                 thrown.getCause().getMessage(), i + 1);
                         FileUtil.deleteDirectory(installDir);
                     }
-                    return attemptInstall(config, installDir, factory);
+                    return attemptInstall(config, uiDir, installDir, factory);
                 } catch (InstallationException e) {
                     thrown = e;
                     i++;
@@ -88,7 +89,7 @@ public final class PackageManagerInstall {
         return vertx;
     }
 
-    private static Installation attemptInstall(PackageManagerInstallConfig config, Path installDir,
+    private static Installation attemptInstall(PackageManagerInstallConfig config, Path uiDir, Path installDir,
             PackageManagerInstallFactory factory) throws InstallationException {
         try {
             factory.getNodeInstaller()
@@ -122,6 +123,7 @@ public final class PackageManagerInstall {
         if (yarnVersion.isPresent() && isNpmProvided) {
             executionPath = YARN_PATH;
             factory.getYarnInstaller()
+                    .setIsYarnBerry(isYarnBerry(uiDir))
                     .setYarnVersion("v" + config.yarnVersion().get())
                     .setYarnDownloadRoot(config.yarnDownloadRoot())
                     .setIsYarnBerry(true)

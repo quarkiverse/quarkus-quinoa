@@ -123,7 +123,8 @@ public class QuinoaProcessor {
             if (resolvedConfig.packageManagerInstall().enabled()) {
                 final PackageManagerInstall.Installation result = PackageManagerInstall.install(
                         resolvedConfig.packageManagerInstall(),
-                        configuredQuinoa.projectDir());
+                        configuredQuinoa.projectDir(),
+                        configuredQuinoa.uiDir());
                 packageManagerBinary = Optional.of(result.getPackageManagerBinary());
                 paths.add(result.getNodeDirPath());
             }
