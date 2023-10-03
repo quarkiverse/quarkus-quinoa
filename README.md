@@ -12,7 +12,7 @@
 [![Project Map](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/quarkiversequarkusquinoa/)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [NodeJS](https://nodejs.org/en) : [React](https://react.dev/learn), [Angular](https://angular.io/guide/what-is-angular), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), [Svelte](https://svelte.dev/docs/introduction), [Astro](https://docs.astro.build/en/getting-started/), [SolidJS](https://www.solidjs.com/guides/getting-started) …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
@@ -93,6 +93,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://shivams.bio.link/"><img src="https://avatars.githubusercontent.com/u/91419219?v=4?s=100" width="100px;" alt="Shivam Sharma"/><br /><sub><b>Shivam Sharma</b></sub></a><br /><a href="#infra-shivam-sharma7" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=shivam-sharma7" title="Documentation">📖</a> <a href="#data-shivam-sharma7" title="Data">🔣</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://thejavaguy.org/"><img src="https://avatars.githubusercontent.com/u/11942401?v=4?s=100" width="100px;" alt="Ivan Milosavljević"/><br /><sub><b>Ivan Milosavljević</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=TheJavaGuy" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://sourcespy.com"><img src="https://avatars.githubusercontent.com/u/6850153?v=4?s=100" width="100px;" alt="Alex Karezin"/><br /><sub><b>Alex Karezin</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=alexkarezin" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://twitter.com/TommiSap"><img src="https://avatars.githubusercontent.com/u/6555967?v=4?s=100" width="100px;" alt="Thomas Sapelza"/><br /><sub><b>Thomas Sapelza</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3AThoSap" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
