@@ -38,7 +38,7 @@ public class QuinoaUIVueTest {
         Assertions.assertEquals("hello-quinoa", title);
 
         // Make sure the component loaded and hits the backend
-        String greeting = page.innerText(".hello h1");
-        Assertions.assertEquals("Welcome to Your Vue Quinoa App", greeting);
+        String greeting = page.textContent(".greetings h3").trim();
+        Assertions.assertEquals("You’ve successfully created a project with Quarkus + Quinoa + Vite + Vue 3.", greeting);
     }
 }

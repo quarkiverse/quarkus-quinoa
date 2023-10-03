@@ -7,7 +7,7 @@ public class TestProfiles {
     public static class YarnTests extends QuinoaTestProfiles.EnableAndRunTests {
         @Override
         public String getConfigProfile() {
-            return "yarn";
+            return "react,yarn";
         }
     }
 
@@ -21,7 +21,7 @@ public class TestProfiles {
     public static class ReactJustBuildTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {
-            return "react-just-build";
+            return "react,just-build";
         }
     }
 
@@ -42,7 +42,7 @@ public class TestProfiles {
     public static class RootPathTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {
-            return "root-path";
+            return "root-path,lit";
         }
     }
 
