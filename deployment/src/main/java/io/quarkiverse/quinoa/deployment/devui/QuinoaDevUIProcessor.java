@@ -26,6 +26,10 @@ public class QuinoaDevUIProcessor {
     void createCard(BuildProducer<CardPageBuildItem> cardPageBuildItemBuildProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
             Optional<ConfiguredQuinoaBuildItem> configuredQuinoa) {
+        if (configuredQuinoa.isEmpty()) {
+            return;
+        }
+
         QuinoaConfig quinoaConfig = configuredQuinoa.get().resolvedConfig();
         final CardPageBuildItem card = new CardPageBuildItem();
 
