@@ -116,6 +116,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "ThoSap",
+      "name": "Thomas Sapelza",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6555967?v=4",
+      "profile": "https://twitter.com/TommiSap",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
