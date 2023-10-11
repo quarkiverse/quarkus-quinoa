@@ -209,7 +209,7 @@ This will configure the build to export the static files:
 [#svelte-kit-config]
 === Svelte Kit Configuration
 
-It will work in production mode though with the following chnages:
+It will work in production mode though with the following changes:
 
 Install Svelte Static adapter:
 
