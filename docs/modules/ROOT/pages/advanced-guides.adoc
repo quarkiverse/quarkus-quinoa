@@ -39,10 +39,12 @@ Quinoa can be configured to install NodeJS and NPM in the project directory:
 ----
 quarkus.quinoa.package-manager-install=true <1>
 quarkus.quinoa.package-manager-install.node-version=18.18.0 <2>
+quarkus.quinoa.package-manager-install.npm-version=10.1.0 <3>
 ----
 
 <1> Enable package manager install
 <2> Define the version of NodeJS to install
+<3> Define the version of NPM to install
 
 NOTE: By default, NodeJS and NPM will be installed in `pass:[{project-dir}]/.quinoa/` (can be link:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.package-manager-install.install-dir[configured]). If not specified, it will use the NPM version provided by NodeJS.
 
