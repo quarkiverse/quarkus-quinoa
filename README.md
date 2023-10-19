@@ -27,7 +27,7 @@ Read the full [Quinoa documentation](https://docs.quarkiverse.io/quarkus-quinoa/
 
 - Create or use an existing Quarkus application
 - Add the Quinoa extension
-- Install [NodeJS](https://nodejs.org/) or make sure Quinoa is [configured](https://docs.quarkiverse.io/quarkus-quinoa/dev/index.html#package-manager) to install it.
+- Install [NodeJS](https://nodejs.org/) or make sure Quinoa is [configured](https://docs.quarkiverse.io/quarkus-quinoa/dev/advanced-guides.html#package-manager) to install it.
 
 ### Installation
 
