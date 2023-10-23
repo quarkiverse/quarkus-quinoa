@@ -14,6 +14,7 @@ Live code the backend and frontend together with close to no configuration. When
 
 ----
 quarkus.quinoa.package-manager-install=true
+quarkus.quinoa.package-manager-install.node-version=18.18.0
 ----
 
 
