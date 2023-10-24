@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/quarkus.svg" width="67" height="70" ><img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/plus-sign.svg" height="70" ><img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/node_logo.svg" height="70" >
  
-# Quarkus Quinoa extension
+# Quarkus Quinoa
 </div>
 <br>
 
