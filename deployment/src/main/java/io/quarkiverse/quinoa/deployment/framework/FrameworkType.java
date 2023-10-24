@@ -29,6 +29,7 @@ import org.jboss.logging.Logger;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.framework.override.AngularFramework;
 import io.quarkiverse.quinoa.deployment.framework.override.NextFramework;
+import io.quarkiverse.quinoa.deployment.framework.override.NuxtFramework;
 import io.quarkiverse.quinoa.deployment.framework.override.ReactFramework;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 
@@ -43,7 +44,7 @@ public enum FrameworkType {
     SOLID_START(Set.of("solid-start dev"), generic("dist", "dev", 3000)),
     ASTRO(Set.of("astro dev"), generic("dist", "dev", 3000)),
     NEXT(Set.of("next dev"), new NextFramework()),
-    NUXT(Set.of("nuxt dev"), generic("dist", "dev", 3000)),
+    NUXT(Set.of("nuxt dev"), new NuxtFramework()),
     ANGULAR(Set.of("ng serve"), new AngularFramework()),
     EMBER(Set.of("ember-cli serve"), generic("dist", "serve", 4200)),
     GATSBY(Set.of("gatsby develop"), generic("dist", "develop", 8000)),
