@@ -40,7 +40,7 @@
     <quarkus.version>3.2.6.Final</quarkus.version>
     <quarkus-playright.version>0.0.1</quarkus-playright.version>
     <assertj.version>3.24.2</assertj.version>
-    <frontend-plugin.version>1.14.0</frontend-plugin.version>
+    <frontend-plugin.version>1.14.1</frontend-plugin.version>
   </properties>
 
   <developers>
