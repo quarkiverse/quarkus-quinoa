@@ -19,7 +19,7 @@ public class QuinoaPackageManagerInstallCommandOverrideTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager-install", "true")
-            .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "18.17.0")
+            .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "20.9.0")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.install-dir", INSTALL_DIR)
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build", "run build-something")
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "yeahhh")
