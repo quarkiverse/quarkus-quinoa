@@ -147,8 +147,8 @@ WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration 
 ----
 @ApplicationScoped
 public class SPARouting {
-    private static final String[] PATH_PREFIXES = { "/api/", "/q/" };
-    private static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(".*[.][a-zA-Z\\d]+").asMatchPredicate();
+    private static final String[] PATH_PREFIXES = {"/q/", "/api/", "/@"};
+    private static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(".+\\.[a-zA-Z0-9]+$").asMatchPredicate();
 
     public void init(@Observes Router router) {
         router.get("/*").handler(rc -> {
