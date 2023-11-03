@@ -137,6 +137,11 @@ public interface QuinoaConfig {
             readExternalConfigPath(allConfig, "quarkus.resteasy.path").ifPresent(defaultIgnore::add);
             readExternalConfigPath(allConfig, "quarkus.resteasy-reactive.path").ifPresent(defaultIgnore::add);
             readExternalConfigPath(allConfig, "quarkus.http.non-application-root-path").ifPresent(defaultIgnore::add);
+
+            // Vite in dev mode requests /@vite/client and /@reactrefresh
+            if (isDevServerMode(config)) {
+                defaultIgnore.add("/@");
+            }
             return defaultIgnore;
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
     }
