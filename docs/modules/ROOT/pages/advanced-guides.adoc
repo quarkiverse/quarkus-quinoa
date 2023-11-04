@@ -147,6 +147,7 @@ WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration 
 ----
 @ApplicationScoped
 public class SPARouting {
+    // Vite in dev mode requests /@vite/client and /@reactrefresh so add "/@" if you use Vite
     private static final String[] PATH_PREFIXES = {"/q/", "/api/", "/@"};
     private static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(".+\\.[a-zA-Z0-9]+$").asMatchPredicate();
 
