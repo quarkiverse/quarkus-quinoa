@@ -134,6 +134,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "treo",
+      "name": "Paul Dubs",
+      "avatar_url": "https://avatars.githubusercontent.com/u/509379?v=4",
+      "profile": "https://www.dubs.tech",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
