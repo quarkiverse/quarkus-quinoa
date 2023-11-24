@@ -8,7 +8,7 @@ include::./includes/attributes.adoc[]
 
 image::quinoa-build.png[Quinoa Build]
 
-NOTE: packages are installed by Quinoa before the build when needed (i.e `npm install`). See link:#install-packages[Packages installation]. Quinoa is pre-configured to work with your favorite link:#package-manager[package manager] (npm, yarn or pnpm).
+NOTE: packages are installed by Quinoa before the build when needed (i.e `npm install`). See xref:advanced-guides.adoc#install-packages[Packages installation]. Quinoa is pre-configured to work with your favorite xref:advanced-guides.adoc#package-manager[package manager] (npm, yarn or pnpm).
 
 === Runtime for production mode
 
@@ -20,7 +20,7 @@ image::quinoa-runtime-prod.png[Quinoa Runtime Production]
 
 Quinoa (using Quarkus live-coding watch feature) will watch the Web UI directory and trigger a new build on changes. It works the same as the production mode. This option is perfect for small/fast builds.
 
-NOTE: You can differentiate the build for link:#build-mode[dev mode]. e.g to disable minification.
+NOTE: You can differentiate the build for xref:advanced-guides.adoc#build-mode[dev mode]. e.g to disable minification.
 
 [#how-dev-server]
 === Runtime for proxied live-coding
@@ -31,4 +31,4 @@ image::quinoa-proxy-dev.png[Quinoa Proxy Dev]
 
 NOTE: Quarkus live-coding will keep watching for the backend changes as usual.
 
-See link:#dev-server[Enable the proxied live coding].
+See xref:advanced-guides.adoc#dev-server[Enable the proxied live coding].
