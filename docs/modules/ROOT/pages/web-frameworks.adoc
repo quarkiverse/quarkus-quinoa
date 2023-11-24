@@ -88,7 +88,7 @@ a|
 a|
 [source,bash]
 ----
-npm create svelte@latest myapp
+npm create svelte@latest webui
 ----
 a|
 - https://kit.svelte.dev/[Svelte Kit]
@@ -208,8 +208,15 @@ This will configure the build to export the static files:
 
 [#svelte-kit-config]
 === Svelte Kit Configuration
+SvelteKit needs to be configured to create a single page application.
+You will not be able to use any of its server-side only functionality.
+See also https://kit.svelte.dev/docs/single-page-apps[SvelteKit documentation on Single-page apps].
 
-It will work in production mode though with the following changes:
+Disable server side rendering at the root layout (`src/routes/+layout.js`):
+[source,javascript]
+----
+export const ssr = false;
+----
 
 Install Svelte Static adapter:
 
@@ -218,9 +225,9 @@ Install Svelte Static adapter:
 npm i -D @sveltejs/adapter-static
 ----
 
-Configure `svelte.config` file with the following changes:
+Configure `svelte.config.js` file with the following changes:
 
-[source,json]
+[source,javascript]
 ----
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
@@ -241,6 +248,9 @@ export default config;
 In `application.properties` add:
 [source,properties]
 ----
-quarkus.quinoa.dev-server=false
 quarkus.quinoa.build-dir=build
+quarkus.quinoa.enable-spa-routing=true
+%dev.quarkus.quinoa.dev-server.index-page=/
 ----
+
+WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. See xref:advanced-guides.adoc#spa-routing[SPA routing] for a workaround.
