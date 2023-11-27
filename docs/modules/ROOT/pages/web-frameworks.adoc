@@ -79,7 +79,7 @@ npm create vite@latest
 ----
 a|
 - https://vitejs.dev/guide/[Vite]
-|
+| <<vite-config>>
 
 a|
 [#svelte-kit]
@@ -205,6 +205,24 @@ This will configure the build to export the static files:
     "build": "next build && next export",
   }
 ----
+
+[#vite-config]
+=== Vite Configuration
+
+You must update `vite.config.ts` to let Vite know this is a Multiple Page Application so any unknown URL gets a `404` instead of routing to `index.html`.
+.vite.config.ts:
+[source,json]
+----
+import { defineConfig } from "vite";
+import eslint from "vite-plugin-eslint";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+    plugins: [eslint()],
+    appType: "mpa",
+});
+----
+
 
 [#svelte-kit-config]
 === Svelte Kit Configuration
