@@ -1,8 +1,4 @@
 name: Quinoa
-description: |
-  Quinoa is a Quarkus extension which eases the development, the build and serving single page apps or web components (built with NodeJS: React, Angular, Vue, Lit, Svelte, Astro, SolidJS, Emberjs, Aurelia, Polymer …) alongside other Quarkus services (REST, GraphQL, Security, Events, ...).
-
-  Live code the backend and frontend together with close to no configuration. When enabled in development mode, Quinoa will start the UI live coding server provided by the target framework and forward relevant requests to it. In production mode, Quinoa will run the build and process the generated files to serve them at runtime.
 metadata:
   keywords:
     - quinoa
@@ -26,6 +22,8 @@ metadata:
   icon-url: "https://raw.githubusercontent.com/quarkiverse/quarkus-quinoa/main/docs/modules/ROOT/assets/images/node_logo.svg"
   categories:
     - "web"
+  config:
+    - "quarkus.quinoa."
   status: "stable"
   codestart:
     name: "quinoa"
