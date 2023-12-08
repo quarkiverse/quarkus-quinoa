@@ -20,14 +20,21 @@ public class NextFramework extends GenericFramework {
     }
 
     @Override
-    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson, Optional<String> detectedDevScript,
+    public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
+            Optional<String> detectedDevScript,
             boolean isCustomized) {
         if (delegate.packageManagerCommand().build().equals("run build") && packageJson.isPresent()) {
             JsonObject scripts = packageJson.get().getJsonObject("scripts");
             if (scripts != null) {
-                if (!scripts.getString("build").contains("next export")) {
+                String buildScript = scripts.getString("build");
+                if (buildScript == null || buildScript.isEmpty()) {
                     LOG.warn(
-                            "Make sure you define  \"build\": \"next build && next export\", in the package.json to make Next work with Quinoa.");
+                            "Make sure you define  \"build\": \"next build \", in the package.json to make Next work with Quinoa.");
+                }
+                String output = packageJson.get().getString("output");
+                if (!"export".equals(output)) {
+                    LOG.warn(
+                            "Make sure you define  \"output\": \"export \", in the package.json to make Next work with Quinoa.");
                 }
             }
         }
@@ -38,7 +45,8 @@ public class NextFramework extends GenericFramework {
                 return new DevServerConfigDelegate(super.devServer()) {
                     @Override
                     public Optional<String> indexPage() {
-                        // In Dev mode Next.js serves everything out of root "/" but in PRD mode its the normal "/index.html".
+                        // In Dev mode Next.js serves everything out of root "/" but in PRD mode its the
+                        // normal "/index.html".
                         return Optional.of(super.indexPage().orElse("/"));
                     }
                 };
