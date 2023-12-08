@@ -202,8 +202,15 @@ This will configure the build to export the static files:
 ----
   "scripts": {
     ...
-    "build": "next build && next export",
+    "build": "next build",
   }
+----
+
+In Next.js 14+ you need to add the following property in `next.config.js` file:
+----
+const nextConfig = {
+  output: 'export',  
+}
 ----
 
 [#svelte-kit-config]
