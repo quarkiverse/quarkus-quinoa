@@ -22,7 +22,7 @@ public class QuinoaPackageManagerInstallTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager-install", "true")
-            .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "20.9.0")
+            .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "20.10.0")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.install-dir", INSTALL_DIR)
             .assertLogRecords(l -> {
                 assertThat(l)
@@ -30,7 +30,7 @@ public class QuinoaPackageManagerInstallTest {
                                 ((String) s.getParameters()[0])
                                         .endsWith(computeBinary(INSTALL_DIR) + " run build"));
                 assertThat(l)
-                        .anyMatch(s -> s.getMessage().equals("v20.9.0"));
+                        .anyMatch(s -> s.getMessage().equals("v20.10.0"));
             });
 
     @Test
