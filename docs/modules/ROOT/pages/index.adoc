@@ -13,8 +13,8 @@ Live code the backend and frontend together with close to no configuration. When
 * Install NodeJS (https://nodejs.org/) or make sure Quinoa is https://docs.quarkiverse.io/quarkus-quinoa/dev/config-reference.html#quarkus-quinoa_quarkus.quinoa.package-manager-install[configured] to install it, see the following example.
 
 ----
-quarkus.quinoa.package-manager-install.node-version=18.18.0
-quarkus.quinoa.package-manager-install.npm-version=10.2.1
+quarkus.quinoa.package-manager-install.node-version=20.10.0
+quarkus.quinoa.package-manager-install.npm-version=10.2.3
 ----
 
 
