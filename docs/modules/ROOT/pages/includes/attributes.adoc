@@ -1,5 +1,5 @@
-:quarkus-version: 3.2.6.Final
-:quarkus-quinoa-version: 2.2.1
+:quarkus-version: 3.5.0
+:quarkus-quinoa-version: 2.3.0
 :maven-version: 3.8.1+
 :extension-status: stable
 
