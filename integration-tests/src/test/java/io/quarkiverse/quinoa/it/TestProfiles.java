@@ -42,7 +42,7 @@ public class TestProfiles {
     public static class RootPathTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {
-            return "root-path,lit";
+            return "lit-root-path";
         }
     }
 

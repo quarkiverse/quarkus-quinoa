@@ -2,6 +2,7 @@ package io.quarkiverse.quinoa.it;
 
 import java.net.URL;
 
+import com.microsoft.playwright.ElementHandle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,11 @@ public class QuinoaRootPathTest {
 
         String title = page.title();
         Assertions.assertEquals("Quinoa Lit App", title);
+
+        // Make sure the component loaded and hits the backend
+        final ElementHandle quinoaEl = page.waitForSelector(".greeting");
+        String greeting = quinoaEl.innerText();
+        Assertions.assertEquals("Hello Quinoa and World and bar", greeting);
     }
 
     @Test

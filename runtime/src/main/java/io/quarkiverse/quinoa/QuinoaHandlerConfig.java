@@ -30,11 +30,13 @@ public class QuinoaHandlerConfig {
         if (o == null || getClass() != o.getClass())
             return false;
         QuinoaHandlerConfig that = (QuinoaHandlerConfig) o;
-        return Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(indexPage, that.indexPage);
+        return prodMode == that.prodMode && enableCompression == that.enableCompression
+                && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(indexPage, that.indexPage)
+                && Objects.equals(compressMediaTypes, that.compressMediaTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ignoredPathPrefixes, indexPage);
+        return Objects.hash(ignoredPathPrefixes, indexPage, prodMode, enableCompression, compressMediaTypes);
     }
 }
