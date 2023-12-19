@@ -23,8 +23,6 @@ You will be able to do live coding of the backend and frontend together nearly o
 
 There are multiple versions available please check which one for your Quarkus release version.
 
-For example:
-
 | Version | Explanation |
 | --- | --- |
 | ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | Quarkus 2 (legacy) |
