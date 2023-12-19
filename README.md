@@ -21,10 +21,7 @@ You will be able to do live coding of the backend and frontend together nearly o
 
 ## Versioning
 
-The versioning of this extension will follow the pattern `[quarkus.version].[primefaces.version].[patch]`. 
-The `patch` is not the PrimeFaces version patch it is the patch version of this extension as we may make Quarkus
-fixes in between PF releases.  However we strive to stay on top of PrimeFaces minor releases such as 13.0.2 and 
-publish a new version here right after a PrimeFaces release.
+There are multiple versions available please check which one for your Quarkus release version.
 
 For example:
 
