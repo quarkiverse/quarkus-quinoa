@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
@@ -39,6 +40,11 @@ public class QuinoaRootPathTest {
 
         String title = page.title();
         Assertions.assertEquals("Quinoa Lit App", title);
+
+        // Make sure the component loaded and hits the backend
+        final ElementHandle quinoaEl = page.waitForSelector(".greeting");
+        String greeting = quinoaEl.innerText();
+        Assertions.assertEquals("Hello Quinoa and World and bar", greeting);
     }
 
     @Test

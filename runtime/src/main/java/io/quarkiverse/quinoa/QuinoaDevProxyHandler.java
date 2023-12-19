@@ -85,11 +85,6 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         final MultiMap headers = request.headers();
         final String uri = computeResourceURI(resourcePath, request);
 
-        // Workaround for issue https://github.com/quarkiverse/quarkus-quinoa/issues/91
-        // See
-        // https://www.npmjs.com/package/connect-history-api-fallback#htmlacceptheaders
-        // When no Accept header is provided, the historyApiFallback is disabled
-        headers.remove("Accept");
         // Disable compression in the forwarded request
         headers.remove("Accept-Encoding");
         client.request(request.method(), port, host, uri)
@@ -99,7 +94,12 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         final int statusCode = event.result().statusCode();
                         switch (statusCode) {
                             case 200:
-                                forwardResponse(event, request, ctx, resourcePath);
+                                if (config.devServerDirectForwarding || shouldForward(ctx, event.result())) {
+                                    forwardResponse(event, request, ctx, resourcePath);
+                                } else {
+                                    next(currentClassLoader, ctx);
+                                }
+
                                 break;
                             case 404:
                                 next(currentClassLoader, ctx);
@@ -111,6 +111,18 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         error(event, ctx);
                     }
                 });
+    }
+
+    private boolean shouldForward(RoutingContext ctx, HttpResponse<Buffer> result) {
+        final List<String> contentType = result.headers().getAll(HttpHeaders.CONTENT_TYPE);
+        if (contentType != null && contentType.stream().anyMatch(s -> s.contains("text/html"))) {
+            final String path = QuinoaRecorder.resolvePath(ctx);
+            // We forward if the server returns a html, and it was intended:
+            // - if the path ends with .html
+            // - if the path is empty (root)
+            return path.endsWith(".html") || path.equals("/") || path.isEmpty();
+        }
+        return true;
     }
 
     private String computeResourceURI(String path, HttpServerRequest request) {

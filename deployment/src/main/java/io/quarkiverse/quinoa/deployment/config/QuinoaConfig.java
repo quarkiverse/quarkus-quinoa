@@ -147,7 +147,7 @@ public interface QuinoaConfig {
         final String indexPage = !isDevServerMode(config) ? config.indexPage()
                 : config.devServer().indexPage().orElse(config.indexPage());
         return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(config), indexPage, prodMode,
-                httpBuildTimeConfig.enableCompression, compressMediaTypes);
+                httpBuildTimeConfig.enableCompression, compressMediaTypes, config.devServer().directForwarding());
     }
 
     private static Optional<String> readExternalConfigPath(Config config, String key) {
