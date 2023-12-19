@@ -143,6 +143,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "devpikachu",
+      "name": "Andrei Hava",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30475873?v=4",
+      "profile": "https://github.com/devpikachu",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
