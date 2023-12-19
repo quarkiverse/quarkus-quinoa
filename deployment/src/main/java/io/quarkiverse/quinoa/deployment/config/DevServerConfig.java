@@ -74,6 +74,19 @@ public interface DevServerConfig {
     @ConfigDocDefault("auto-detected falling back to the quinoa.index-page")
     Optional<String> indexPage();
 
+    /**
+     * Quinoa deals with SPA routing by itself (see quarkus.quinoa.enable-spa-routing), some dev-server have this feature
+     * enabled by default.
+     * This is a problem for proxying as it prevents other Quarkus resources (REST, ...) to answer.
+     * By default, Quinoa will try to detect when the dev server is answering with a html page for non-existing resources
+     * (SPA-Routing)
+     * in which case it will instead allow other Quarkus resources (REST, ...) to answer.
+     * Set this to true (direct) when the other Quarkus resources use a specific path prefix (and marked as ignored by Quinoa)
+     * or if the dev-server is configured without SPA routing.
+     */
+    @WithDefault("false")
+    boolean directForwarding();
+
     static boolean isEqual(DevServerConfig d1, DevServerConfig d2) {
         if (!Objects.equals(d1.enabled(), d2.enabled())) {
             return false;
@@ -100,6 +113,9 @@ public interface DevServerConfig {
             return false;
         }
         if (!Objects.equals(d1.indexPage(), d2.indexPage())) {
+            return false;
+        }
+        if (!Objects.equals(d1.directForwarding(), d2.directForwarding())) {
             return false;
         }
         return true;

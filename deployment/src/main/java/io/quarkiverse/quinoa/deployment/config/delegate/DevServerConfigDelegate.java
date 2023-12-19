@@ -55,4 +55,9 @@ public class DevServerConfigDelegate implements DevServerConfig {
     public Optional<String> indexPage() {
         return delegate.indexPage();
     }
+
+    @Override
+    public boolean directForwarding() {
+        return delegate.directForwarding();
+    }
 }

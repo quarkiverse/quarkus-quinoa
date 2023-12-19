@@ -94,7 +94,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
                         final int statusCode = event.result().statusCode();
                         switch (statusCode) {
                             case 200:
-                                if (shouldForward(ctx, event.result())) {
+                                if (config.devServerDirectForwarding || shouldForward(ctx, event.result())) {
                                     forwardResponse(event, request, ctx, resourcePath);
                                 } else {
                                     next(currentClassLoader, ctx);

@@ -13,14 +13,17 @@ public class QuinoaHandlerConfig {
     public final boolean enableCompression;
     public final Set<String> compressMediaTypes;
 
+    public final boolean devServerDirectForwarding;
+
     @RecordableConstructor
     public QuinoaHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean prodMode, boolean enableCompression,
-            Set<String> compressMediaTypes) {
+            Set<String> compressMediaTypes, boolean devServerDirectForwarding) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
         this.indexPage = "/".equals(indexPage) ? "" : indexPage;
         this.prodMode = prodMode;
         this.enableCompression = enableCompression;
         this.compressMediaTypes = compressMediaTypes;
+        this.devServerDirectForwarding = devServerDirectForwarding;
     }
 
     @Override
@@ -31,12 +34,14 @@ public class QuinoaHandlerConfig {
             return false;
         QuinoaHandlerConfig that = (QuinoaHandlerConfig) o;
         return prodMode == that.prodMode && enableCompression == that.enableCompression
+                && devServerDirectForwarding == that.devServerDirectForwarding
                 && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(indexPage, that.indexPage)
                 && Objects.equals(compressMediaTypes, that.compressMediaTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ignoredPathPrefixes, indexPage, prodMode, enableCompression, compressMediaTypes);
+        return Objects.hash(ignoredPathPrefixes, indexPage, prodMode, enableCompression, compressMediaTypes,
+                devServerDirectForwarding);
     }
 }

@@ -622,6 +622,23 @@ endif::add-copy-button-to-env-var[]
 |`auto-detected falling back to the quinoa.index-page`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.dev-server.direct-forwarding]]`link:#quarkus-quinoa_quarkus.quinoa.dev-server.direct-forwarding[quarkus.quinoa.dev-server.direct-forwarding]`
+
+
+[.description]
+--
+Quinoa deals with SPA routing by itself (see quarkus.quinoa.enable-spa-routing), some dev-server have this feature enabled by default. This is a problem for proxying as it prevents other Quarkus resources (REST, ...) to answer. By default, Quinoa will try to detect when the dev server is answering with a html page for non-existing resources (SPA-Routing) in which case it will instead allow other Quarkus resources (REST, ...) to answer. Set this to true (direct) when the other Quarkus resources use a specific path prefix (and marked as ignored by Quinoa) or if the dev-server is configured without SPA routing.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_DIRECT_FORWARDING+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_DIRECT_FORWARDING+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`false`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install-env-install-env[quarkus.quinoa.package-manager-command.install-env]`
 
 

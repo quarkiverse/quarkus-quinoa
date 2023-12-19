@@ -2,11 +2,11 @@ package io.quarkiverse.quinoa.it;
 
 import java.net.URL;
 
-import com.microsoft.playwright.ElementHandle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Response;
 
