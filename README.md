@@ -19,6 +19,21 @@ Quinoa is a Quarkus extension which eases the development, the build and serving
 
 You will be able to do live coding of the backend and frontend together nearly out of the box. In Quarkus dev mode, Quinoa will start the node live coding server provided by the target framework and forward relevant requests to it.
 
+## Versioning
+
+The versioning of this extension will follow the pattern `[quarkus.version].[primefaces.version].[patch]`. 
+The `patch` is not the PrimeFaces version patch it is the patch version of this extension as we may make Quarkus
+fixes in between PF releases.  However we strive to stay on top of PrimeFaces minor releases such as 13.0.2 and 
+publish a new version here right after a PrimeFaces release.
+
+For example:
+
+| Version | Explanation |
+| --- | --- |
+| ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | Quarkus 2 (legacy) |
+| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | Quarkus 3 Long Term Support |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | Quarkus 3 Latest |
+
 ## Getting started
 
 Read the full [Quinoa documentation](https://docs.quarkiverse.io/quarkus-quinoa/dev/index.html).
