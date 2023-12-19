@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.config;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigDocDefault;
@@ -72,4 +73,35 @@ public interface DevServerConfig {
      */
     @ConfigDocDefault("auto-detected falling back to the quinoa.index-page")
     Optional<String> indexPage();
+
+    static boolean isEqual(DevServerConfig d1, DevServerConfig d2) {
+        if (!Objects.equals(d1.enabled(), d2.enabled())) {
+            return false;
+        }
+        if (!Objects.equals(d1.managed(), d2.managed())) {
+            return false;
+        }
+        if (!Objects.equals(d1.port(), d2.port())) {
+            return false;
+        }
+        if (!Objects.equals(d1.host(), d2.host())) {
+            return false;
+        }
+        if (!Objects.equals(d1.checkPath(), d2.checkPath())) {
+            return false;
+        }
+        if (!Objects.equals(d1.websocket(), d2.websocket())) {
+            return false;
+        }
+        if (!Objects.equals(d1.checkTimeout(), d2.checkTimeout())) {
+            return false;
+        }
+        if (!Objects.equals(d1.logs(), d2.logs())) {
+            return false;
+        }
+        if (!Objects.equals(d1.indexPage(), d2.indexPage())) {
+            return false;
+        }
+        return true;
+    }
 }

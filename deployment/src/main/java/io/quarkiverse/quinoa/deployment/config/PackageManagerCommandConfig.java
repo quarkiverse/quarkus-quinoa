@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment.config;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigDocDefault;
@@ -74,4 +75,31 @@ public interface PackageManagerCommandConfig {
      */
     Map<String, String> devEnv();
 
+    static boolean isEqual(PackageManagerCommandConfig p1, PackageManagerCommandConfig p2) {
+        if (!Objects.equals(p1.install(), p2.install())) {
+            return false;
+        }
+        if (!Objects.equals(p1.installEnv(), p2.installEnv())) {
+            return false;
+        }
+        if (!Objects.equals(p1.ci(), p2.ci())) {
+            return false;
+        }
+        if (!Objects.equals(p1.ciEnv(), p2.ciEnv())) {
+            return false;
+        }
+        if (!Objects.equals(p1.buildEnv(), p2.buildEnv())) {
+            return false;
+        }
+        if (!Objects.equals(p1.testEnv(), p2.testEnv())) {
+            return false;
+        }
+        if (!Objects.equals(p1.dev(), p2.dev())) {
+            return false;
+        }
+        if (!Objects.equals(p1.devEnv(), p2.devEnv())) {
+            return false;
+        }
+        return true;
+    }
 }

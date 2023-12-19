@@ -164,4 +164,53 @@ public interface QuinoaConfig {
         return config.enabled().orElse(true);
     }
 
+    static boolean isEqual(QuinoaConfig q1, QuinoaConfig q2) {
+        if (!Objects.equals(q1.enabled(), q2.enabled())) {
+            return false;
+        }
+        if (!Objects.equals(q1.justBuild(), q2.justBuild())) {
+            return false;
+        }
+        if (!Objects.equals(q1.uiDir(), q2.uiDir())) {
+            return false;
+        }
+        if (!Objects.equals(q1.buildDir(), q2.buildDir())) {
+            return false;
+        }
+        if (!Objects.equals(q1.packageManager(), q2.packageManager())) {
+            return false;
+        }
+        if (!PackageManagerInstallConfig.isEqual(q1.packageManagerInstall(), q2.packageManagerInstall())) {
+            return false;
+        }
+        if (!PackageManagerCommandConfig.isEqual(q1.packageManagerCommand(), q2.packageManagerCommand())) {
+            return false;
+        }
+        if (!Objects.equals(q1.indexPage(), q2.indexPage())) {
+            return false;
+        }
+        if (!Objects.equals(q1.runTests(), q2.runTests())) {
+            return false;
+        }
+        if (!Objects.equals(q1.ci(), q2.ci())) {
+            return false;
+        }
+        if (!Objects.equals(q1.forceInstall(), q2.forceInstall())) {
+            return false;
+        }
+        if (!FrameworkConfig.isEqual(q1.framework(), q2.framework())) {
+            return false;
+        }
+        if (!Objects.equals(q1.enableSPARouting(), q2.enableSPARouting())) {
+            return false;
+        }
+        if (!Objects.equals(q1.ignoredPathPrefixes(), q2.ignoredPathPrefixes())) {
+            return false;
+        }
+        if (!DevServerConfig.isEqual(q1.devServer(), q2.devServer())) {
+            return false;
+        }
+        return true;
+    }
+
 }
