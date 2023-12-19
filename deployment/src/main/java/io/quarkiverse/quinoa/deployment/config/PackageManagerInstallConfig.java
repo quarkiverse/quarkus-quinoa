@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.config;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigDocDefault;
@@ -80,4 +81,37 @@ public interface PackageManagerInstallConfig {
     @WithDefault("https://registry.npmjs.org/pnpm/-/")
     String pnpmDownloadRoot();
 
+    static boolean isEqual(PackageManagerInstallConfig p1, PackageManagerInstallConfig p2) {
+        if (!Objects.equals(p1.enabled(), p2.enabled())) {
+            return false;
+        }
+        if (!Objects.equals(p1.installDir(), p2.installDir())) {
+            return false;
+        }
+        if (!Objects.equals(p1.enabled(), p2.enabled())) {
+            return false;
+        }
+        if (!Objects.equals(p1.nodeVersion(), p2.nodeVersion())) {
+            return false;
+        }
+        if (!Objects.equals(p1.npmVersion(), p2.npmVersion())) {
+            return false;
+        }
+        if (!Objects.equals(p1.npmDownloadRoot(), p2.npmDownloadRoot())) {
+            return false;
+        }
+        if (!Objects.equals(p1.nodeDownloadRoot(), p2.nodeDownloadRoot())) {
+            return false;
+        }
+        if (!Objects.equals(p1.yarnVersion(), p2.yarnVersion())) {
+            return false;
+        }
+        if (!Objects.equals(p1.pnpmVersion(), p2.pnpmVersion())) {
+            return false;
+        }
+        if (!Objects.equals(p1.pnpmDownloadRoot(), p2.pnpmDownloadRoot())) {
+            return false;
+        }
+        return true;
+    }
 }
