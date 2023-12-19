@@ -33,11 +33,11 @@
   </issueManagement>
 
   <properties>
-    <compiler-plugin.version>3.11.0</compiler-plugin.version>
+    <compiler-plugin.version>3.12.0</compiler-plugin.version>
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>3.5.0</quarkus.version>
+    <quarkus.version>3.2.9.Final</quarkus.version>
     <quarkus-playright.version>0.0.1</quarkus-playright.version>
     <assertj.version>3.24.2</assertj.version>
     <frontend-plugin.version>1.15.0</frontend-plugin.version>
