@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.jboss.logging.Logger;
 
+import io.quarkus.runtime.util.StringUtil;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.FileSystemAccess;
@@ -61,6 +62,10 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
     }
 
     private static Handler<RoutingContext> createStaticHandler(QuinoaHandlerConfig config, String directory) {
+        LOG.debugf("Static Index: '%s'", config.indexPage);
+        if (StringUtil.isNullOrEmpty(config.indexPage)) {
+            throw new IllegalStateException("Static index page is not configured!");
+        }
         final StaticHandler staticHandler = directory != null ? StaticHandler.create(FileSystemAccess.ROOT, directory)
                 : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
         staticHandler.setDefaultContentEncoding(StandardCharsets.UTF_8.name());
