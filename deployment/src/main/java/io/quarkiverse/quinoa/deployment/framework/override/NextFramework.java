@@ -45,7 +45,7 @@ public class NextFramework extends GenericFramework {
                 return new DevServerConfigDelegate(super.devServer()) {
                     @Override
                     public Optional<String> indexPage() {
-                        // In Dev mode Next.js serves everything out of root "/" but in PRD mode its the
+                        // In Dev mode Next.js serves everything out of root "/" but in PRD mode it is the
                         // normal "/index.html".
                         return Optional.of(super.indexPage().orElse("/"));
                     }
