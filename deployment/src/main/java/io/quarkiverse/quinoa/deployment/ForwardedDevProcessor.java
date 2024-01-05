@@ -198,7 +198,7 @@ public class ForwardedDevProcessor {
                 return;
             }
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
-            final QuinoaHandlerConfig handlerConfig = toHandlerConfig(quinoaConfig, false, httpBuildTimeConfig);
+            final QuinoaHandlerConfig handlerConfig = toHandlerConfig(quinoaConfig, true, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
                             devProxy.get().getPort(),
