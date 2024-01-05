@@ -259,7 +259,7 @@ public class QuinoaProcessor {
                 directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
             }
             final QuinoaHandlerConfig handlerConfig = toHandlerConfig(configuredQuinoa.resolvedConfig(),
-                    !launchMode.getLaunchMode().isDevOrTest(),
+                    launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT,
                     httpBuildTimeConfig);
             resumeOn404.produce(new ResumeOn404BuildItem());
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
@@ -357,7 +357,7 @@ public class QuinoaProcessor {
      * Ignored directories include any that start with DOT "." like ".next" or ".svelte", also "node_modules" and any
      * of the framework build directories.
      *
-     * @param filePath the file path to check
+     * @param relativeFilePath the file path to check
      * @return true if it is a directory that should be scanned for changes, false if it should be ignored
      */
     private static boolean shouldWatch(String relativeFilePath) {

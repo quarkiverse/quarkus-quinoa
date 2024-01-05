@@ -65,7 +65,7 @@ class QuinoaUIResourceHandler implements Handler<RoutingContext> {
                 : StaticHandler.create(QuinoaRecorder.META_INF_WEB_UI);
         staticHandler.setDefaultContentEncoding(StandardCharsets.UTF_8.name());
         staticHandler.setIndexPage(config.indexPage);
-        staticHandler.setCachingEnabled(config.prodMode);
+        staticHandler.setCachingEnabled(!config.devMode);
         return staticHandler;
     }
 
