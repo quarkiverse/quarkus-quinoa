@@ -141,13 +141,20 @@ public interface QuinoaConfig {
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
     }
 
-    static QuinoaHandlerConfig toHandlerConfig(QuinoaConfig config, boolean prodMode,
+    static QuinoaHandlerConfig toHandlerConfig(QuinoaConfig config, boolean devMode,
             final HttpBuildTimeConfig httpBuildTimeConfig) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
-        final String indexPage = !isDevServerMode(config) ? config.indexPage()
-                : config.devServer().indexPage().orElse(config.indexPage());
-        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(config), indexPage, prodMode,
+        final String indexPage = resolveIndexPage(config, devMode);
+        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(config), indexPage, devMode,
                 httpBuildTimeConfig.enableCompression, compressMediaTypes, config.devServer().directForwarding());
+    }
+
+    private static String resolveIndexPage(QuinoaConfig config, boolean devMode) {
+        if (!devMode) {
+            // Make sure we never return the devServer.indexPage() in non-dev mode
+            return config.indexPage();
+        }
+        return isDevServerMode(config) ? config.devServer().indexPage().orElse(config.indexPage()) : config.indexPage();
     }
 
     private static Optional<String> readExternalConfigPath(Config config, String key) {
