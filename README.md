@@ -12,7 +12,7 @@
 [![Project Map](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/quarkiversequarkusquinoa/)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [NodeJS](https://nodejs.org/en) : [React](https://react.dev/learn), [Angular](https://angular.io/guide/what-is-angular), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), [Svelte](https://svelte.dev/docs/introduction), [Astro](https://docs.astro.build/en/getting-started/), [SolidJS](https://www.solidjs.com/guides/getting-started) …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
@@ -109,6 +109,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://www.dubs.tech"><img src="https://avatars.githubusercontent.com/u/509379?v=4?s=100" width="100px;" alt="Paul Dubs"/><br /><sub><b>Paul Dubs</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=treo" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/devpikachu"><img src="https://avatars.githubusercontent.com/u/30475873?v=4?s=100" width="100px;" alt="Andrei Hava"/><br /><sub><b>Andrei Hava</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Adevpikachu" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/l2c0r3"><img src="https://avatars.githubusercontent.com/u/62983504?v=4?s=100" width="100px;" alt="l2c0r3"/><br /><sub><b>l2c0r3</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Al2c0r3" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
