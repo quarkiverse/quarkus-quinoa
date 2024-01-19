@@ -15,7 +15,6 @@ import org.jboss.logging.Logger;
 import com.github.eirslett.maven.plugins.frontend.lib.InstallationException;
 import com.github.eirslett.maven.plugins.frontend.lib.PackageManagerInstallFactory;
 
-import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallAuthConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.configuration.ConfigurationException;
@@ -52,7 +51,8 @@ public final class PackageManagerInstall {
         try {
             vertx = createVertxInstance();
             PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, uiDir, installDir,
-                    config.packageManagerInstallAuth().username().orElse(null), config.packageManagerInstallAuth().password().orElse(null));
+                    config.packageManagerInstallAuth().username().orElse(null),
+                    config.packageManagerInstallAuth().password().orElse(null));
             while (i < 5) {
                 try {
                     if (i > 0) {

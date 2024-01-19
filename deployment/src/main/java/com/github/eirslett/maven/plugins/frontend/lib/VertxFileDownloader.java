@@ -9,15 +9,15 @@ import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.web.client.HttpRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.logging.Logger;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.OpenOptions;
+import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
@@ -53,7 +53,7 @@ public class VertxFileDownloader implements FileDownloader {
                 Files.deleteIfExists(destinationPath);
                 final AsyncFile destinationFile = vertx.fileSystem().openBlocking(destination, new OpenOptions());
                 final HttpRequest<Buffer> httpRequest = webClient.getAbs(downloadUrl);
-                if(userName != null && password != null) {
+                if (userName != null && password != null) {
                     httpRequest.basicAuthentication(userName, password);
                 }
                 final Future<HttpResponse<Void>> future = httpRequest

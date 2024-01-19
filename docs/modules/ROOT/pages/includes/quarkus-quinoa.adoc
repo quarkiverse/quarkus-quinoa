@@ -265,6 +265,40 @@ endif::add-copy-button-to-env-var[]
 |`https://registry.npmjs.org/pnpm/-/`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.basic-auth.username]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.basic-auth.username[quarkus.quinoa.package-manager-install.basic-auth.username]`
+
+
+[.description]
+--
+The basic authentication username to use for node download.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BASIC_AUTH_USERNAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BASIC_AUTH_USERNAME+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-install.basic-auth.password]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-install.basic-auth.password[quarkus.quinoa.package-manager-install.basic-auth.password]`
+
+
+[.description]
+--
+The basic authentication password to use for node download.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BASIC_AUTH_PASSWORD+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BASIC_AUTH_PASSWORD+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus.quinoa.package-manager-command.install]]`link:#quarkus-quinoa_quarkus.quinoa.package-manager-command.install[quarkus.quinoa.package-manager-command.install]`
 
 
