@@ -14,30 +14,45 @@ public class PackageManagerInstallFactory {
     private final Path installDir;
     private final CacheResolver cacheResolver;
     private final VertxFileDownloader fileDownloader;
+    private final String userName;
+    private final String password;
 
-    public PackageManagerInstallFactory(Vertx vertx, Path uiDir, Path installDir) {
+    public PackageManagerInstallFactory(Vertx vertx, Path uiDir, Path installDir, String userName, String password) {
         this.vertx = vertx;
         this.uiDir = uiDir;
         this.installDir = installDir;
         this.cacheResolver = getDefaultCacheResolver(installDir);
+        this.userName = userName;
+        this.password = password;
         fileDownloader = new VertxFileDownloader(vertx);
     }
 
     public NodeInstaller getNodeInstaller() {
-
-        return new NodeInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        NodeInstaller nodeInstaller = new NodeInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        nodeInstaller.setUserName(this.userName);
+        nodeInstaller.setPassword(this.password);
+        return nodeInstaller;
     }
 
     public NPMInstaller getNPMInstaller() {
-        return new NPMInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        NPMInstaller npmInstaller = new NPMInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        npmInstaller.setUserName(this.userName);
+        npmInstaller.setPassword(this.password);
+        return npmInstaller;
     }
 
     public PnpmInstaller getPnpmInstaller() {
-        return new PnpmInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        PnpmInstaller pnpmInstaller = new PnpmInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        pnpmInstaller.setUserName(this.userName);
+        pnpmInstaller.setPassword(this.password);
+        return pnpmInstaller;
     }
 
     public YarnInstaller getYarnInstaller() {
-        return new YarnInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        YarnInstaller yarnInstaller = new YarnInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        yarnInstaller.setUserName(this.userName);
+        yarnInstaller.setPassword(this.password);
+        return yarnInstaller;
     }
 
     private NodeExecutorConfig getExecutorConfig() {
