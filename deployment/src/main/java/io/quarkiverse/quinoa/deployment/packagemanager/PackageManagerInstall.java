@@ -34,7 +34,8 @@ public final class PackageManagerInstall {
 
     }
 
-    public static Installation install(PackageManagerInstallConfig config, final Path projectDir, final Path uiDir) {
+    public static Installation install(PackageManagerInstallConfig config,
+            final Path projectDir, final Path uiDir) {
         Path installDir = resolveInstallDir(config, projectDir).normalize();
         if (config.nodeVersion().isEmpty()) {
             throw new ConfigurationException("node-version is required to install package manager",
@@ -49,7 +50,9 @@ public final class PackageManagerInstall {
         Vertx vertx = null;
         try {
             vertx = createVertxInstance();
-            PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, uiDir, installDir);
+            PackageManagerInstallFactory factory = new PackageManagerInstallFactory(vertx, uiDir, installDir,
+                    config.packageManagerInstallAuth().username().orElse(null),
+                    config.packageManagerInstallAuth().password().orElse(null));
             while (i < 5) {
                 try {
                     if (i > 0) {
