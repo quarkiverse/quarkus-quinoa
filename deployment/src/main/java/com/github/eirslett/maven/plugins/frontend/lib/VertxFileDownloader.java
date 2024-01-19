@@ -25,7 +25,7 @@ import io.vertx.ext.web.codec.BodyCodec;
 public class VertxFileDownloader implements FileDownloader {
     private static final Logger LOG = Logger.getLogger(VertxFileDownloader.class);
     private final Vertx vertx;
-    private WebClient webClient;
+    private final WebClient webClient;
 
     public VertxFileDownloader(Vertx vertx) {
         this.vertx = vertx;
@@ -51,6 +51,7 @@ public class VertxFileDownloader implements FileDownloader {
                 Files.deleteIfExists(destinationPath);
                 final AsyncFile destinationFile = vertx.fileSystem().openBlocking(destination, new OpenOptions());
                 final Future<HttpResponse<Void>> future = webClient.getAbs(downloadUrl)
+                        .basicAuthentication(userName, password)
                         .expect(ResponsePredicate.SC_SUCCESS)
                         .as(BodyCodec.pipe(destinationFile))
                         .send();
