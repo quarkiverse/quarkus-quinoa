@@ -6,6 +6,7 @@ import java.util.Optional;
 import io.quarkus.runtime.annotations.ConfigDocDefault;
 import io.quarkus.runtime.annotations.ConfigGroup;
 import io.smallrye.config.WithDefault;
+import io.smallrye.config.WithName;
 import io.smallrye.config.WithParentName;
 
 @ConfigGroup
@@ -81,6 +82,12 @@ public interface PackageManagerInstallConfig {
     @WithDefault("https://registry.npmjs.org/pnpm/-/")
     String pnpmDownloadRoot();
 
+    /**
+     * Configuration for installing the package manager authenticated
+     */
+    @WithName("basic-auth")
+    PackageManagerInstallAuthConfig packageManagerInstallAuth();
+
     static boolean isEqual(PackageManagerInstallConfig p1, PackageManagerInstallConfig p2) {
         if (!Objects.equals(p1.enabled(), p2.enabled())) {
             return false;
@@ -110,6 +117,9 @@ public interface PackageManagerInstallConfig {
             return false;
         }
         if (!Objects.equals(p1.pnpmDownloadRoot(), p2.pnpmDownloadRoot())) {
+            return false;
+        }
+        if (!PackageManagerInstallAuthConfig.isEqual(p1.packageManagerInstallAuth(), p2.packageManagerInstallAuth())) {
             return false;
         }
         return true;
