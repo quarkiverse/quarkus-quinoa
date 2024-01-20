@@ -161,6 +161,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "stevenfuhr",
+      "name": "stevenfuhr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26394575?v=4",
+      "profile": "https://github.com/stevenfuhr",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
