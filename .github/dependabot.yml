@@ -11,3 +11,7 @@ updates:
       interval: "daily"
     ignore:
       - dependency-name: "io.quarkus:quarkus-bom"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
