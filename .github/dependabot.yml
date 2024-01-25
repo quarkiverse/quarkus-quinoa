@@ -11,6 +11,21 @@ updates:
       interval: "daily"
     ignore:
       - dependency-name: "io.quarkus:quarkus-bom"
+    groups:
+      quarkus:
+        patterns:
+          - "io.quarkus*"
+          - "quarkus*"
+      quarkiverse:
+        patterns:
+          - "io.quarkiverse*"
+      dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "io.quarkus*"
+          - "quarkus*"
+          - "io.quarkiverse*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
