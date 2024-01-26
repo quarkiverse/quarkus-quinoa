@@ -47,6 +47,9 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
+      - name: Install pnpm
+        run: npm install -g pnpm@~8.1.0
+
       - name: Update latest release version in docs
         run: |
           mvn -B -ntp -pl docs -am generate-resources -Denforcer.skip -Dformatter.skip -Dimpsort.skip
