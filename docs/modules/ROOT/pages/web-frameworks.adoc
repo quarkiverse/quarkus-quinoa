@@ -79,7 +79,7 @@ npm create vite@latest
 ----
 a|
 - https://vitejs.dev/guide/[Vite]
-|
+| <<vite-config>>
 
 a|
 [#svelte-kit]
@@ -211,6 +211,24 @@ In Next.js 14+ you need to add the following property in `next.config.js` file:
 const nextConfig = {
   output: 'export',  
 }
+----
+
+[#vite-config]
+=== Vite Configuration
+Configure `vite.config.ts` file with the following changes:
+[source,javascript]
+----
+  export default defineConfig({
+    // depending on your application, base can also be "/"
+    base: '',
+    plugins: [react(), viteTsconfigPaths()],
+    server: {    
+        // this ensures that the browser opens upon server start
+        open: true,
+        // this sets a default port to 3000, you can change this  
+        port: 3000, 
+    },
+})
 ----
 
 [#svelte-kit-config]
