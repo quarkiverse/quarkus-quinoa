@@ -209,7 +209,7 @@ Whenever you execute mvn quarkus:dev, it automatically produces the openapi.json
 [source,json]
 ----
 "scripts": {
-  "dev": "orval && vite",
+  "dev": "orval --config ./orval.config.ts && vite",
   "build": "vite build",
 },
 "devDependencies": {
