@@ -193,7 +193,31 @@ To enable server Http compression:
 quarkus.http.enable-compression=true
 ----
 
-=== CI
+=== OpenAPI Code Generation
+
+Many Quinoa projects commonly utilize REST services, specifying their requirements with OpenAPI support in Quarkus. If you wish to streamline the process of generating TypeScript code for your React/Vue/Angular web application using the OpenAPI spec, you can now achieve it effortlessly in a single step.
+
+Start by configuring OpenAPI to consistently generate code in the designated directory, such as `/src/main/webui`, where your Quinoa UI is intended to reside.
+
+[source,properties]
+----
+quarkus.smallrye-openapi.store-schema-directory=src/main/webui/
+----
+
+Whenever you execute mvn quarkus:dev, it automatically produces the openapi.json in the specified directory. Following this, it is essential to notify your JavaScript application about the changes and facilitate the automatic generation of new TypeScript code from your OpenAPI. A solution like https://orval.dev/[Orval] can be incredibly helpful in this scenario!
+
+[source,json]
+----
+"scripts": {
+  "dev": "orval && vite",
+  "build": "vite build",
+},
+"devDependencies": {
+  "orval": "6.24.0",
+}
+----
+
+=== Continuous Integration (CI)
 
 Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven/Gradle (and Yarn/PNPM if needed). Then you can use it like any Maven/Gradle project.
 

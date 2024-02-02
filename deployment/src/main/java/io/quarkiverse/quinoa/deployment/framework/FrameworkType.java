@@ -117,7 +117,7 @@ public enum FrameworkType {
                 final String projectDevScript = e.getKey();
                 final boolean isDefaultDevCommand = projectDevScript.equals(frameworkDefaultDevScript);
                 if (!isDefaultDevCommand) {
-                    LOG.warnf("%s framework typically defines a '%s` script in package.json file but found '%s' instead.",
+                    LOG.warnf("%s framework typically defines a '%s' script in package.json file but found '%s' instead.",
                             framework, frameworkDefaultDevScript, projectDevScript);
                 }
                 return Optional.of(new DetectedFramework(framework, projectDevScript, !isDefaultDevCommand));
