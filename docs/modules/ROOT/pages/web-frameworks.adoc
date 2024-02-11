@@ -255,7 +255,12 @@ Configure `svelte.config.js` file with the following changes:
 [source,javascript]
 ----
 import adapter from '@sveltejs/adapter-static';
+
+// In projects using Sveltekit v1
 import { vitePreprocess } from '@sveltejs/kit/vite';
+
+// In projects using SvelteKit v2
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
