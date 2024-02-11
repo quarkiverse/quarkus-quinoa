@@ -170,6 +170,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "trpouh",
+      "name": "Leon Kirschner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19832039?v=4",
+      "profile": "https://github.com/trpouh",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
