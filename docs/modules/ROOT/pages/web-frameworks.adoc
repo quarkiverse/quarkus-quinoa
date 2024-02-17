@@ -268,7 +268,11 @@ const config = {
     kit: {
         adapter: adapter({
             fallback: 'index.html'
-        })
+        }),
+        // Mark path non-relative, otherwise SvelteKit assumes it works in a sub-directory
+        paths: {
+            relative: false
+        }
     }
 };
 
