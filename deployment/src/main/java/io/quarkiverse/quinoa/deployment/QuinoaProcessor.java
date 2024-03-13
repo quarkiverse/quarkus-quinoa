@@ -11,6 +11,7 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunn
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -278,7 +279,7 @@ public class QuinoaProcessor {
             BuildProducer<GeneratedResourceBuildItem> generatedResources,
             BuildProducer<NativeImageResourceBuildItem> nativeImageResources,
             Path targetDir) throws IOException {
-        final List<Path> files = Files.walk(targetDir).filter(Files::isRegularFile)
+        final List<Path> files = Files.walk(targetDir, FileVisitOption.FOLLOW_LINKS).filter(Files::isRegularFile)
                 .collect(Collectors.toList());
         final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
         LOG.infof("Quinoa target directory: '%s'", targetDir);
