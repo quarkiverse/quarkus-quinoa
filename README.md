@@ -26,8 +26,8 @@ There are multiple versions available please check which one for your Quarkus re
 | Version | Explanation |
 | --- | --- |
 | ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | Quarkus 2 (legacy) |
-| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | Quarkus 3 Long Term Support |
-| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | Quarkus 3 Latest |
+| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | Quarkus 3.2 LTS |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | Quarkus 3.8 LTS |
 
 ## Getting started
 
