@@ -62,7 +62,7 @@ class ConfiguredPackageManager implements PackageManager {
 
     @Override
     public Command test() {
-        final Map<String, String> testEnv = commandsConfig.testEnv();
+        final Map<String, String> testEnv = new HashMap<>(commandsConfig.testEnv());
         if (testEnv.isEmpty()) {
             testEnv.put("CI", "true");
         }
