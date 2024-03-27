@@ -12,7 +12,7 @@
     "theaterjs": "3.2.0"
   },
   "devDependencies": {
-    "express": "4.18.2",
+    "express": "4.19.2",
     "vite": "4.5.2"
   }
 }
