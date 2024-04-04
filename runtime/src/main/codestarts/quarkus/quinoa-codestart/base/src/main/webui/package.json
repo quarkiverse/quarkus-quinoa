@@ -13,6 +13,6 @@
   },
   "devDependencies": {
     "express": "4.19.2",
-    "vite": "4.5.2"
+    "vite": "4.5.3"
   }
 }
