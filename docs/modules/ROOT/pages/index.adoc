@@ -93,6 +93,6 @@ $ quarkus build
 $ java -jar target/quarkus-app/quarkus-run.jar
 ----
 
-*It's done!* The web application is now built alongside Quarkus, dev-mode is available, and the generated files will be automatically copied to the right place and be served by Quinoa if you hit http://localhost:8080
+*It's done!* The web application is now built alongside Quarkus, dev-mode is available, and the generated files will be automatically copied to the right place and be served by Quinoa if you hit http://localhost:3000
 
 WARNING: With Quinoa, you don't need to manually copy the files to `META-INF/resources`. Quinoa has its own system and will provide another Vert.x route for it. *If you have conflicting files with `META-INF/resources`, Quinoa will have priority over them.*
