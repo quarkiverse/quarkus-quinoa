@@ -11,6 +11,7 @@ updates:
       interval: "daily"
     ignore:
       - dependency-name: "io.quarkus:quarkus-bom"
+      - dependency-name: "io.quarkus:quarkus-maven-plugin"
     groups:
       quarkus:
         patterns:
