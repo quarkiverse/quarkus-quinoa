@@ -54,6 +54,9 @@ jobs:
           repository: ${{ env.ECOSYSTEM_CI_REPO }}
           path: ecosystem-ci
 
+      - name: Install pnpm
+        run: npm install -g pnpm@~8.6.12
+
       - name: Setup and Run Tests
         run: ./ecosystem-ci/setup-and-test
         env:
