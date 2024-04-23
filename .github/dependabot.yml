@@ -13,6 +13,7 @@ updates:
       - dependency-name: "io.quarkus:quarkus-bom"
       - dependency-name: "io.quarkus:quarkus-maven-plugin"
       - dependency-name: "io.quarkus:quarkus-extension-processor"
+      - dependency-name: "io.quarkus:quarkus-extension-maven-plugin"
     groups:
       quarkus:
         patterns:
