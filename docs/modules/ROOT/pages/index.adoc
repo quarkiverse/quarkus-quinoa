@@ -2,7 +2,7 @@
 
 include::./includes/attributes.adoc[]
 
-Quinoa is a Quarkus extension which eases the development, the build and serving single page apps or web components (built with  https://nodejs.org/en[NodeJS] : https://react.dev/learn[React], https://angular.io/guide/what-is-angular[Angular], https://vuejs.org/guide/introduction.html[Vue], https://lit.dev/[Lit], https://svelte.dev/docs/introduction[Svelte], https://docs.astro.build/en/getting-started/[Astro], https://www.solidjs.com/guides/getting-started[SolidJS] …) alongside other Quarkus services (REST, GraphQL, Security, Events, ...).
+Quinoa is a Quarkus extension which eases the development, the build and serving single page apps or web components (built with  https://docs.npmjs.com/[npm] : https://react.dev/learn[React], https://angular.io/guide/what-is-angular[Angular], https://vuejs.org/guide/introduction.html[Vue], https://lit.dev/[Lit], https://svelte.dev/docs/introduction[Svelte], https://docs.astro.build/en/getting-started/[Astro], https://www.solidjs.com/guides/getting-started[SolidJS] …) alongside other Quarkus services (REST, GraphQL, Security, Events, ...).
 
 Live code the backend and frontend together with close to no configuration. When enabled in development mode, Quinoa will start the UI live coding server provided by the target framework and forward relevant requests to it. In production mode, Quinoa will run the build and process the generated files to serve them at runtime.
 
@@ -59,11 +59,11 @@ quarkus ext add io.quarkiverse.quinoa:quarkus-quinoa
 [#getting-started]
 == Getting Started
 
-If not yet created by the tooling, you will need  a Web UI directory in `src/main/webui`. This directory will contain your NodeJS Web application code with a `package.json`.
+If not yet created by the tooling, you will need  a Web UI directory in `src/main/webui`. This directory will contain your `npm` Web application code with a `package.json`.
 
 NOTE: The location is configurable, the directory could be outside the Quarkus project as long as the files are available at build time.
 
-You may use an existing Web UI or generate a starter application from any existing Node based xref:web-frameworks.adoc[Web Framework]. Some Web Frameworks are detected and preconfigured with sensible defaults. If your Web Framework is not part of the detected frameworks or if you changed the configuration, you can always configure Quinoa to work with it.
+You may use an existing Web UI or generate a starter application from any existing `npm` based xref:web-frameworks.adoc[Web Framework]. Some Web Frameworks are detected and preconfigured with sensible defaults. If your Web Framework is not part of the detected frameworks or if you changed the configuration, you can always configure Quinoa to work with it.
 
 The key points for Quinoa are:
 
