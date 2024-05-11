@@ -11,7 +11,7 @@
   <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Quarkus - Quinoa - Parent</name>
-   <description>Node.js extension which allows serving of single page apps alongside Quarkus.</description>
+   <description>Develop, build, and serve your npm-compatible web applications such as React, Angular, Vue, Lit, Svelte, Astro, SolidJS, and others alongside Quarkus.</description>
    <url>https://github.com/quarkiverse/quarkus-quinoa</url>
   <modules>
     <module>deployment-testing</module>
