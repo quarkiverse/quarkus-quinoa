@@ -39,7 +39,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>3.8.2</quarkus.version>
     <quarkus-playright.version>1.0.0</quarkus-playright.version>
-    <assertj.version>3.25.3</assertj.version>
+    <assertj.version>3.26.0</assertj.version>
     <frontend-plugin.version>1.15.0</frontend-plugin.version>
   </properties>
 
