@@ -197,6 +197,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "ylemoigne",
+      "name": "Yann Le Moigne",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2000657?v=4",
+      "profile": "https://github.com/ylemoigne",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
