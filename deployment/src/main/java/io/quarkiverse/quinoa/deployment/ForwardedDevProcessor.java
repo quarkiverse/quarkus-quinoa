@@ -122,7 +122,8 @@ public class ForwardedDevProcessor {
         if (!devServerConfig.managed()) {
             // No need to start the dev-service it is not managed by Quinoa
             // We just check that it is up
-            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredTls, configuredTlsAllowInsecure, configuredDevServerHost, port, checkPath);
+            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredTls, configuredTlsAllowInsecure,
+                    configuredDevServerHost, port, checkPath);
             if (resolvedHostIPAddress != null) {
                 return new ForwardedDevServerBuildItem(resolvedHostIPAddress, port);
             } else {
@@ -139,7 +140,8 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         PackageManagerRunner.DevServer devServer = null;
         try {
-            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, configuredTls, configuredTlsAllowInsecure, configuredDevServerHost,
+            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, configuredTls, configuredTlsAllowInsecure,
+                    configuredDevServerHost,
                     port,
                     checkPath,
                     checkTimeout);

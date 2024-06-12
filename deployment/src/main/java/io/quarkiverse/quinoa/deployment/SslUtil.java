@@ -43,10 +43,10 @@ public class SslUtil {
         }
     };
 
-    public static SSLContext createNonValidatingSslContext()  {
+    public static SSLContext createNonValidatingSslContext() {
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{NON_VALIDATING_TRUST_MANAGER}, new SecureRandom());
+            sslContext.init(null, new TrustManager[] { NON_VALIDATING_TRUST_MANAGER }, new SecureRandom());
             return sslContext;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new RuntimeException(e);

@@ -112,10 +112,10 @@ public interface DevServerConfig {
         if (!Objects.equals(d1.host(), d2.host())) {
             return false;
         }
-        if(!Objects.equals(d1.tls(), d2.tls())) {
+        if (!Objects.equals(d1.tls(), d2.tls())) {
             return false;
         }
-        if(!Objects.equals(d1.tlsAllowInsecure(), d2.tlsAllowInsecure())) {
+        if (!Objects.equals(d1.tlsAllowInsecure(), d2.tlsAllowInsecure())) {
             return false;
         }
         if (!Objects.equals(d1.checkPath(), d2.checkPath())) {

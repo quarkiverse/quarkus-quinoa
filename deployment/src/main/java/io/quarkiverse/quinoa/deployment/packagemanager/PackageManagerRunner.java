@@ -139,7 +139,8 @@ public class PackageManagerRunner {
     }
 
     public DevServer dev(Optional<ConsoleInstalledBuildItem> consoleInstalled, LoggingSetupBuildItem loggingSetup,
-            boolean tls, boolean tlsAllowInsecure, String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+            boolean tls, boolean tlsAllowInsecure, String devServerHost, int devServerPort, String checkPath,
+            int checkTimeout) {
         final PackageManager.Command dev = packageManager.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         StartupLogCompressor logCompressor = new StartupLogCompressor(
@@ -287,9 +288,9 @@ public class PackageManagerRunner {
                     final String ipAddress = address instanceof Inet6Address ? "[" + hostAddress + "]" : hostAddress;
                     URL url = new URL(String.format("%s://%s:%d%s", tls ? "https" : "http", ipAddress, port, normalizedPath));
                     HttpURLConnection connection;
-                    if(tls){
+                    if (tls) {
                         HttpsURLConnection httpsConnection = (HttpsURLConnection) url.openConnection();
-                        if(tlsAllowInsecure) {
+                        if (tlsAllowInsecure) {
                             httpsConnection.setSSLSocketFactory(SslUtil.createNonValidatingSslContext().getSocketFactory());
                             httpsConnection.setHostnameVerifier(new HostnameVerifier() {
                                 @Override
@@ -299,7 +300,7 @@ public class PackageManagerRunner {
                             });
                         }
                         connection = httpsConnection;
-                    }else{
+                    } else {
                         connection = (HttpURLConnection) url.openConnection();
                     }
 
