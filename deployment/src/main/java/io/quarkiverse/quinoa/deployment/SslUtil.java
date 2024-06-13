@@ -1,15 +1,13 @@
 package io.quarkiverse.quinoa.deployment;
 
-import javax.net.ssl.*;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.*;
 
 public class SslUtil {
     private final static X509ExtendedTrustManager NON_VALIDATING_TRUST_MANAGER = new X509ExtendedTrustManager() {
