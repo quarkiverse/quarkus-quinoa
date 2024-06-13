@@ -83,7 +83,7 @@ public interface DevServerConfig {
     /**
      * Set this value if the index page is different for the dev-server
      */
-    @ConfigDocDefault("auto-detected falling back to the quinoa.index-page")
+    @ConfigDocDefault("auto-detected falling back to index.html")
     Optional<String> indexPage();
 
     /**

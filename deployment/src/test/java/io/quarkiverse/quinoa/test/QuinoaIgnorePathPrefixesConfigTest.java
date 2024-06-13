@@ -14,8 +14,10 @@ public class QuinoaIgnorePathPrefixesConfigTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.ignored-path-prefixes", "/foo/bar,/api,q,a/b")
+            .overrideConfigKey("quarkus.quinoa.enable-spa-routing", "true")
             .assertLogRecords(l -> assertThat(l)
-                    .anyMatch(s -> s.getMessage().equals("Quinoa is ignoring paths starting with: /foo/bar, /api, /q, /a/b")));
+                    .anyMatch(s -> s.getMessage()
+                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /foo/bar, /api, /q, /a/b")));
 
     @Test
     public void testQuinoa() {

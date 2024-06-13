@@ -34,9 +34,9 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private final WebClient client;
     private final QuinoaDevWebSocketProxyHandler wsUpgradeHandler;
     private final ClassLoader currentClassLoader;
-    private final QuinoaHandlerConfig config;
+    private final QuinoaDevProxyHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port,
+    QuinoaDevProxyHandler(final QuinoaDevProxyHandlerConfig config, final Vertx vertx, String host, int port,
             boolean websocket) {
         this.host = host;
         this.port = port;

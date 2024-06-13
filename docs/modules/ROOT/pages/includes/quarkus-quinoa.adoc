@@ -384,23 +384,6 @@ endif::add-copy-button-to-env-var[]
 |`framework detection with fallback to 'start'`
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-index-page]]`link:#quarkus-quinoa_quarkus-quinoa-index-page[quarkus.quinoa.index-page]`
-
-
-[.description]
---
-Name of the index page.
-
-ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_INDEX_PAGE+++[]
-endif::add-copy-button-to-env-var[]
-ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_INDEX_PAGE+++`
-endif::add-copy-button-to-env-var[]
---|string 
-|`index.html`
-
-
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-run-tests]]`link:#quarkus-quinoa_quarkus-quinoa-run-tests[quarkus.quinoa.run-tests]`
 
 
@@ -491,7 +474,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ignored-p
 
 [.description]
 --
-List of path prefixes to be ignored by Quinoa.
+List of path prefixes to be ignored by Quinoa (SPA Handler and Dev-Proxy).
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_IGNORED_PATH_PREFIXES+++[]
@@ -673,7 +656,7 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env[quarkus.quinoa.package-manager-command.install-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env[quarkus.quinoa.package-manager-command.install-env."install-env"]`
 
 
 [.description]
@@ -681,16 +664,17 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-m
 Environment variables for install command execution.
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV__INSTALL_ENV_+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV+++`
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_INSTALL_ENV__INSTALL_ENV_+++`
 endif::add-copy-button-to-env-var[]
---|`Map<String,String>` 
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env[quarkus.quinoa.package-manager-command.ci-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env[quarkus.quinoa.package-manager-command.ci-env."ci-env"]`
 
 
 [.description]
@@ -698,16 +682,17 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-m
 Environment variables for ci command execution.
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV__CI_ENV_+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV+++`
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_CI_ENV__CI_ENV_+++`
 endif::add-copy-button-to-env-var[]
---|`Map<String,String>` 
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env[quarkus.quinoa.package-manager-command.build-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env[quarkus.quinoa.package-manager-command.build-env."build-env"]`
 
 
 [.description]
@@ -715,16 +700,17 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-m
 Environment variables for build command execution.
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD_ENV+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD_ENV__BUILD_ENV_+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD_ENV+++`
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_BUILD_ENV__BUILD_ENV_+++`
 endif::add-copy-button-to-env-var[]
---|`Map<String,String>` 
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env[quarkus.quinoa.package-manager-command.test-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env[quarkus.quinoa.package-manager-command.test-env."test-env"]`
 
 
 [.description]
@@ -732,16 +718,17 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-m
 Environment variables for test command execution.
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST_ENV+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST_ENV__TEST_ENV_+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST_ENV+++`
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_TEST_ENV__TEST_ENV_+++`
 endif::add-copy-button-to-env-var[]
---|`Map<String,String>` 
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
 |
 
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env[quarkus.quinoa.package-manager-command.dev-env]`
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env[quarkus.quinoa.package-manager-command.dev-env."dev-env"]`
 
 
 [.description]
@@ -749,12 +736,13 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-m
 Environment variables for development command execution.
 
 ifdef::add-copy-button-to-env-var[]
-Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV_ENV+++[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV_ENV__DEV_ENV_+++[]
 endif::add-copy-button-to-env-var[]
 ifndef::add-copy-button-to-env-var[]
-Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV_ENV+++`
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_COMMAND_DEV_ENV__DEV_ENV_+++`
 endif::add-copy-button-to-env-var[]
---|`Map<String,String>` 
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
 |
 
 |===

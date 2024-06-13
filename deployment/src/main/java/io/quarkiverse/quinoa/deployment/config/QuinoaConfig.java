@@ -11,7 +11,7 @@ import java.util.Set;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
-import io.quarkiverse.quinoa.QuinoaHandlerConfig;
+import io.quarkiverse.quinoa.QuinoaDevProxyHandlerConfig;
 import io.quarkus.runtime.annotations.ConfigDocDefault;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
@@ -79,12 +79,6 @@ public interface QuinoaConfig {
     PackageManagerCommandConfig packageManagerCommand();
 
     /**
-     * Name of the index page.
-     */
-    @WithDefault(DEFAULT_INDEX_PAGE)
-    String indexPage();
-
-    /**
      * Indicate if the Web UI should also be tested during the build phase (i.e: npm test).
      * To be used in a {@link io.quarkus.test.junit.QuarkusTestProfile} to have Web UI test running during a
      * {@link io.quarkus.test.junit.QuarkusTest}
@@ -120,7 +114,7 @@ public interface QuinoaConfig {
     boolean enableSPARouting();
 
     /**
-     * List of path prefixes to be ignored by Quinoa.
+     * List of path prefixes to be ignored by Quinoa (SPA Handler and Dev-Proxy).
      */
     @ConfigDocDefault("ignore values configured by 'quarkus.resteasy-reactive.path', 'quarkus.resteasy.path' and 'quarkus.http.non-application-root-path'")
     Optional<List<String>> ignoredPathPrefixes();
@@ -135,26 +129,19 @@ public interface QuinoaConfig {
             Config allConfig = ConfigProvider.getConfig();
             List<String> defaultIgnore = new ArrayList<>();
             readExternalConfigPath(allConfig, "quarkus.resteasy.path").ifPresent(defaultIgnore::add);
+            readExternalConfigPath(allConfig, "quarkus.rest.path").ifPresent(defaultIgnore::add);
             readExternalConfigPath(allConfig, "quarkus.resteasy-reactive.path").ifPresent(defaultIgnore::add);
             readExternalConfigPath(allConfig, "quarkus.http.non-application-root-path").ifPresent(defaultIgnore::add);
             return defaultIgnore;
         }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
     }
 
-    static QuinoaHandlerConfig toHandlerConfig(QuinoaConfig config, boolean devMode,
+    static QuinoaDevProxyHandlerConfig toDevProxyHandlerConfig(final QuinoaConfig config,
             final HttpBuildTimeConfig httpBuildTimeConfig) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
-        final String indexPage = resolveIndexPage(config, devMode);
-        return new QuinoaHandlerConfig(getNormalizedIgnoredPathPrefixes(config), indexPage, devMode,
+        return new QuinoaDevProxyHandlerConfig(getNormalizedIgnoredPathPrefixes(config),
+                config.devServer().indexPage().orElse(DEFAULT_INDEX_PAGE),
                 httpBuildTimeConfig.enableCompression, compressMediaTypes, config.devServer().directForwarding());
-    }
-
-    private static String resolveIndexPage(QuinoaConfig config, boolean devMode) {
-        if (!devMode) {
-            // Make sure we never return the devServer.indexPage() in non-dev mode
-            return config.indexPage();
-        }
-        return isDevServerMode(config) ? config.devServer().indexPage().orElse(config.indexPage()) : config.indexPage();
     }
 
     private static Optional<String> readExternalConfigPath(Config config, String key) {
@@ -191,9 +178,6 @@ public interface QuinoaConfig {
             return false;
         }
         if (!PackageManagerCommandConfig.isEqual(q1.packageManagerCommand(), q2.packageManagerCommand())) {
-            return false;
-        }
-        if (!Objects.equals(q1.indexPage(), q2.indexPage())) {
             return false;
         }
         if (!Objects.equals(q1.runTests(), q2.runTests())) {

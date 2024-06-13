@@ -23,8 +23,6 @@ public class QuinoaDefaultConfigTest {
                 assertThat(l)
                         .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
                                 s.getParameters()[0].equals(systemBinary("npm") + " run build"));
-                assertThat(l)
-                        .anyMatch(s -> s.getMessage().equals("Quinoa is ignoring paths starting with: /q/"));
             });
 
     @Test

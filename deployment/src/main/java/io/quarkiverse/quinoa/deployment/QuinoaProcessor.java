@@ -1,11 +1,7 @@
 package io.quarkiverse.quinoa.deployment;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.META_INF_WEB_UI;
-import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toHandlerConfig;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.*;
 import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
@@ -30,7 +26,6 @@ import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.quinoa.QuinoaHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.framework.FrameworkType;
@@ -42,23 +37,19 @@ import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.IsDevelopment;
-import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
-import io.quarkus.deployment.builditem.GeneratedResourceBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
-import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
-import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
-import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
+import io.quarkus.vertx.http.deployment.spi.GeneratedStaticResourceBuildItem;
 
 public class QuinoaProcessor {
 
@@ -198,28 +189,12 @@ public class QuinoaProcessor {
         return new TargetDirBuildItem(targetBuildDir);
     }
 
-    @BuildStep(onlyIf = IsNormal.class)
-    public BuiltResourcesBuildItem prepareResourcesForNormalMode(
-            Optional<TargetDirBuildItem> targetDir,
-            BuildProducer<GeneratedResourceBuildItem> generatedResources,
-            BuildProducer<NativeImageResourceBuildItem> nativeImageResources) throws IOException {
+    @BuildStep
+    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {
         if (targetDir.isEmpty()) {
             return null;
         }
-        return new BuiltResourcesBuildItem(
-                prepareBuiltResources(generatedResources, nativeImageResources, targetDir.get().getBuildDirectory()));
-    }
-
-    @BuildStep(onlyIfNot = IsNormal.class)
-    public BuiltResourcesBuildItem prepareResourcesForOtherMode(
-            Optional<TargetDirBuildItem> targetDir,
-            BuildProducer<GeneratedResourceBuildItem> generatedResources) throws IOException {
-        if (targetDir.isEmpty()) {
-            return null;
-        }
-        final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = prepareBuiltResources(generatedResources,
-                null, targetDir.get().getBuildDirectory());
-        return new BuiltResourcesBuildItem(targetDir.get().getBuildDirectory(), entries);
+        return new BuiltResourcesBuildItem(lookupBuiltResources(targetDir.get().getBuildDirectory()));
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
@@ -241,59 +216,55 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    @Record(RUNTIME_INIT)
-    public void runtimeInit(
+    public void produceGeneratedStaticResources(
             ConfiguredQuinoaBuildItem configuredQuinoa,
-            HttpBuildTimeConfig httpBuildTimeConfig,
-            LaunchModeBuildItem launchMode,
-            Optional<BuiltResourcesBuildItem> uiResources,
-            QuinoaRecorder recorder,
-            BuildProducer<RouteBuildItem> routes,
-            BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
+            BuildProducer<GeneratedStaticResourceBuildItem> generatedStaticResourceProducer,
+            Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
             LOG.info("Quinoa is in build only mode");
             return;
         }
-        if (uiResources.isPresent() && !uiResources.get().getNames().isEmpty()) {
-            String directory = null;
-            if (uiResources.get().getDirectory().isPresent()) {
-                directory = uiResources.get().getDirectory().get().toAbsolutePath().toString();
+        if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
+            for (BuiltResourcesBuildItem.BuiltResource resource : uiResources.get().resources()) {
+                generatedStaticResourceProducer
+                        .produce(new GeneratedStaticResourceBuildItem(resource.name(), resource.content()));
             }
-            final QuinoaHandlerConfig handlerConfig = toHandlerConfig(configuredQuinoa.resolvedConfig(),
-                    launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT,
-                    httpBuildTimeConfig);
-            resumeOn404.produce(new ResumeOn404BuildItem());
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaHandler(handlerConfig, directory,
-                            uiResources.get().getNames()))
-                    .build());
+        }
+    }
+
+    @BuildStep
+    @Record(RUNTIME_INIT)
+    public void runtimeInit(
+            ConfiguredQuinoaBuildItem configuredQuinoa,
+            QuinoaRecorder recorder,
+            BuildProducer<RouteBuildItem> routes,
+            Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
+        if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
+            return;
+        }
+        if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
             if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
+                        .handler(recorder
+                                .quinoaSPARoutingHandler(getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig())))
                         .build());
             }
         }
     }
 
-    private HashSet<BuiltResourcesBuildItem.BuiltResource> prepareBuiltResources(
-            BuildProducer<GeneratedResourceBuildItem> generatedResources,
-            BuildProducer<NativeImageResourceBuildItem> nativeImageResources,
-            Path targetDir) throws IOException {
-        final List<Path> files = Files.walk(targetDir, FileVisitOption.FOLLOW_LINKS).filter(Files::isRegularFile)
-                .collect(Collectors.toList());
-        final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
-        LOG.infof("Quinoa target directory: '%s'", targetDir);
-        for (Path file : files) {
-            final String name = "/" + targetDir.relativize(file).toString().replace('\\', '/');
-            LOG.infof("Quinoa generated resource: '%s'", name);
-            generatedResources.produce(new GeneratedResourceBuildItem(META_INF_WEB_UI + name, Files.readAllBytes(file), true));
-            if (nativeImageResources != null) {
-                nativeImageResources
-                        .produce(new NativeImageResourceBuildItem(META_INF_WEB_UI + name));
+    private HashSet<BuiltResourcesBuildItem.BuiltResource> lookupBuiltResources(Path targetDir) throws IOException {
+        try (Stream<Path> paths = Files.walk(targetDir, FileVisitOption.FOLLOW_LINKS).filter(Files::isRegularFile)) {
+            final var files = paths.toList();
+            final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
+            LOG.infof("Quinoa target directory: '%s'", targetDir);
+            for (Path file : files) {
+                final String name = "/" + targetDir.relativize(file).toString().replace('\\', '/');
+                LOG.infof("Quinoa generated resource: '%s'", name);
+                entries.add(new BuiltResourcesBuildItem.BuiltResource(name, Files.readAllBytes(file)));
             }
-            entries.add(new BuiltResourcesBuildItem.BuiltResource(name));
+            return entries;
         }
-        return entries;
+
     }
 
     private void scan(Path uiDir, Path directory, BuildProducer<HotDeploymentWatchedFileBuildItem> watchedPaths)

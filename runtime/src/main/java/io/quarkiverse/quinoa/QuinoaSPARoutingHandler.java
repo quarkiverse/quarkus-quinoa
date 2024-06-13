@@ -5,6 +5,7 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.next;
 import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
 import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.jboss.logging.Logger;
@@ -15,10 +16,10 @@ import io.vertx.ext.web.RoutingContext;
 class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaSPARoutingHandler.class);
     private final ClassLoader currentClassLoader;
-    private final QuinoaHandlerConfig config;
+    private final List<String> ignoredPathPrefixes;
 
-    public QuinoaSPARoutingHandler(final QuinoaHandlerConfig config) {
-        this.config = config;
+    public QuinoaSPARoutingHandler(List<String> ignoredPathPrefixes) {
+        this.ignoredPathPrefixes = ignoredPathPrefixes;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -29,7 +30,7 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
             return;
         }
         String path = resolvePath(ctx);
-        if (!Objects.equals(path, "/") && !isIgnored(path, config.ignoredPathPrefixes)) {
+        if (!Objects.equals(path, "/") && !isIgnored(path, ignoredPathPrefixes)) {
             LOG.debugf("Quinoa is re-routing SPA request '%s' to '/'", ctx.normalizedPath());
             ctx.reroute(ctx.mountPoint() != null ? ctx.mountPoint() : "/");
         } else {
