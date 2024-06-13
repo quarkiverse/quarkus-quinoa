@@ -21,9 +21,13 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-import io.quarkiverse.quinoa.deployment.SslUtil;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.quinoa.deployment.SslUtil;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManager;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
@@ -33,10 +37,6 @@ import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.ProcessUtil;
 import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.runtime.LaunchMode;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 public class PackageManagerRunner {
     private static final Logger LOG = Logger.getLogger(PackageManagerRunner.class);
