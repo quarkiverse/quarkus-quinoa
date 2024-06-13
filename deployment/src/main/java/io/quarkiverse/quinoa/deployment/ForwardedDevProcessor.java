@@ -3,7 +3,7 @@ package io.quarkiverse.quinoa.deployment;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toHandlerConfig;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toDevProxyHandlerConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.DEV_PROCESS_THREAD_PREDICATE;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 import static io.quarkus.deployment.dev.testing.MessageFormat.RESET;
@@ -28,7 +28,7 @@ import java.util.function.BiPredicate;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.quinoa.QuinoaHandlerConfig;
+import io.quarkiverse.quinoa.QuinoaDevProxyHandlerConfig;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkiverse.quinoa.deployment.config.DevServerConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
@@ -204,7 +204,7 @@ public class ForwardedDevProcessor {
                 return;
             }
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
-            final QuinoaHandlerConfig handlerConfig = toHandlerConfig(quinoaConfig, true, httpBuildTimeConfig);
+            final QuinoaDevProxyHandlerConfig handlerConfig = toDevProxyHandlerConfig(quinoaConfig, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
                             devProxy.get().getPort(),
@@ -216,7 +216,7 @@ public class ForwardedDevProcessor {
             if (quinoaConfig.enableSPARouting()) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
                 routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
+                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig.ignoredPathPrefixes))
                         .build());
             }
         }

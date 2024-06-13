@@ -52,11 +52,6 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     }
 
     @Override
-    public String indexPage() {
-        return delegate.indexPage();
-    }
-
-    @Override
     public boolean runTests() {
         return delegate.runTests();
     }

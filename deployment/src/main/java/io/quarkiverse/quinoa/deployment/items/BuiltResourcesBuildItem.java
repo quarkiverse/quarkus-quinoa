@@ -1,8 +1,6 @@
 package io.quarkiverse.quinoa.deployment.items;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,38 +25,10 @@ public final class BuiltResourcesBuildItem extends SimpleBuildItem {
         return directory;
     }
 
-    public Set<String> getNames() {
-        Set<String> names = new HashSet<>(resources.size());
-        for (BuiltResource entry : resources) {
-            names.add(entry.getName());
-        }
-        return names;
+    public Set<BuiltResource> resources() {
+        return resources;
     }
 
-    public static class BuiltResource {
-        private final String name;
-
-        public BuiltResource(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            BuiltResource entry = (BuiltResource) o;
-            return name.equals(entry.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
+    public record BuiltResource(String name, byte[] content) {
     }
 }

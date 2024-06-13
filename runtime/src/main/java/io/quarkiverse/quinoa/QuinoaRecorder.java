@@ -25,20 +25,20 @@ public class QuinoaRecorder {
     public static final int QUINOA_SPA_ROUTE_ORDER = ROUTE_ORDER_DEFAULT + 30_000;
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
-    public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaHandlerConfig handlerConfig, Supplier<Vertx> vertx,
+    public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaDevProxyHandlerConfig handlerConfig, Supplier<Vertx> vertx,
             String host, int port, boolean websocket) {
-        logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
+        if (LOG.isDebugEnabled()) {
+            LOG.debugf("Quinoa dev proxy-handler is ignoring paths starting with: "
+                    + String.join(", ", handlerConfig.ignoredPathPrefixes));
+        }
         return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), host, port, websocket);
     }
 
-    public Handler<RoutingContext> quinoaSPARoutingHandler(final QuinoaHandlerConfig handlerConfig) throws IOException {
-        return new QuinoaSPARoutingHandler(handlerConfig);
-    }
-
-    public Handler<RoutingContext> quinoaHandler(final QuinoaHandlerConfig handlerConfig, final String directory,
-            final Set<String> uiResources) {
-        logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
-        return new QuinoaUIResourceHandler(handlerConfig, directory, uiResources);
+    public Handler<RoutingContext> quinoaSPARoutingHandler(List<String> ignoredPathPrefixes) throws IOException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debugf("Quinoa SPA routing handler is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
+        }
+        return new QuinoaSPARoutingHandler(ignoredPathPrefixes);
     }
 
     static String resolvePath(RoutingContext ctx) {
@@ -57,7 +57,7 @@ public class QuinoaRecorder {
         return false;
     }
 
-    static void compressIfNeeded(QuinoaHandlerConfig config, RoutingContext ctx, String path) {
+    static void compressIfNeeded(QuinoaDevProxyHandlerConfig config, RoutingContext ctx, String path) {
         if (config.enableCompression && isCompressed(config, path)) {
             // VertxHttpRecorder is adding "Content-Encoding: identity" to all requests if
             // compression is enabled.
@@ -67,18 +67,12 @@ public class QuinoaRecorder {
         }
     }
 
-    private static boolean isCompressed(QuinoaHandlerConfig config, String path) {
+    private static boolean isCompressed(QuinoaDevProxyHandlerConfig config, String path) {
         if (config.compressMediaTypes.isEmpty()) {
             return false;
         }
         String contentType = MimeMapping.getMimeTypeForFilename(path);
         return contentType != null && config.compressMediaTypes.contains(contentType);
-    }
-
-    static void logIgnoredPathPrefixes(final List<String> ignoredPathPrefixes) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debugf("Quinoa is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
-        }
     }
 
     static boolean shouldHandleMethod(RoutingContext ctx) {
