@@ -32,6 +32,16 @@ public class DevServerConfigDelegate implements DevServerConfig {
     }
 
     @Override
+    public boolean tls() {
+        return delegate.tls();
+    }
+
+    @Override
+    public boolean tlsAllowInsecure() {
+        return delegate.tlsAllowInsecure();
+    }
+
+    @Override
     public Optional<String> checkPath() {
         return delegate.checkPath();
     }

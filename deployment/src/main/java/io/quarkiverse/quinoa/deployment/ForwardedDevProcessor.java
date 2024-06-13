@@ -79,6 +79,8 @@ public class ForwardedDevProcessor {
         final DevServerConfig devServerConfig = resolvedConfig.devServer();
         liveReload.setContextObject(QuinoaConfig.class, resolvedConfig);
         final String configuredDevServerHost = devServerConfig.host();
+        final boolean configuredTls = devServerConfig.tls();
+        final boolean configuredTlsAllowInsecure = devServerConfig.tlsAllowInsecure();
         final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         final String checkPath = resolvedConfig.devServer().checkPath().orElse(null);
         if (devService != null) {
@@ -92,7 +94,9 @@ public class ForwardedDevProcessor {
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                final String resolvedDevServerHost = PackageManagerRunner.isDevServerUp(devServerConfig.host(),
+                final String resolvedDevServerHost = PackageManagerRunner.isDevServerUp(devServerConfig.tls(),
+                        devServerConfig.tlsAllowInsecure(),
+                        devServerConfig.host(),
                         devServerConfig.port().get(),
                         checkPath);
                 return new ForwardedDevServerBuildItem(resolvedDevServerHost, devServerConfig.port().get());
@@ -118,7 +122,8 @@ public class ForwardedDevProcessor {
         if (!devServerConfig.managed()) {
             // No need to start the dev-service it is not managed by Quinoa
             // We just check that it is up
-            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredDevServerHost, port, checkPath);
+            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredTls, configuredTlsAllowInsecure,
+                    configuredDevServerHost, port, checkPath);
             if (resolvedHostIPAddress != null) {
                 return new ForwardedDevServerBuildItem(resolvedHostIPAddress, port);
             } else {
@@ -135,7 +140,8 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         PackageManagerRunner.DevServer devServer = null;
         try {
-            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, configuredDevServerHost,
+            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, configuredTls, configuredTlsAllowInsecure,
+                    configuredDevServerHost,
                     port,
                     checkPath,
                     checkTimeout);

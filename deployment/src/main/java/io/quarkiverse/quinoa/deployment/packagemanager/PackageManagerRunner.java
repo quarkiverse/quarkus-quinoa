@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import io.quarkiverse.quinoa.deployment.SslUtil;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
@@ -32,6 +33,10 @@ import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.ProcessUtil;
 import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.runtime.LaunchMode;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 
 public class PackageManagerRunner {
     private static final Logger LOG = Logger.getLogger(PackageManagerRunner.class);
@@ -134,7 +139,8 @@ public class PackageManagerRunner {
     }
 
     public DevServer dev(Optional<ConsoleInstalledBuildItem> consoleInstalled, LoggingSetupBuildItem loggingSetup,
-            String devServerHost, int devServerPort, String checkPath, int checkTimeout) {
+            boolean tls, boolean tlsAllowInsecure, String devServerHost, int devServerPort, String checkPath,
+            int checkTimeout) {
         final PackageManager.Command dev = packageManager.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
         StartupLogCompressor logCompressor = new StartupLogCompressor(
@@ -155,7 +161,7 @@ public class PackageManagerRunner {
         String ipAddress = null;
         try {
             int i = 0;
-            while ((ipAddress = isDevServerUp(devServerHost, devServerPort, checkPath)) == null) {
+            while ((ipAddress = isDevServerUp(tls, tlsAllowInsecure, devServerHost, devServerPort, checkPath)) == null) {
                 if (++i >= checkTimeout / 500) {
                     stopDev(p);
                     throw new RuntimeException(
@@ -269,7 +275,7 @@ public class PackageManagerRunner {
         }
     }
 
-    public static String isDevServerUp(String host, int port, String path) {
+    public static String isDevServerUp(boolean tls, boolean tlsAllowInsecure, String host, int port, String path) {
         if (path == null) {
             return host;
         }
@@ -280,8 +286,24 @@ public class PackageManagerRunner {
                 try {
                     final String hostAddress = address.getHostAddress();
                     final String ipAddress = address instanceof Inet6Address ? "[" + hostAddress + "]" : hostAddress;
-                    URL url = new URL(String.format("http://%s:%d%s", ipAddress, port, normalizedPath));
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    URL url = new URL(String.format("%s://%s:%d%s", tls ? "https" : "http", ipAddress, port, normalizedPath));
+                    HttpURLConnection connection;
+                    if (tls) {
+                        HttpsURLConnection httpsConnection = (HttpsURLConnection) url.openConnection();
+                        if (tlsAllowInsecure) {
+                            httpsConnection.setSSLSocketFactory(SslUtil.createNonValidatingSslContext().getSocketFactory());
+                            httpsConnection.setHostnameVerifier(new HostnameVerifier() {
+                                @Override
+                                public boolean verify(String hostname, SSLSession session) {
+                                    return true;
+                                }
+                            });
+                        }
+                        connection = httpsConnection;
+                    } else {
+                        connection = (HttpURLConnection) url.openConnection();
+                    }
+
                     connection.setRequestMethod("GET");
                     connection.setConnectTimeout(2000);
                     connection.setReadTimeout(2000);

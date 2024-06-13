@@ -41,6 +41,18 @@ public interface DevServerConfig {
     String host();
 
     /**
+     * Protocol of the server to forward requests to.
+     */
+    @WithDefault("false")
+    boolean tls();
+
+    /**
+     * Protocol of the server to forward requests to.
+     */
+    @WithDefault("false")
+    boolean tlsAllowInsecure();
+
+    /**
      * After start, Quinoa wait for the external dev server.
      * by sending GET requests to this path waiting for a 200 status.
      * If forced empty, Quinoa will not check if the dev server is up.
@@ -98,6 +110,12 @@ public interface DevServerConfig {
             return false;
         }
         if (!Objects.equals(d1.host(), d2.host())) {
+            return false;
+        }
+        if (!Objects.equals(d1.tls(), d2.tls())) {
+            return false;
+        }
+        if (!Objects.equals(d1.tlsAllowInsecure(), d2.tlsAllowInsecure())) {
             return false;
         }
         if (!Objects.equals(d1.checkPath(), d2.checkPath())) {
