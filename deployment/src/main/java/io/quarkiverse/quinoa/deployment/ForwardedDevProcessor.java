@@ -50,6 +50,8 @@ import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
+import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
+import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.WebsocketSubProtocolsBuildItem;
 import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
@@ -193,6 +195,8 @@ public class ForwardedDevProcessor {
             Optional<ForwardedDevServerBuildItem> devProxy,
             Optional<ConfiguredQuinoaBuildItem> configuredQuinoa,
             CoreVertxBuildItem vertx,
+            HttpRootPathBuildItem httpRootPath,
+            NonApplicationRootPathBuildItem nonApplicationRootPath,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<WebsocketSubProtocolsBuildItem> websocketSubProtocols,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
@@ -204,8 +208,12 @@ public class ForwardedDevProcessor {
                 return;
             }
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
-            final QuinoaDevProxyHandlerConfig handlerConfig = toDevProxyHandlerConfig(quinoaConfig, httpBuildTimeConfig);
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
+            final QuinoaDevProxyHandlerConfig handlerConfig = toDevProxyHandlerConfig(quinoaConfig, httpBuildTimeConfig,
+                    nonApplicationRootPath);
+            String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(quinoaConfig);
+            recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
+            // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
+            routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
                             devProxy.get().getPort(),
                             quinoaConfig.devServer().websocket()))
@@ -215,7 +223,7 @@ public class ForwardedDevProcessor {
             }
             if (quinoaConfig.enableSPARouting()) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
-                routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
+                routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(handlerConfig.ignoredPathPrefixes))
                         .build());
             }

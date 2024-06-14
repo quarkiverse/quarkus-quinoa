@@ -27,6 +27,11 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     }
 
     @Override
+    public String uiRootPath() {
+        return delegate.uiRootPath();
+    }
+
+    @Override
     public String uiDir() {
         return delegate.uiDir();
     }

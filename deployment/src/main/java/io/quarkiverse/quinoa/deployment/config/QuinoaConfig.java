@@ -1,20 +1,21 @@
 package io.quarkiverse.quinoa.deployment.config;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import io.quarkiverse.quinoa.QuinoaDevProxyHandlerConfig;
+import io.quarkus.deployment.util.UriNormalizationUtil;
 import io.quarkus.runtime.annotations.ConfigDocDefault;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
@@ -26,6 +27,7 @@ import io.smallrye.config.WithParentName;
 public interface QuinoaConfig {
 
     String DEFAULT_BUILD_DIR = "build/";
+    String DEFAULT_WEB_UI_ROOT_PATH = "/";
     String DEFAULT_WEB_UI_DIR = "src/main/webui";
     String DEFAULT_INDEX_PAGE = "index.html";
 
@@ -45,6 +47,13 @@ public interface QuinoaConfig {
      */
     @WithDefault("false")
     boolean justBuild();
+
+    /**
+     * Root path for hosting the Web UI.
+     * This path is normalized and always resolved relative to 'quarkus.http.root-path'.
+     */
+    @WithDefault(DEFAULT_WEB_UI_ROOT_PATH)
+    String uiRootPath();
 
     /**
      * Path to the Web UI (NodeJS) root directory (relative to the project root).
@@ -115,8 +124,9 @@ public interface QuinoaConfig {
 
     /**
      * List of path prefixes to be ignored by Quinoa (SPA Handler and Dev-Proxy).
+     * The paths are normalized and always resolved relative to 'quarkus.quinoa.ui-root-path'.
      */
-    @ConfigDocDefault("ignore values configured by 'quarkus.resteasy-reactive.path', 'quarkus.resteasy.path' and 'quarkus.http.non-application-root-path'")
+    @ConfigDocDefault("ignore values configured by 'quarkus.resteasy-reactive.path', 'quarkus.rest.path', 'quarkus.resteasy.path' and 'quarkus.http.non-application-root-path'")
     Optional<List<String>> ignoredPathPrefixes();
 
     /**
@@ -124,30 +134,82 @@ public interface QuinoaConfig {
      */
     DevServerConfig devServer();
 
-    static List<String> getNormalizedIgnoredPathPrefixes(QuinoaConfig config) {
-        return config.ignoredPathPrefixes().orElseGet(() -> {
-            Config allConfig = ConfigProvider.getConfig();
-            List<String> defaultIgnore = new ArrayList<>();
-            readExternalConfigPath(allConfig, "quarkus.resteasy.path").ifPresent(defaultIgnore::add);
-            readExternalConfigPath(allConfig, "quarkus.rest.path").ifPresent(defaultIgnore::add);
-            readExternalConfigPath(allConfig, "quarkus.resteasy-reactive.path").ifPresent(defaultIgnore::add);
-            readExternalConfigPath(allConfig, "quarkus.http.non-application-root-path").ifPresent(defaultIgnore::add);
-            return defaultIgnore;
-        }).stream().map(s -> s.startsWith("/") ? s : "/" + s).collect(toList());
+    static List<String> getNormalizedIgnoredPathPrefixes(QuinoaConfig config,
+            NonApplicationRootPathBuildItem nonApplicationRootPath) {
+        return config.ignoredPathPrefixes()
+                .map(list -> list.stream()
+                        .map(s -> normalizePath(s, false))
+                        .collect(Collectors.toList()))
+                .orElseGet(() -> {
+                    Config allConfig = ConfigProvider.getConfig();
+                    List<String> defaultIgnore = new ArrayList<>();
+                    String uiRootPath = getNormalizedUiRootPath(config);
+                    // note that quarkus.resteasy.path and quarkus.resteasy-reactive.path are always relative to the http root path
+                    readExternalConfigPath(uiRootPath, allConfig, "quarkus.resteasy.path").ifPresent(defaultIgnore::add);
+                    readExternalConfigPath(uiRootPath, allConfig, "quarkus.rest.path").ifPresent(defaultIgnore::add);
+                    readExternalConfigPath(uiRootPath, allConfig, "quarkus.resteasy-reactive.path")
+                            .ifPresent(defaultIgnore::add);
+                    // the non-application root path is not always relative to the http root path
+                    convertNonApplicationRootPath(uiRootPath, nonApplicationRootPath).ifPresent(defaultIgnore::add);
+                    return defaultIgnore;
+                });
     }
 
     static QuinoaDevProxyHandlerConfig toDevProxyHandlerConfig(final QuinoaConfig config,
-            final HttpBuildTimeConfig httpBuildTimeConfig) {
+            final HttpBuildTimeConfig httpBuildTimeConfig, final NonApplicationRootPathBuildItem nonApplicationRootPath) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
-        return new QuinoaDevProxyHandlerConfig(getNormalizedIgnoredPathPrefixes(config),
+        return new QuinoaDevProxyHandlerConfig(getNormalizedIgnoredPathPrefixes(config, nonApplicationRootPath),
                 config.devServer().indexPage().orElse(DEFAULT_INDEX_PAGE),
                 httpBuildTimeConfig.enableCompression, compressMediaTypes, config.devServer().directForwarding());
     }
 
-    private static Optional<String> readExternalConfigPath(Config config, String key) {
+    /**
+     * <p>
+     * Normalizes the {@link QuinoaConfig#uiRootPath()} and the returned path always starts with {@code "/"} and ends with
+     * {@code "/"}.
+     * <p>
+     * Note that this will not resolve the path relative to 'quarkus.http.root-path'.
+     */
+    static String getNormalizedUiRootPath(QuinoaConfig config) {
+        return normalizePath(config.uiRootPath(), true);
+    }
+
+    /**
+     * Normalizes the path and the returned path starts with a slash and if {@code trailingSlash} is set to {@code true} then it
+     * will also end in a slash.
+     */
+    private static String normalizePath(String path, boolean trailingSlash) {
+        String normalizedPath = UriNormalizationUtil.toURI(path, trailingSlash).getPath();
+        return normalizedPath.startsWith("/") ? normalizedPath : "/" + normalizedPath;
+    }
+
+    /**
+     * Note that {@code rootPath} and {@code leafPath} are required to start and end in a slash.
+     * The returned path also fulfills this requirement.
+     */
+    private static Optional<String> relativizePath(String rootPath, String leafPath) {
+        return Optional.ofNullable(UriNormalizationUtil.relativize(rootPath, leafPath))
+                // note that relativize always removes the leading slash
+                .map(s -> "/" + s);
+    }
+
+    private static Optional<String> readExternalConfigPath(String uiRootPath, Config config, String key) {
         return config.getOptionalValue(key, String.class)
-                .filter(s -> !Objects.equals(s, "/"))
-                .map(s -> s.endsWith("/") ? s : s + "/");
+                .map(s -> normalizePath(s, true))
+                // only add this path if it is relative to the ui-root-path
+                .flatMap(s -> relativizePath(uiRootPath, s))
+                .filter(s -> !Objects.equals(s, "/"));
+    }
+
+    private static Optional<String> convertNonApplicationRootPath(String uiRootPath,
+            NonApplicationRootPathBuildItem nonApplicationRootPath) {
+        // only add the non-application root path if it is relative to the http root path
+        // note that both paths start and end in a slash already
+        return relativizePath(nonApplicationRootPath.getNormalizedHttpRootPath(),
+                nonApplicationRootPath.getNonApplicationRootPath())
+                // and also only add this path if it is relative to the ui-root-path
+                .flatMap(s -> relativizePath(uiRootPath, s))
+                .filter(s -> !Objects.equals(s, "/"));
     }
 
     static boolean isDevServerMode(QuinoaConfig config) {
@@ -163,6 +225,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!Objects.equals(q1.justBuild(), q2.justBuild())) {
+            return false;
+        }
+        if (!Objects.equals(q1.uiRootPath(), q2.uiRootPath())) {
             return false;
         }
         if (!Objects.equals(q1.uiDir(), q2.uiDir())) {
