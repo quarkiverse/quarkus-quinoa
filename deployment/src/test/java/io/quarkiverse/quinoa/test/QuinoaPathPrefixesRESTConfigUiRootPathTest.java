@@ -11,22 +11,25 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaPathPrefixesRESTConfigTest {
+public class QuinoaPathPrefixesRESTConfigUiRootPathTest {
 
-    private static final String NAME = "resteasy-reactive-path-config";
+    private static final String NAME = "resteasy-reactive-path-config-ui-root-path";
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
             .toQuarkusUnitTest()
+            .overrideConfigKey("quarkus.http.root-path", "/root/path")
+            .overrideConfigKey("quarkus.quinoa.ui-root-path", "/foo")
             .overrideConfigKey("quarkus.rest.path", "/foo/reactive")
             .overrideConfigKey("quarkus.resteasy.path", "/foo/classic")
             .overrideConfigKey("quarkus.http.non-application-root-path", "/bar/non")
             .overrideConfigKey("quarkus.quinoa.enable-spa-routing", "true")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /foo/classic/, /foo/reactive/, /bar/non/"))
+                            // ignored paths are always relative to the ui root path
+                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /classic/, /reactive/"))
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa is available at: /")));
+                            .equals("Quinoa is available at: /root/path/foo")));
 
     @Test
     public void testQuinoa() {
