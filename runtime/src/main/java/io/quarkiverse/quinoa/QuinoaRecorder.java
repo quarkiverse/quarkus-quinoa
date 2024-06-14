@@ -41,17 +41,31 @@ public class QuinoaRecorder {
         return new QuinoaUIResourceHandler(handlerConfig, directory, uiResources);
     }
 
+    public void logUiRootPath(final String resolvedUiRootPath) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Quinoa is available at: " + resolvedUiRootPath);
+        }
+    }
+
     static String resolvePath(RoutingContext ctx) {
-        return (ctx.mountPoint() == null) ? ctx.normalizedPath()
+        // quarkus.http.root-path
+        String path = (ctx.mountPoint() == null) ? ctx.normalizedPath()
                 : ctx.normalizedPath().substring(
                         // let's be extra careful here in case Vert.x normalizes the mount points at
                         // some point
                         ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
+        // quarkus.quinoa.ui-root-path
+        String routePath = ctx.currentRoute().getPath();
+        String resolvedPath = (routePath == null) ? path
+                : path.substring(routePath.endsWith("/") ? routePath.length() - 1 : routePath.length());
+        // use "/" when the path is empty
+        // e.g. this happens when the request path is "/example" and the root path is "/example"
+        return resolvedPath.isEmpty() ? "/" : resolvedPath;
     }
 
     static boolean isIgnored(final String path, final List<String> ignoredPathPrefixes) {
         if (ignoredPathPrefixes.stream().anyMatch(path::startsWith)) {
-            LOG.debugf("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
+            LOG.debug("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
             return true;
         }
         return false;
@@ -77,7 +91,7 @@ public class QuinoaRecorder {
 
     static void logIgnoredPathPrefixes(final List<String> ignoredPathPrefixes) {
         if (LOG.isDebugEnabled()) {
-            LOG.debugf("Quinoa is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
+            LOG.debug("Quinoa is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
         }
     }
 

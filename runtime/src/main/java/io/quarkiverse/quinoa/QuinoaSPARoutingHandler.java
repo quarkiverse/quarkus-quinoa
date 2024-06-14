@@ -30,8 +30,16 @@ class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
         }
         String path = resolvePath(ctx);
         if (!Objects.equals(path, "/") && !isIgnored(path, config.ignoredPathPrefixes)) {
-            LOG.debugf("Quinoa is re-routing SPA request '%s' to '/'", ctx.normalizedPath());
-            ctx.reroute(ctx.mountPoint() != null ? ctx.mountPoint() : "/");
+            String mountPoint = ctx.mountPoint() != null ? ctx.mountPoint() : "/";
+            String routePath = ctx.currentRoute().getPath() != null ? ctx.currentRoute().getPath() : "/";
+            String target;
+            if (mountPoint.endsWith("/")) {
+                target = mountPoint.substring(0, mountPoint.length() - 1) + routePath;
+            } else {
+                target = mountPoint + routePath;
+            }
+            LOG.debugf("Quinoa is re-routing SPA request '%s' to '%s'", ctx.normalizedPath(), target);
+            ctx.reroute(target);
         } else {
             next(currentClassLoader, ctx);
         }
