@@ -37,14 +37,15 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private final ClassLoader currentClassLoader;
     private final QuinoaDevProxyHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaDevProxyHandlerConfig config, final Vertx vertx,  boolean tls, boolean tlsAllowInsecure,String host, int port,
+    QuinoaDevProxyHandler(final QuinoaDevProxyHandlerConfig config, final Vertx vertx, boolean tls, boolean tlsAllowInsecure,
+            String host, int port,
             boolean websocket) {
         this.host = host;
         this.port = port;
         WebClientOptions options = new WebClientOptions();
-        if(tls){
+        if (tls) {
             options.setSsl(true);
-            if(tlsAllowInsecure){
+            if (tlsAllowInsecure) {
                 options.setTrustAll(true);
                 options.setVerifyHost(false);
             }

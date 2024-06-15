@@ -26,7 +26,7 @@ public class QuinoaRecorder {
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
     public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaDevProxyHandlerConfig handlerConfig, Supplier<Vertx> vertx,
-                                                         boolean tls, boolean tlsAllowInsecure, String host, int port, boolean websocket) {
+            boolean tls, boolean tlsAllowInsecure, String host, int port, boolean websocket) {
         if (LOG.isDebugEnabled()) {
             LOG.debugf("Quinoa dev proxy-handler is ignoring paths starting with: "
                     + String.join(", ", handlerConfig.ignoredPathPrefixes));
