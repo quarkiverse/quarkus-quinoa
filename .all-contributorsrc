@@ -206,6 +206,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "liquidnya",
+      "name": "Alice",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7364785?v=4",
+      "profile": "http://meow.liquidnya.art",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
