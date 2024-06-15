@@ -26,9 +26,9 @@ public class QuinoaRecorder {
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
     public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaHandlerConfig handlerConfig, Supplier<Vertx> vertx,
-            String host, int port, boolean websocket) {
+            boolean tls, boolean tlsAllowInsecure, String host, int port, boolean websocket) {
         logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
-        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), host, port, websocket);
+        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), tls, tlsAllowInsecure, host, port, websocket);
     }
 
     public Handler<RoutingContext> quinoaSPARoutingHandler(final QuinoaHandlerConfig handlerConfig) throws IOException {

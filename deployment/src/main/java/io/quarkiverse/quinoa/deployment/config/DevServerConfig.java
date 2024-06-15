@@ -41,13 +41,13 @@ public interface DevServerConfig {
     String host();
 
     /**
-     * Protocol of the server to forward requests to.
+     * When set to true, Quinoa requests will be forwarded with tls enabled.
      */
     @WithDefault("false")
     boolean tls();
 
     /**
-     * Protocol of the server to forward requests to.
+     * When set to true, Quinoa will accept any certificate with any hostname.
      */
     @WithDefault("false")
     boolean tlsAllowInsecure();

@@ -99,7 +99,8 @@ public class ForwardedDevProcessor {
                         devServerConfig.host(),
                         devServerConfig.port().get(),
                         checkPath);
-                return new ForwardedDevServerBuildItem(resolvedDevServerHost, devServerConfig.port().get());
+                return new ForwardedDevServerBuildItem(devServerConfig.tls(), devServerConfig.tlsAllowInsecure(),
+                        resolvedDevServerHost, devServerConfig.port().get());
             }
             shutdownDevService();
         }
@@ -125,7 +126,7 @@ public class ForwardedDevProcessor {
             final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredTls, configuredTlsAllowInsecure,
                     configuredDevServerHost, port, checkPath);
             if (resolvedHostIPAddress != null) {
-                return new ForwardedDevServerBuildItem(resolvedHostIPAddress, port);
+                return new ForwardedDevServerBuildItem(configuredTls, configuredTlsAllowInsecure, resolvedHostIPAddress, port);
             } else {
                 throw new IllegalStateException(
                         "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + port);
@@ -161,7 +162,7 @@ public class ForwardedDevProcessor {
             devService = new DevServicesResultBuildItem.RunningDevService(
                     DEV_SERVICE_NAME, null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
-            return new ForwardedDevServerBuildItem(devServer.hostIPAddress(), port);
+            return new ForwardedDevServerBuildItem(configuredTls, configuredTlsAllowInsecure, devServer.hostIPAddress(), port);
         } catch (Throwable t) {
             packageManagerRunner.stopDev(dev.get());
             if (devServer != null) {
@@ -206,7 +207,8 @@ public class ForwardedDevProcessor {
             LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
             final QuinoaHandlerConfig handlerConfig = toHandlerConfig(quinoaConfig, true, httpBuildTimeConfig);
             routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
+                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().isTls(),
+                            devProxy.get().isTlsAllowInsecure(), devProxy.get().getHost(),
                             devProxy.get().getPort(),
                             quinoaConfig.devServer().websocket()))
                     .build());

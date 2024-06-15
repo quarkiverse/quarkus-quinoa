@@ -20,6 +20,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 
 class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
@@ -36,11 +37,20 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private final ClassLoader currentClassLoader;
     private final QuinoaHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, String host, int port,
+    QuinoaDevProxyHandler(final QuinoaHandlerConfig config, final Vertx vertx, boolean tls, boolean tlsAllowInsecure,
+            String host, int port,
             boolean websocket) {
         this.host = host;
         this.port = port;
-        this.client = WebClient.create(vertx);
+        WebClientOptions options = new WebClientOptions();
+        if (tls) {
+            options.setSsl(true);
+            if (tlsAllowInsecure) {
+                options.setTrustAll(true);
+                options.setVerifyHost(false);
+            }
+        }
+        this.client = WebClient.create(vertx, options);
         this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, host, port) : null;
         this.config = config;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
