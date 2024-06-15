@@ -27,6 +27,7 @@ import javax.net.ssl.SSLSession;
 
 import org.jboss.logging.Logger;
 
+import io.quarkiverse.quinoa.QuinoaNetworkConfiguration;
 import io.quarkiverse.quinoa.deployment.SslUtil;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManager;
@@ -139,7 +140,7 @@ public class PackageManagerRunner {
     }
 
     public DevServer dev(Optional<ConsoleInstalledBuildItem> consoleInstalled, LoggingSetupBuildItem loggingSetup,
-            boolean tls, boolean tlsAllowInsecure, String devServerHost, int devServerPort, String checkPath,
+            QuinoaNetworkConfiguration network, String checkPath,
             int checkTimeout) {
         final PackageManager.Command dev = packageManager.dev();
         LOG.infof("Running Quinoa package manager live coding as a dev service: %s", dev.commandWithArguments);
@@ -156,16 +157,16 @@ public class PackageManagerRunner {
         });
         if (checkPath == null) {
             LOG.infof("Quinoa is configured to continue without check if the live coding server is up");
-            return new DevServer(p, devServerHost, logCompressor);
+            return new DevServer(p, network.getHost(), logCompressor);
         }
         String ipAddress = null;
         try {
             int i = 0;
-            while ((ipAddress = isDevServerUp(tls, tlsAllowInsecure, devServerHost, devServerPort, checkPath)) == null) {
+            while ((ipAddress = isDevServerUp(network, checkPath)) == null) {
                 if (++i >= checkTimeout / 500) {
                     stopDev(p);
                     throw new RuntimeException(
-                            "Quinoa package manager live coding port " + devServerPort
+                            "Quinoa package manager live coding port " + network.getPort()
                                     + " is still not listening after the checkTimeout.");
                 }
                 Thread.sleep(500);
@@ -275,22 +276,23 @@ public class PackageManagerRunner {
         }
     }
 
-    public static String isDevServerUp(boolean tls, boolean tlsAllowInsecure, String host, int port, String path) {
+    public static String isDevServerUp(QuinoaNetworkConfiguration network, String path) {
         if (path == null) {
-            return host;
+            return network.getHost();
         }
         final String normalizedPath = path.indexOf("/") == 0 ? path : "/" + path;
         try {
-            InetAddress[] addresses = InetAddress.getAllByName(host);
+            InetAddress[] addresses = InetAddress.getAllByName(network.getHost());
             for (InetAddress address : addresses) {
                 try {
                     final String hostAddress = address.getHostAddress();
                     final String ipAddress = address instanceof Inet6Address ? "[" + hostAddress + "]" : hostAddress;
-                    URL url = new URL(String.format("%s://%s:%d%s", tls ? "https" : "http", ipAddress, port, normalizedPath));
+                    URL url = new URL(String.format("%s://%s:%d%s", network.isTls() ? "https" : "http", ipAddress,
+                            network.getPort(), normalizedPath));
                     HttpURLConnection connection;
-                    if (tls) {
+                    if (network.isTls()) {
                         HttpsURLConnection httpsConnection = (HttpsURLConnection) url.openConnection();
-                        if (tlsAllowInsecure) {
+                        if (network.isTlsAllowInsecure()) {
                             httpsConnection.setSSLSocketFactory(SslUtil.createNonValidatingSslContext().getSocketFactory());
                             httpsConnection.setHostnameVerifier(new HostnameVerifier() {
                                 @Override

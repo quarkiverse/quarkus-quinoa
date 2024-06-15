@@ -1,34 +1,33 @@
 package io.quarkiverse.quinoa.deployment.items;
 
+import io.quarkiverse.quinoa.QuinoaNetworkConfiguration;
 import io.quarkus.builder.item.SimpleBuildItem;
 
 public final class ForwardedDevServerBuildItem extends SimpleBuildItem {
 
-    private final boolean tls;
-    private final boolean tlsAllowInsecure;
-    private final String host;
-    private final Integer port;
+    private final QuinoaNetworkConfiguration networkConfiguration;
 
-    public ForwardedDevServerBuildItem(boolean tls, boolean tlsAllowInsecure, String host, Integer port) {
-        this.tls = tls;
-        this.tlsAllowInsecure = tlsAllowInsecure;
-        this.host = host;
-        this.port = port;
+    public ForwardedDevServerBuildItem(QuinoaNetworkConfiguration networkConfiguration) {
+        this.networkConfiguration = networkConfiguration;
+    }
+
+    public QuinoaNetworkConfiguration getNetworkConfiguration() {
+        return networkConfiguration;
     }
 
     public boolean isTls() {
-        return tls;
+        return networkConfiguration.isTls();
     }
 
     public boolean isTlsAllowInsecure() {
-        return tlsAllowInsecure;
+        return networkConfiguration.isTlsAllowInsecure();
     }
 
     public String getHost() {
-        return host;
+        return networkConfiguration.getHost();
     }
 
     public Integer getPort() {
-        return port;
+        return networkConfiguration.getPort();
     }
 }

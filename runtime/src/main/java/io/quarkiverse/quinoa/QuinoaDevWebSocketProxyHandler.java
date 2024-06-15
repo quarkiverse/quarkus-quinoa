@@ -18,13 +18,11 @@ import io.vertx.ext.web.RoutingContext;
 class QuinoaDevWebSocketProxyHandler {
     private static final Logger LOG = Logger.getLogger(QuinoaDevWebSocketProxyHandler.class);
     private final HttpClient httpClient;
-    private String host;
-    private final int port;
+    private final QuinoaNetworkConfiguration networkConfiguration;
 
-    QuinoaDevWebSocketProxyHandler(Vertx vertx, String host, int port) {
+    QuinoaDevWebSocketProxyHandler(Vertx vertx, QuinoaNetworkConfiguration network) {
         this.httpClient = vertx.createHttpClient();
-        this.host = host;
-        this.port = port;
+        this.networkConfiguration = network;
     }
 
     public void handle(final RoutingContext ctx) {
@@ -33,7 +31,8 @@ class QuinoaDevWebSocketProxyHandler {
         request.toWebSocket(r -> {
             if (r.succeeded()) {
                 final String forwardUri = request.uri();
-                LOG.debugf("Quinoa Dev WebSocket Server Connected: %s:%s%s", host, port, forwardUri);
+                LOG.debugf("Quinoa Dev WebSocket Server Connected: %s:%s%s", networkConfiguration.getHost(),
+                        networkConfiguration.getPort(), forwardUri);
                 final ServerWebSocket serverWs = r.result();
                 final AtomicReference<WebSocket> clientWs = new AtomicReference<>();
                 serverWs
@@ -58,8 +57,8 @@ class QuinoaDevWebSocketProxyHandler {
                 }
 
                 final WebSocketConnectOptions options = new WebSocketConnectOptions()
-                        .setHost(host)
-                        .setPort(port)
+                        .setHost(networkConfiguration.getHost())
+                        .setPort(networkConfiguration.getPort())
                         .setURI(forwardUri)
                         .setHeaders(serverWs.headers())
                         .setSubProtocols(subProtocols)
@@ -68,7 +67,8 @@ class QuinoaDevWebSocketProxyHandler {
 
                 httpClient.webSocket(options, clientContext -> {
                     if (clientContext.succeeded()) {
-                        LOG.infof("Quinoa Dev WebSocket Client Connected: %s:%s%s", host, port, forwardUri);
+                        LOG.infof("Quinoa Dev WebSocket Client Connected: %s:%s%s", networkConfiguration.getHost(),
+                                networkConfiguration.getPort(), forwardUri);
                         clientWs.set(clientContext.result());
                         // messages from NodeJS forwarded back to browser
                         clientWs.get().exceptionHandler(

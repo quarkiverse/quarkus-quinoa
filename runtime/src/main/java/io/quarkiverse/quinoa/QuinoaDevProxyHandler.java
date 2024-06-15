@@ -7,7 +7,6 @@ import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
 
 import java.util.List;
 
-import io.vertx.ext.web.client.WebClientOptions;
 import org.jboss.logging.Logger;
 
 import io.vertx.core.AsyncResult;
@@ -21,6 +20,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 
 class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
@@ -30,29 +30,21 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             HttpHeaders.CONTENT_LENGTH.toString(),
             HttpHeaders.CONTENT_TYPE.toString());
 
-    private final String host;
-    private final int port;
+    private final QuinoaNetworkConfiguration networkConfiguration;
     private final WebClient client;
     private final QuinoaDevWebSocketProxyHandler wsUpgradeHandler;
     private final ClassLoader currentClassLoader;
     private final QuinoaDevProxyHandlerConfig config;
 
-    QuinoaDevProxyHandler(final QuinoaDevProxyHandlerConfig config, final Vertx vertx, boolean tls, boolean tlsAllowInsecure,
-            String host, int port,
-            boolean websocket) {
-        this.host = host;
-        this.port = port;
+    QuinoaDevProxyHandler(final QuinoaDevProxyHandlerConfig config, final Vertx vertx, QuinoaNetworkConfiguration network) {
         WebClientOptions options = new WebClientOptions();
-        if (tls) {
-            options.setSsl(true);
-            if (tlsAllowInsecure) {
-                options.setTrustAll(true);
-                options.setVerifyHost(false);
-            }
-        }
+        options.setSsl(network.isTls());
+        options.setTrustAll(network.isTlsAllowInsecure());
+        options.setVerifyHost(!network.isTlsAllowInsecure());
         this.client = WebClient.create(vertx, options);
-        this.wsUpgradeHandler = websocket ? new QuinoaDevWebSocketProxyHandler(vertx, host, port) : null;
+        this.wsUpgradeHandler = network.isWebsocket() ? new QuinoaDevWebSocketProxyHandler(vertx, network) : null;
         this.config = config;
+        this.networkConfiguration = network;
         currentClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
@@ -97,7 +89,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
 
         // Disable compression in the forwarded request
         headers.remove("Accept-Encoding");
-        client.request(request.method(), port, host, uri)
+        client.request(request.method(), networkConfiguration.getPort(), networkConfiguration.getHost(), uri)
                 .putHeaders(headers)
                 .send(event -> {
                     if (event.succeeded()) {
