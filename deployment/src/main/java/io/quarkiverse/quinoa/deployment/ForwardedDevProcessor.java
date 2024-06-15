@@ -29,6 +29,7 @@ import java.util.function.BiPredicate;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaDevProxyHandlerConfig;
+import io.quarkiverse.quinoa.QuinoaNetworkConfiguration;
 import io.quarkiverse.quinoa.QuinoaRecorder;
 import io.quarkiverse.quinoa.deployment.config.DevServerConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
@@ -42,7 +43,6 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CuratedApplicationShutdownBuildItem;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
-import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
@@ -64,7 +64,6 @@ public class ForwardedDevProcessor {
 
     @BuildStep(onlyIf = IsDevelopment.class)
     public ForwardedDevServerBuildItem prepareDevService(
-            LaunchModeBuildItem launchMode,
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
             QuinoaConfig userConfig,
@@ -80,9 +79,8 @@ public class ForwardedDevProcessor {
         final QuinoaConfig resolvedConfig = configuredQuinoa.resolvedConfig();
         final DevServerConfig devServerConfig = resolvedConfig.devServer();
         liveReload.setContextObject(QuinoaConfig.class, resolvedConfig);
-        final String configuredDevServerHost = devServerConfig.host();
-        final boolean configuredTls = devServerConfig.tls();
-        final boolean configuredTlsAllowInsecure = devServerConfig.tlsAllowInsecure();
+        final QuinoaNetworkConfiguration networkConfiguration = new QuinoaNetworkConfiguration(devServerConfig.tls(),
+                devServerConfig.tlsAllowInsecure(), devServerConfig.host(), devServerConfig.port().orElse(0), false);
         final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         final String checkPath = resolvedConfig.devServer().checkPath().orElse(null);
         if (devService != null) {
@@ -96,12 +94,11 @@ public class ForwardedDevProcessor {
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
                 devServices.produce(devService.toBuildItem());
-                final String resolvedDevServerHost = PackageManagerRunner.isDevServerUp(devServerConfig.tls(),
-                        devServerConfig.tlsAllowInsecure(),
-                        devServerConfig.host(),
-                        devServerConfig.port().get(),
-                        checkPath);
-                return new ForwardedDevServerBuildItem(resolvedDevServerHost, devServerConfig.port().get());
+                networkConfiguration.setHost(devServerConfig.host());
+                networkConfiguration.setPort(devServerConfig.port().get());
+                final String resolvedDevServerHost = PackageManagerRunner.isDevServerUp(networkConfiguration, checkPath);
+                networkConfiguration.setHost(resolvedDevServerHost);
+                return new ForwardedDevServerBuildItem(networkConfiguration);
             }
             shutdownDevService();
         }
@@ -120,14 +117,15 @@ public class ForwardedDevProcessor {
             return null;
         }
         final Integer port = devServerConfig.port().get();
+        networkConfiguration.setPort(port);
 
         if (!devServerConfig.managed()) {
             // No need to start the dev-service it is not managed by Quinoa
             // We just check that it is up
-            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(configuredTls, configuredTlsAllowInsecure,
-                    configuredDevServerHost, port, checkPath);
+            final String resolvedHostIPAddress = PackageManagerRunner.isDevServerUp(networkConfiguration, checkPath);
             if (resolvedHostIPAddress != null) {
-                return new ForwardedDevServerBuildItem(resolvedHostIPAddress, port);
+                networkConfiguration.setHost(resolvedHostIPAddress);
+                return new ForwardedDevServerBuildItem(networkConfiguration);
             } else {
                 throw new IllegalStateException(
                         "The Web UI dev server (configured as not managed by Quinoa) is not started on port: " + port);
@@ -142,11 +140,8 @@ public class ForwardedDevProcessor {
         final AtomicReference<Process> dev = new AtomicReference<>();
         PackageManagerRunner.DevServer devServer = null;
         try {
-            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, configuredTls, configuredTlsAllowInsecure,
-                    configuredDevServerHost,
-                    port,
-                    checkPath,
-                    checkTimeout);
+            devServer = packageManagerRunner.dev(consoleInstalled, loggingSetup, networkConfiguration,
+                    checkPath, checkTimeout);
             dev.set(devServer.process());
             devServer.logCompressor().close();
             final LiveCodingLogOutputFilter logOutputFilter = new LiveCodingLogOutputFilter(
@@ -163,7 +158,8 @@ public class ForwardedDevProcessor {
             devService = new DevServicesResultBuildItem.RunningDevService(
                     DEV_SERVICE_NAME, null, onClose, devServerConfigMap);
             devServices.produce(devService.toBuildItem());
-            return new ForwardedDevServerBuildItem(devServer.hostIPAddress(), port);
+            networkConfiguration.setHost(devServer.hostIPAddress());
+            return new ForwardedDevServerBuildItem(networkConfiguration);
         } catch (Throwable t) {
             packageManagerRunner.stopDev(dev.get());
             if (devServer != null) {
@@ -177,7 +173,7 @@ public class ForwardedDevProcessor {
         Map<String, String> devServerConfigMap = new LinkedHashMap<>();
         devServerConfigMap.put("quarkus.quinoa.dev-server.host", quinoaConfig.devServer().host());
         devServerConfigMap.put("quarkus.quinoa.dev-server.port",
-                quinoaConfig.devServer().port().map(p -> p.toString()).orElse(""));
+                quinoaConfig.devServer().port().map(Object::toString).orElse(""));
         devServerConfigMap.put("quarkus.quinoa.dev-server.check-timeout",
                 Integer.toString(quinoaConfig.devServer().checkTimeout()));
         devServerConfigMap.put("quarkus.quinoa.dev-server.check-path", quinoaConfig.devServer().checkPath().orElse(""));
@@ -212,11 +208,13 @@ public class ForwardedDevProcessor {
                     nonApplicationRootPath);
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(quinoaConfig);
             recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
+            final QuinoaNetworkConfiguration networkConfig = new QuinoaNetworkConfiguration(devProxy.get().isTls(),
+                    devProxy.get().isTlsAllowInsecure(), devProxy.get().getHost(),
+                    devProxy.get().getPort(),
+                    quinoaConfig.devServer().websocket());
             // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
             routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().getHost(),
-                            devProxy.get().getPort(),
-                            quinoaConfig.devServer().websocket()))
+                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), networkConfig))
                     .build());
             if (quinoaConfig.devServer().websocket()) {
                 websocketSubProtocols.produce(new WebsocketSubProtocolsBuildItem("*"));
