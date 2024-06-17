@@ -32,6 +32,13 @@ public class QuinoaUiRootPathTest {
     @TestHTTPResource("/ui/ignored")
     URL url404Ignored;
 
+    @TestHTTPResource("/ui/ignored/sub-path")
+    URL url404IgnoredSubPath;
+
+    // this path starts with /ignored, but is not a sub path of /ignored
+    @TestHTTPResource("/ui/ignored-not-ignored")
+    URL urlNotIgnored;
+
     // note how the path "/ui" does not work in a production build
     // note that "/ui" works in dev-mode as long as the nodejs server also hosts "/ui"
     @TestHTTPResource("/ui/")
@@ -48,6 +55,10 @@ public class QuinoaUiRootPathTest {
                 .statusCode(404);
         given()
                 .when().get(url404Ignored)
+                .then()
+                .statusCode(404);
+        given()
+                .when().get(url404IgnoredSubPath)
                 .then()
                 .statusCode(404);
     }
@@ -73,6 +84,18 @@ public class QuinoaUiRootPathTest {
     public void testRoute() {
         final Page page = context.newPage();
         Response response = page.navigate(urlRoute.toString());
+        Assertions.assertEquals("OK", response.statusText());
+
+        page.waitForLoadState();
+
+        String title = page.title();
+        Assertions.assertEquals("Quinoa Lit App", title);
+    }
+
+    @Test
+    public void testNotIgnored() {
+        final Page page = context.newPage();
+        Response response = page.navigate(urlNotIgnored.toString());
         Assertions.assertEquals("OK", response.statusText());
 
         page.waitForLoadState();

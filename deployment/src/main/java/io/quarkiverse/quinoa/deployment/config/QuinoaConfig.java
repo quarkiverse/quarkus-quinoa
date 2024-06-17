@@ -198,7 +198,8 @@ public interface QuinoaConfig {
                 .map(s -> normalizePath(s, true))
                 // only add this path if it is relative to the ui-root-path
                 .flatMap(s -> relativizePath(uiRootPath, s))
-                .filter(s -> !Objects.equals(s, "/"));
+                .filter(s -> !Objects.equals(s, "/"))
+                .map(s -> s.endsWith("/") ? s.substring(0, s.length() - 1) : s);
     }
 
     private static Optional<String> convertNonApplicationRootPath(String uiRootPath,
@@ -209,7 +210,8 @@ public interface QuinoaConfig {
                 nonApplicationRootPath.getNonApplicationRootPath())
                 // and also only add this path if it is relative to the ui-root-path
                 .flatMap(s -> relativizePath(uiRootPath, s))
-                .filter(s -> !Objects.equals(s, "/"));
+                .filter(s -> !Objects.equals(s, "/"))
+                .map(s -> s.endsWith("/") ? s.substring(0, s.length() - 1) : s);
     }
 
     static boolean isDevServerMode(QuinoaConfig config) {

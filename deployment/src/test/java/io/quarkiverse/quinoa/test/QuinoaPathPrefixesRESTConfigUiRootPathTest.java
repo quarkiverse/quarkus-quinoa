@@ -27,7 +27,7 @@ public class QuinoaPathPrefixesRESTConfigUiRootPathTest {
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage()
                             // ignored paths are always relative to the ui root path
-                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /classic/, /reactive/"))
+                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /classic, /reactive"))
                     .anyMatch(s -> s.getMessage()
                             .equals("Quinoa is available at: /root/path/foo/")));
 

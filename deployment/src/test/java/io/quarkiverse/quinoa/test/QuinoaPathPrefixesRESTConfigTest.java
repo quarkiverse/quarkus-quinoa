@@ -24,7 +24,7 @@ public class QuinoaPathPrefixesRESTConfigTest {
             .overrideConfigKey("quarkus.quinoa.enable-spa-routing", "true")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /foo/classic/, /foo/reactive/, /bar/non/"))
+                            .equals("Quinoa SPA routing handler is ignoring paths starting with: /foo/classic, /foo/reactive, /bar/non"))
                     .anyMatch(s -> s.getMessage()
                             .equals("Quinoa is available at: /")));
 

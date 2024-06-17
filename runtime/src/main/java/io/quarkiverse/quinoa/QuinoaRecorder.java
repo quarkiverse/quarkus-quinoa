@@ -4,6 +4,7 @@ import static io.quarkus.vertx.http.runtime.RouteConstants.ROUTE_ORDER_DEFAULT;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -63,8 +64,18 @@ public class QuinoaRecorder {
         return resolvedPath.isEmpty() ? "/" : resolvedPath;
     }
 
+    static boolean matchesPathSeparatedPrefix(String path, String pathSeparatedPrefix) {
+        if (path.startsWith(pathSeparatedPrefix)) {
+            String restPath = path.substring(pathSeparatedPrefix.length());
+            // the path matches the path separated prefix if the rest path is empty or starts with "/"
+            // note that the pathSeparatedPrefix never ends in "/" except if it equals "/" exactly
+            return restPath.isEmpty() || restPath.startsWith("/") || Objects.equals(pathSeparatedPrefix, "/");
+        }
+        return false;
+    }
+
     static boolean isIgnored(final String path, final List<String> ignoredPathPrefixes) {
-        if (ignoredPathPrefixes.stream().anyMatch(path::startsWith)) {
+        if (ignoredPathPrefixes.stream().anyMatch(prefix -> matchesPathSeparatedPrefix(path, prefix))) {
             LOG.debug("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
             return true;
         }
