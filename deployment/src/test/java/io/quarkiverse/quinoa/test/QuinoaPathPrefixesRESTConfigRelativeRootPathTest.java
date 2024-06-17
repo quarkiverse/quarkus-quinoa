@@ -11,21 +11,25 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
 import io.quarkus.test.QuarkusUnitTest;
 
-public class QuinoaPathPrefixesRESTConfigTest {
+public class QuinoaPathPrefixesRESTConfigRelativeRootPathTest {
 
-    private static final String NAME = "resteasy-reactive-path-config";
+    private static final String NAME = "resteasy-reactive-path-config-relative-root-path";
 
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
             .toQuarkusUnitTest()
-            .overrideConfigKey("quarkus.resteasy-reactive.path", "/foo/reactive")
-            .overrideConfigKey("quarkus.resteasy.path", "/foo/classic")
-            .overrideConfigKey("quarkus.http.non-application-root-path", "/bar/non")
+            .overrideConfigKey("quarkus.http.root-path", "root/path")
+            .overrideConfigKey("quarkus.resteasy-reactive.path", "foo/reactive")
+            .overrideConfigKey("quarkus.resteasy.path", "foo/classic")
+            .overrideConfigKey("quarkus.http.non-application-root-path", "bar/non")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage()
+                            // note how /bar/non is part of the ignored paths
+                            // this is because bar/non is relative to the root path when it does not start with a slash
+                            // also note that quarkus.rest.path, and quarkus.resteasy.path are always relative to the root path even if they start with a slash
                             .equals("Quinoa is ignoring paths starting with: /foo/classic, /foo/reactive, /bar/non"))
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa is available at: /")));
+                            .equals("Quinoa is available at: /root/path/")));
 
     @Test
     public void testQuinoa() {

@@ -57,6 +57,8 @@ import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
+import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
+import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
 
@@ -247,6 +249,8 @@ public class QuinoaProcessor {
             HttpBuildTimeConfig httpBuildTimeConfig,
             LaunchModeBuildItem launchMode,
             Optional<BuiltResourcesBuildItem> uiResources,
+            HttpRootPathBuildItem httpRootPath,
+            NonApplicationRootPathBuildItem nonApplicationRootPath,
             QuinoaRecorder recorder,
             BuildProducer<RouteBuildItem> routes,
             BuildProducer<ResumeOn404BuildItem> resumeOn404) throws IOException {
@@ -261,14 +265,20 @@ public class QuinoaProcessor {
             }
             final QuinoaHandlerConfig handlerConfig = toHandlerConfig(configuredQuinoa.resolvedConfig(),
                     launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT,
-                    httpBuildTimeConfig);
+                    httpBuildTimeConfig,
+                    nonApplicationRootPath);
             resumeOn404.produce(new ResumeOn404BuildItem());
-            routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_ROUTE_ORDER)
+            String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
+            // the resolvedUiRootPath is only used for logging
+            String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
+            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
+            // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
+            routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaHandler(handlerConfig, directory,
                             uiResources.get().getNames()))
                     .build());
             if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
-                routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
+                routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder.quinoaSPARoutingHandler(handlerConfig))
                         .build());
             }
