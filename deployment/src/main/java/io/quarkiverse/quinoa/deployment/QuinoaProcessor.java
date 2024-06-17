@@ -1,7 +1,9 @@
 package io.quarkiverse.quinoa.deployment;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.*;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.getNormalizedIgnoredPathPrefixes;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
 import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
@@ -221,7 +223,7 @@ public class QuinoaProcessor {
     public void produceGeneratedStaticResources(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             BuildProducer<GeneratedStaticResourceBuildItem> generatedStaticResourceProducer,
-            Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
+            Optional<BuiltResourcesBuildItem> uiResources) {
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
             LOG.info("Quinoa is in build only mode");
             return;
@@ -255,7 +257,7 @@ public class QuinoaProcessor {
             // the resolvedUiRootPath is only used for logging
             String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
             recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
-            if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
+            if (Objects.requireNonNull(configuredQuinoa).resolvedConfig().enableSPARouting()) {
                 routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder
                                 .quinoaSPARoutingHandler(getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig(),
