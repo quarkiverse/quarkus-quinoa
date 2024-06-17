@@ -269,7 +269,9 @@ public class QuinoaProcessor {
                     nonApplicationRootPath);
             resumeOn404.produce(new ResumeOn404BuildItem());
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
-            recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
+            // the resolvedUiRootPath is only used for logging
+            String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
+            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
             // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
             routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaHandler(handlerConfig, directory,

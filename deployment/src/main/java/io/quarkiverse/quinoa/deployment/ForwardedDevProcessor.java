@@ -212,7 +212,9 @@ public class ForwardedDevProcessor {
             final QuinoaHandlerConfig handlerConfig = toHandlerConfig(quinoaConfig, true, httpBuildTimeConfig,
                     nonApplicationRootPath);
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(quinoaConfig);
-            recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
+            // the resolvedUiRootPath is only used for logging
+            String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
+            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
             // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
             routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
                     .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), devProxy.get().isTls(),

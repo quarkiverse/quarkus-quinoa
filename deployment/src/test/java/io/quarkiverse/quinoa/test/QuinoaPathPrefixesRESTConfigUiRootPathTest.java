@@ -28,7 +28,7 @@ public class QuinoaPathPrefixesRESTConfigUiRootPathTest {
                             // ignored paths are always relative to the ui root path
                             .equals("Quinoa is ignoring paths starting with: /classic/, /reactive/"))
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa is available at: /root/path/foo")));
+                            .equals("Quinoa is available at: /root/path/foo/")));
 
     @Test
     public void testQuinoa() {
