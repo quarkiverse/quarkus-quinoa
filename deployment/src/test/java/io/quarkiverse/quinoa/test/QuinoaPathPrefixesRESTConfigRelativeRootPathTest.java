@@ -30,7 +30,7 @@ public class QuinoaPathPrefixesRESTConfigRelativeRootPathTest {
                             // also note that quarkus.rest.path, and quarkus.resteasy.path are always relative to the root path even if they start with a slash
                             .equals("Quinoa SPA routing handler is ignoring paths starting with: /foo/classic/, /foo/reactive/, /bar/non/"))
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa is available at: /root/path")));
+                            .equals("Quinoa is available at: /root/path/")));
 
     @Test
     public void testQuinoa() {

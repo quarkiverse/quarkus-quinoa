@@ -230,7 +230,7 @@ public class QuinoaProcessor {
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
             for (BuiltResourcesBuildItem.BuiltResource resource : uiResources.get().resources()) {
                 // note how uiRootPath always starts and ends in a slash
-                // and resource.name() always starts in a slash
+                // and resource.name() always starts in a slash, therfore resource.name().substring(1) never starts in a slash
                 generatedStaticResourceProducer
                         .produce(new GeneratedStaticResourceBuildItem(uiRootPath + resource.name().substring(1),
                                 resource.content()));
@@ -252,7 +252,9 @@ public class QuinoaProcessor {
         }
         if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
-            recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
+            // the resolvedUiRootPath is only used for logging
+            String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
+            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
             if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
                 routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder
