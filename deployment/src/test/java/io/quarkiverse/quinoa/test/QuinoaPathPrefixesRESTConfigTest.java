@@ -23,7 +23,7 @@ public class QuinoaPathPrefixesRESTConfigTest {
             .overrideConfigKey("quarkus.http.non-application-root-path", "/bar/non")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage()
-                            .equals("Quinoa is ignoring paths starting with: /foo/classic/, /foo/reactive/, /bar/non/"))
+                            .equals("Quinoa is ignoring paths starting with: /foo/classic, /foo/reactive, /bar/non"))
                     .anyMatch(s -> s.getMessage()
                             .equals("Quinoa is available at: /")));
 
