@@ -40,6 +40,7 @@ public enum FrameworkType {
     REACT(Set.of("react-scripts start", "react-app-rewired start", "craco start"), new ReactFramework()),
     VUE_LEGACY(Set.of("vue-cli-service serve"), generic("dist", "serve", 3000)),
     VITE(Set.of("vite"), generic("dist", "dev", 5173)),
+    FARM(Set.of("farm"), generic("dist", "dev", 9000)),
     SOLID_START(Set.of("solid-start dev"), generic("dist", "dev", 3000)),
     ASTRO(Set.of("astro dev"), generic("dist", "dev", 3000)),
     NEXT(Set.of("next dev"), new NextFramework()),
