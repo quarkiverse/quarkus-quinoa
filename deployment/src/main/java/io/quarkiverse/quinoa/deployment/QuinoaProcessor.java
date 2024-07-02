@@ -1,7 +1,9 @@
 package io.quarkiverse.quinoa.deployment;
 
 import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.*;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.getNormalizedIgnoredPathPrefixes;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
+import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
 import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
@@ -48,6 +50,8 @@ import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
+import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
+import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.spi.GeneratedStaticResourceBuildItem;
 
@@ -219,15 +223,19 @@ public class QuinoaProcessor {
     public void produceGeneratedStaticResources(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             BuildProducer<GeneratedStaticResourceBuildItem> generatedStaticResourceProducer,
-            Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
+            Optional<BuiltResourcesBuildItem> uiResources) {
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
             LOG.info("Quinoa is in build only mode");
             return;
         }
         if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
+            String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
             for (BuiltResourcesBuildItem.BuiltResource resource : uiResources.get().resources()) {
+                // note how uiRootPath always starts and ends in a slash
+                // and resource.name() always starts in a slash, therfore resource.name().substring(1) never starts in a slash
                 generatedStaticResourceProducer
-                        .produce(new GeneratedStaticResourceBuildItem(resource.name(), resource.content()));
+                        .produce(new GeneratedStaticResourceBuildItem(uiRootPath + resource.name().substring(1),
+                                resource.content()));
             }
         }
     }
@@ -236,6 +244,8 @@ public class QuinoaProcessor {
     @Record(RUNTIME_INIT)
     public void runtimeInit(
             ConfiguredQuinoaBuildItem configuredQuinoa,
+            HttpRootPathBuildItem httpRootPath,
+            NonApplicationRootPathBuildItem nonApplicationRootPath,
             QuinoaRecorder recorder,
             BuildProducer<RouteBuildItem> routes,
             Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
@@ -243,10 +253,15 @@ public class QuinoaProcessor {
             return;
         }
         if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
-            if (configuredQuinoa.resolvedConfig().enableSPARouting()) {
-                routes.produce(RouteBuildItem.builder().orderedRoute("/*", QUINOA_SPA_ROUTE_ORDER)
+            String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
+            // the resolvedUiRootPath is only used for logging
+            String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
+            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
+            if (Objects.requireNonNull(configuredQuinoa).resolvedConfig().enableSPARouting()) {
+                routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
                         .handler(recorder
-                                .quinoaSPARoutingHandler(getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig())))
+                                .quinoaSPARoutingHandler(getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig(),
+                                        nonApplicationRootPath)))
                         .build());
             }
         }
