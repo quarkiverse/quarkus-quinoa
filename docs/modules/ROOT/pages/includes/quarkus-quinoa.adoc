@@ -44,6 +44,23 @@ endif::add-copy-button-to-env-var[]
 |`false`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-root-path]]`link:#quarkus-quinoa_quarkus-quinoa-ui-root-path[quarkus.quinoa.ui-root-path]`
+
+
+[.description]
+--
+Root path for hosting the Web UI. This path is normalized and always resolved relative to 'quarkus.http.root-path'.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_UI_ROOT_PATH+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_UI_ROOT_PATH+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`/`
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-dir]]`link:#quarkus-quinoa_quarkus-quinoa-ui-dir[quarkus.quinoa.ui-dir]`
 
 
@@ -491,7 +508,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ignored-p
 
 [.description]
 --
-List of path prefixes to be ignored by Quinoa.
+List of path prefixes to be ignored by Quinoa. The paths are normalized and always resolved relative to 'quarkus.quinoa.ui-root-path'.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_IGNORED_PATH_PREFIXES+++[]
@@ -569,6 +586,40 @@ Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_HOST+++`
 endif::add-copy-button-to-env-var[]
 --|string 
 |`localhost`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls]]`link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls[quarkus.quinoa.dev-server.tls]`
+
+
+[.description]
+--
+When set to true, Quinoa requests will be forwarded with tls enabled.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_TLS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_TLS+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`false`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure]]`link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure[quarkus.quinoa.dev-server.tls-allow-insecure]`
+
+
+[.description]
+--
+When set to true, Quinoa will accept any certificate with any hostname.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_DEV_SERVER_TLS_ALLOW_INSECURE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_DEV_SERVER_TLS_ALLOW_INSECURE+++`
+endif::add-copy-button-to-env-var[]
+--|boolean 
+|`false`
 
 
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-check-path]]`link:#quarkus-quinoa_quarkus-quinoa-dev-server-check-path[quarkus.quinoa.dev-server.check-path]`

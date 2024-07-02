@@ -46,6 +46,13 @@ public class TestProfiles {
         }
     }
 
+    public static class UiRootPathTests extends QuinoaTestProfiles.Enable {
+        @Override
+        public String getConfigProfile() {
+            return "lit-ui-root-path";
+        }
+    }
+
     public static class VueTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {

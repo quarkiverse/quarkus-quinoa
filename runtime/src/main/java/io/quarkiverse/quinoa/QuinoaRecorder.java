@@ -4,6 +4,7 @@ import static io.quarkus.vertx.http.runtime.RouteConstants.ROUTE_ORDER_DEFAULT;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -26,9 +27,9 @@ public class QuinoaRecorder {
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
     public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaHandlerConfig handlerConfig, Supplier<Vertx> vertx,
-            String host, int port, boolean websocket) {
+            boolean tls, boolean tlsAllowInsecure, String host, int port, boolean websocket) {
         logIgnoredPathPrefixes(handlerConfig.ignoredPathPrefixes);
-        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), host, port, websocket);
+        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), tls, tlsAllowInsecure, host, port, websocket);
     }
 
     public Handler<RoutingContext> quinoaSPARoutingHandler(final QuinoaHandlerConfig handlerConfig) throws IOException {
@@ -41,17 +42,41 @@ public class QuinoaRecorder {
         return new QuinoaUIResourceHandler(handlerConfig, directory, uiResources);
     }
 
+    public void logUiRootPath(final String resolvedUiRootPath) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Quinoa is available at: " + resolvedUiRootPath);
+        }
+    }
+
     static String resolvePath(RoutingContext ctx) {
-        return (ctx.mountPoint() == null) ? ctx.normalizedPath()
+        // quarkus.http.root-path
+        String path = (ctx.mountPoint() == null) ? ctx.normalizedPath()
                 : ctx.normalizedPath().substring(
                         // let's be extra careful here in case Vert.x normalizes the mount points at
                         // some point
                         ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
+        // quarkus.quinoa.ui-root-path
+        String routePath = ctx.currentRoute().getPath();
+        String resolvedPath = (routePath == null) ? path
+                : path.substring(routePath.endsWith("/") ? routePath.length() - 1 : routePath.length());
+        // use "/" when the path is empty
+        // e.g. this happens when the request path is "/example" and the root path is "/example"
+        return resolvedPath.isEmpty() ? "/" : resolvedPath;
+    }
+
+    static boolean matchesPathSeparatedPrefix(String path, String pathSeparatedPrefix) {
+        if (path.startsWith(pathSeparatedPrefix)) {
+            String restPath = path.substring(pathSeparatedPrefix.length());
+            // the path matches the path separated prefix if the rest path is empty or starts with "/"
+            // note that the pathSeparatedPrefix never ends in "/" except if it equals "/" exactly
+            return restPath.isEmpty() || restPath.startsWith("/") || Objects.equals(pathSeparatedPrefix, "/");
+        }
+        return false;
     }
 
     static boolean isIgnored(final String path, final List<String> ignoredPathPrefixes) {
-        if (ignoredPathPrefixes.stream().anyMatch(path::startsWith)) {
-            LOG.debugf("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
+        if (ignoredPathPrefixes.stream().anyMatch(prefix -> matchesPathSeparatedPrefix(path, prefix))) {
+            LOG.debug("Quinoa is ignoring path (quarkus.quinoa.ignored-path-prefixes): " + path);
             return true;
         }
         return false;
@@ -77,7 +102,7 @@ public class QuinoaRecorder {
 
     static void logIgnoredPathPrefixes(final List<String> ignoredPathPrefixes) {
         if (LOG.isDebugEnabled()) {
-            LOG.debugf("Quinoa is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
+            LOG.debug("Quinoa is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
         }
     }
 
