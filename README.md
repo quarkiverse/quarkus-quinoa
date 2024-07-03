@@ -9,7 +9,6 @@
 [![Issues](https://img.shields.io/github/issues/quarkiverse/quarkus-quinoa)](https://github.com/quarkiverse/quarkus-quinoa/issues) 
 [![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Project Map](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/quarkiversequarkusquinoa/)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
