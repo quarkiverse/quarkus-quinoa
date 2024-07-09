@@ -42,7 +42,7 @@ public enum FrameworkType {
     VITE(Set.of("vite"), generic("dist", "dev", 5173)),
     FARM(Set.of("farm"), generic("dist", "dev", 9000)),
     SOLID_START_LEGACY(Set.of("solid-start dev"), generic("dist", "dev", 3000)),
-    SOLID_START(Set.of("vinxi dev"), generic("output", "dev", 3000)),
+    SOLID_START(Set.of("vinxi dev"), generic(".output", "dev", 3000)),
     ASTRO(Set.of("astro dev"), generic("dist", "dev", 3000)),
     NEXT(Set.of("next dev"), new NextFramework()),
     NUXT(Set.of("nuxt dev"), generic("dist", "dev", 3000)),
