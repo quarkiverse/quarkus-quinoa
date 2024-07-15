@@ -216,6 +216,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "yatho",
+      "name": "Yann-Thomas LE MOIGNE",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6213245?v=4",
+      "profile": "https://github.com/yatho",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
