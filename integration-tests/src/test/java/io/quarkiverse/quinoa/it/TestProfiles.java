@@ -32,6 +32,13 @@ public class TestProfiles {
         }
     }
 
+    public static class AngularEsBuildTests extends QuinoaTestProfiles.Enable {
+        @Override
+        public String getConfigProfile() {
+            return "angular-esbuild";
+        }
+    }
+
     public static class LitTests extends QuinoaTestProfiles.Enable {
         @Override
         public String getConfigProfile() {
