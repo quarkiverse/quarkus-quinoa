@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [npm](https://docs.npmjs.com/) : [React](https://react.dev/learn), [Angular](https://angular.io/guide/what-is-angular), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), [Svelte](https://svelte.dev/docs/introduction), [Astro](https://docs.astro.build/en/getting-started/), [SolidJS](https://www.solidjs.com/guides/getting-started) …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
@@ -119,6 +119,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ylemoigne"><img src="https://avatars.githubusercontent.com/u/2000657?v=4?s=100" width="100px;" alt="Yann Le Moigne"/><br /><sub><b>Yann Le Moigne</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=ylemoigne" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://meow.liquidnya.art"><img src="https://avatars.githubusercontent.com/u/7364785?v=4?s=100" width="100px;" alt="Alice"/><br /><sub><b>Alice</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=liquidnya" title="Code">💻</a> <a href="#ideas-liquidnya" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/yatho"><img src="https://avatars.githubusercontent.com/u/6213245?v=4?s=100" width="100px;" alt="Yann-Thomas LE MOIGNE"/><br /><sub><b>Yann-Thomas LE MOIGNE</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=yatho" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Blarc"><img src="https://avatars.githubusercontent.com/u/36704759?v=4?s=100" width="100px;" alt="Jakob Maležič"/><br /><sub><b>Jakob Maležič</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3ABlarc" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
