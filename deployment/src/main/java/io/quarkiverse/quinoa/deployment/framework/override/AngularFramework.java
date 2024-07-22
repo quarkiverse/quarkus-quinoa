@@ -29,23 +29,25 @@ public class AngularFramework extends GenericFramework {
         return new QuinoaConfigDelegate(super.override(originalConfig, packageJson, detectedDevScript, isCustomized)) {
             @Override
             public Optional<String> buildDir() {
-                final JsonObject angularJson = readAngularJson(originalConfig);
-                final JsonObject projectList = angularJson.getJsonObject("projects");
-                final JsonObject builder = projectList.values().stream()
-                        .map(JsonValue::asJsonObject)
-                        .filter(project -> "application".equals(project.getString("projectType")))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException(
-                                "Quinoa failed to determine which application must be started in the angular.json file."))
-                        .getJsonObject("architect")
-                        .getJsonObject("build");
+                return Optional.of(originalConfig.buildDir().orElseGet(() -> {
+                    final JsonObject angularJson = readAngularJson(originalConfig);
+                    final JsonObject projectList = angularJson.getJsonObject("projects");
+                    final JsonObject builder = projectList.values().stream()
+                            .map(JsonValue::asJsonObject)
+                            .filter(project -> "application".equals(project.getString("projectType")))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Quinoa failed to determine which application must be started in the angular.json file."))
+                            .getJsonObject("architect")
+                            .getJsonObject("build");
 
-                final String builderName = builder.getString("builder");
-                String fullBuildDir = builder.getJsonObject("options").getString("outputPath");
-                if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
-                    fullBuildDir = String.format("%s/browser", fullBuildDir);
-                }
-                return Optional.of(originalConfig.buildDir().orElse(fullBuildDir));
+                    final String builderName = builder.getString("builder");
+                    String fullBuildDir = builder.getJsonObject("options").getString("outputPath");
+                    if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
+                        fullBuildDir = String.format("%s/browser", fullBuildDir);
+                    }
+                    return fullBuildDir;
+                }));
             }
 
             private static JsonObject readAngularJson(QuinoaConfig configuration) {
