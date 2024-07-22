@@ -5,10 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import jakarta.json.Json;
-import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
+import jakarta.json.*;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
@@ -32,15 +29,25 @@ public class AngularFramework extends GenericFramework {
         return new QuinoaConfigDelegate(super.override(originalConfig, packageJson, detectedDevScript, isCustomized)) {
             @Override
             public Optional<String> buildDir() {
-                // Angular builds a custom directory "dist/[appname]" or "dist/[appname]/browser" if it is build with application builder
-                final String applicationName = packageJson.map(p -> p.getString("name")).orElse("quinoa");
-                final JsonObject angularJson = readAngularJson(originalConfig);
-                final String builder = getBuilderUse(angularJson, applicationName);
-                String fullBuildDir = String.format("%s/%s", getDefaultBuildDir(), applicationName);
-                if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builder)) {
-                    fullBuildDir = String.format("%s/browser", fullBuildDir);
-                }
-                return Optional.of(originalConfig.buildDir().orElse(fullBuildDir));
+                return Optional.of(originalConfig.buildDir().orElseGet(() -> {
+                    final JsonObject angularJson = readAngularJson(originalConfig);
+                    final JsonObject projectList = angularJson.getJsonObject("projects");
+                    final JsonObject builder = projectList.values().stream()
+                            .map(JsonValue::asJsonObject)
+                            .filter(project -> "application".equals(project.getString("projectType")))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Quinoa failed to determine which application must be started in the angular.json file."))
+                            .getJsonObject("architect")
+                            .getJsonObject("build");
+
+                    final String builderName = builder.getString("builder");
+                    String fullBuildDir = builder.getJsonObject("options").getString("outputPath");
+                    if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
+                        fullBuildDir = String.format("%s/browser", fullBuildDir);
+                    }
+                    return fullBuildDir;
+                }));
             }
 
             private static JsonObject readAngularJson(QuinoaConfig configuration) {
@@ -51,11 +58,6 @@ public class AngularFramework extends GenericFramework {
                 } catch (IOException | JsonException e) {
                     throw new RuntimeException("Quinoa failed to read the angular.json file. %s", e);
                 }
-            }
-
-            private static String getBuilderUse(JsonObject angularJson, String applicationName) {
-                return angularJson.getJsonObject("projects").getJsonObject(applicationName)
-                        .getJsonObject("architect").getJsonObject("build").getString("builder");
             }
 
             @Override
