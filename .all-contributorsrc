@@ -225,6 +225,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Blarc",
+      "name": "Jakob Maležič",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36704759?v=4",
+      "profile": "https://github.com/Blarc",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
