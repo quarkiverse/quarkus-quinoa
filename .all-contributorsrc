@@ -234,6 +234,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "UbiquitousBear",
+      "name": "Shamil Nunhuck",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5007497?v=4",
+      "profile": "https://shamil.co.uk",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
