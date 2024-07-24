@@ -1,22 +1,24 @@
-import theaterJS from 'theaterjs';
+import './style.css'
+import quarkusLogo from '/quarkus.svg'
+import viteLogo from '/vite.svg'
+import { setupCounter } from './counter.js'
 
-const theater = theaterJS();
+document.querySelector('#app').innerHTML = `
+  <div>
+    <a href="https://vitejs.dev" target="_blank">
+      <img src="${viteLogo}" class="logo" alt="Vite logo" />
+    </a>
+    <a href="https://docs.quarkiverse.io/quarkus-quinoa/dev/web-frameworks.html" target="_blank">
+      <img src="${quarkusLogo}" class="logo vanilla" alt="Quarkus logo" />
+    </a>
+    <h1>Hello Quinoa!</h1>
+    <div class="card">
+      <button id="counter" type="button"></button>
+    </div>
+    <p class="read-the-docs">
+      Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with npm : React, Angular, Vue, Lit, Svelte, Astro, SolidJS …) alongside Quarkus. It is possible to use it with a Quarkus backend in a single project.
+    </p>
+  </div>
+`
 
-theater
-    .on('type:start, erase:start', function() { theater.getCurrentActor().$element.classList.add('actor-content--typing');})
-    .on('type:end, erase:end', function() {theater.getCurrentActor().$element.classList.remove('actor-content--typing');});
-
-theater
-    .addActor('Quarkus', { speed: 1, accuracy: 0.7 })
-    .addActor('Me', { speed: 0.9, accuracy: 0.8 })
-    .addScene('Quarkus:Toc toc.', 1000)
-    .addScene('Me:What?', 500)
-    .addScene('Quarkus:You will eat Quinoa today!', 200)
-    .addScene('Me:Nooo...', -3, '!!! ', 150, 'No! ', 150)
-    .addScene('Me:Yuk! That\'s impossible!', 100)
-    .addScene('Quarkus:It is time!', 100)
-    .addScene('Quarkus:With your training and this power,', 100)
-    .addScene('Quarkus:You will create awesome web apps.', 100)
-    .addScene('Quarkus:It is your destiny!', 200)
-    .addScene('Quarkus:Meet Quarkus UI with NO hAssle!', 200)
-    .addScene('Me:Neat!', 200)
+setupCounter(document.querySelector('#counter'))
