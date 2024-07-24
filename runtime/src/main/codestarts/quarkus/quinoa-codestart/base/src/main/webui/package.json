@@ -1,5 +1,5 @@
 {
-  "name": "quinoa-bowl",
+  "name": "quinoa-starter",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,11 +8,7 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "theaterjs": "3.2.0"
-  },
   "devDependencies": {
-    "express": "4.19.2",
-    "vite": "4.5.3"
+    "vite": "^5.3.4"
   }
 }
