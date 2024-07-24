@@ -1,9 +1,10 @@
 /
+counter.js
+index.html
 main.js
 package-lock.json
 package.json
 public/
+public/quarkus.svg
 public/vite.svg
-quinoa.css
-quinoa.html
-vite.config.js
+style.css
