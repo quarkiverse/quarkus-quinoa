@@ -5,9 +5,9 @@
 </div>
 <br>
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa)
 [![Build](https://github.com/quarkiverse/quarkus-quinoa/actions/workflows/build.yml/badge.svg)](https://github.com/quarkiverse/quarkus-quinoa/actions/workflows/build.yml) 
 [![Issues](https://img.shields.io/github/issues/quarkiverse/quarkus-quinoa)](https://github.com/quarkiverse/quarkus-quinoa/issues) 
-[![Maven Central](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.quarkiverse.quinoa/quarkus-quinoa)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -22,12 +22,14 @@ You will be able to do live coding of the backend and frontend together nearly o
 
 There are multiple versions available please check which one for your Quarkus release version.
 
-| Version | Explanation |
+[![Quarkus](https://img.shields.io/badge/Quarkus-3.0.0+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.0.0.Final)
+
+| Version | Quarkus Version |
 | --- | --- |
-| ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | Quarkus 2 (legacy) |
-| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | Quarkus 3.2 LTS |
-| ![2.3.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.3&color=cyan) | Quarkus 3.8 LTS |
-| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | Quarkus 3.12 |
+| ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-2.0+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/2.16.6.Final) |
+| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.2+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.2.0.Final) |
+| ![2.3.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.3&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.8+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.8.0) |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.12+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.12.0) |
 
 ## Getting started
 
