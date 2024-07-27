@@ -24,10 +24,10 @@ There are multiple versions available please check which one for your Quarkus re
 
 | Extension Version | Quarkus Version |
 | --- | --- |
-| ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-2.0+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/2.16.6.Final) |
-| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.2+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.2.0.Final) |
-| ![2.3.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.3&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.8+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.8.0) |
-| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.12+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.12.0) |
+| ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-2.0+-DarkMagenta.svg)](https://github.com/quarkusio/quarkus/releases/tag/2.16.6.Final) |
+| ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.2+-DarkMagenta.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.2.0.Final) |
+| ![2.3.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.3&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.8+-DarkMagenta.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.8.0) |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.12+-DarkMagenta.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.12.0) |
 
 ## Getting started
 
