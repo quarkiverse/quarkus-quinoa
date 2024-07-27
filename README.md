@@ -22,8 +22,6 @@ You will be able to do live coding of the backend and frontend together nearly o
 
 There are multiple versions available please check which one for your Quarkus release version.
 
-[![Quarkus](https://img.shields.io/badge/Quarkus-3.0.0+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.0.0.Final)
-
 | Version | Quarkus Version |
 | --- | --- |
 | ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-2.0+-important.svg)](https://github.com/quarkusio/quarkus/releases/tag/2.16.6.Final) |
