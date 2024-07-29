@@ -5,6 +5,7 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManag
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import javax.net.ssl.HostnameVerifier;
@@ -47,10 +49,16 @@ public class PackageManagerRunner {
     private final Path directory;
 
     private final PackageManager packageManager;
+    private final Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem;
+    private final LoggingSetupBuildItem loggingSetupBuildItem;
 
-    private PackageManagerRunner(Path directory, PackageManager packageManager) {
+    private PackageManagerRunner(Path directory, PackageManager packageManager,
+            Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+            LoggingSetupBuildItem loggingSetupBuildItem) {
         this.directory = directory;
         this.packageManager = packageManager;
+        this.consoleInstalledBuildItem = consoleInstalledBuildItem;
+        this.loggingSetupBuildItem = loggingSetupBuildItem;
     }
 
     public Path getDirectory() {
@@ -182,7 +190,9 @@ public class PackageManagerRunner {
     }
 
     public static PackageManagerRunner autoDetectPackageManager(Optional<String> configuredBinary,
-            PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths) {
+            PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths,
+            Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+            LoggingSetupBuildItem loggingSetupBuildItem) {
         String binary;
         PackageManagerType type = detectPackageManagerType(directory);
         if (configuredBinary.isEmpty()) {
@@ -191,7 +201,8 @@ public class PackageManagerRunner {
             binary = configuredBinary.get();
             type = resolveConfiguredPackageManagerType(binary, type);
         }
-        return new PackageManagerRunner(directory, PackageManager.resolve(type, binary, packageManagerCommands, paths));
+        return new PackageManagerRunner(directory, PackageManager.resolve(type, binary, packageManagerCommands, paths),
+                consoleInstalledBuildItem, loggingSetupBuildItem);
     }
 
     public static boolean isWindows() {
@@ -216,6 +227,7 @@ public class PackageManagerRunner {
 
     private boolean exec(PackageManager.Command command) {
         Process process = null;
+        HandleOutput handleOutput = null;
         try {
             final ProcessBuilder processBuilder = new ProcessBuilder();
             if (!command.envs.isEmpty()) {
@@ -226,12 +238,17 @@ public class PackageManagerRunner {
                     .command(runner(command))
                     .redirectErrorStream(true)
                     .start();
-            new HandleOutput(process.getInputStream()).run();
+            handleOutput = new HandleOutput(process.getInputStream(), consoleInstalledBuildItem, loggingSetupBuildItem);
+            handleOutput.run();
             process.waitFor();
         } catch (IOException e) {
             throw new RuntimeException("Input/Output error while executing command.", e);
         } catch (InterruptedException e) {
             return false;
+        } finally {
+            if (handleOutput != null) {
+                handleOutput.close();
+            }
         }
         return process != null && process.exitValue() == 0;
     }
@@ -244,18 +261,25 @@ public class PackageManagerRunner {
         }
     }
 
-    private static class HandleOutput implements Runnable {
+    private static class HandleOutput implements Runnable, Closeable {
 
         private final InputStream is;
         private final Logger.Level logLevel;
+        private final StartupLogCompressor logCompressor;
+        private final AtomicBoolean closed = new AtomicBoolean(false);
 
-        HandleOutput(InputStream is) {
-            this(is, Logger.Level.INFO);
+        HandleOutput(InputStream is,
+                Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+                LoggingSetupBuildItem loggingSetupBuildItem) {
+            this(is, Logger.Level.INFO, consoleInstalledBuildItem, loggingSetupBuildItem);
         }
 
-        HandleOutput(InputStream is, Logger.Level logLevel) {
+        HandleOutput(InputStream is, Logger.Level logLevel,
+                Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+                LoggingSetupBuildItem loggingSetupBuildItem) {
             this.is = is;
             this.logLevel = LOG.isEnabled(logLevel) ? logLevel : null;
+            logCompressor = new StartupLogCompressor("quinoa", consoleInstalledBuildItem, loggingSetupBuildItem);
         }
 
         @Override
@@ -272,6 +296,15 @@ public class PackageManagerRunner {
                 if (logLevel != null) {
                     LOG.log(logLevel, "Failed to handle output", e);
                 }
+                closed.set(true);
+                logCompressor.closeAndDumpCaptured();
+            }
+        }
+
+        @Override
+        public void close() {
+            if (closed.compareAndSet(false, true)) {
+                logCompressor.close();
             }
         }
     }
