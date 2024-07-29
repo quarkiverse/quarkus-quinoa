@@ -16,6 +16,9 @@ import com.github.eirslett.maven.plugins.frontend.lib.InstallationException;
 import com.github.eirslett.maven.plugins.frontend.lib.PackageManagerInstallFactory;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
+import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
+import io.quarkus.deployment.console.StartupLogCompressor;
+import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.vertx.core.Vertx;
@@ -35,7 +38,9 @@ public final class PackageManagerInstall {
     }
 
     public static Installation install(PackageManagerInstallConfig config,
-            final Path projectDir, final Path uiDir) {
+            final Path projectDir, final Path uiDir,
+            Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+            LoggingSetupBuildItem loggingSetupBuildItem) {
         Path installDir = resolveInstallDir(config, projectDir).normalize();
         if (config.nodeVersion().isEmpty()) {
             throw new ConfigurationException("node-version is required to install package manager",
@@ -60,7 +65,7 @@ public final class PackageManagerInstall {
                                 thrown.getCause().getMessage(), i + 1);
                         FileUtil.deleteDirectory(installDir);
                     }
-                    return attemptInstall(config, uiDir, installDir, factory);
+                    return attemptInstall(config, uiDir, installDir, factory, consoleInstalledBuildItem, loggingSetupBuildItem);
                 } catch (InstallationException e) {
                     thrown = e;
                     i++;
@@ -93,14 +98,22 @@ public final class PackageManagerInstall {
     }
 
     private static Installation attemptInstall(PackageManagerInstallConfig config, Path uiDir, Path installDir,
-            PackageManagerInstallFactory factory) throws InstallationException {
+            PackageManagerInstallFactory factory,
+            Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+
+            LoggingSetupBuildItem loggingSetupBuildItem) throws InstallationException {
+        StartupLogCompressor nodeInstallerLogCompressor = null;
         try {
+            nodeInstallerLogCompressor = new StartupLogCompressor("node installer", consoleInstalledBuildItem,
+                    loggingSetupBuildItem);
             factory.getNodeInstaller()
                     .setNodeVersion("v" + config.nodeVersion().get())
                     .setNodeDownloadRoot(config.nodeDownloadRoot())
                     .setNpmVersion(config.npmVersion())
                     .install();
+            nodeInstallerLogCompressor.close();
         } catch (InstallationException e) {
+            nodeInstallerLogCompressor.closeAndDumpCaptured();
             if (e.getCause() instanceof DirectoryNotEmptyException && e.getCause().getMessage().contains("tmp")) {
                 LOG.warnf("Quinoa was not able to delete the Node install temporary directory: %s",
                         e.getCause().getMessage());
@@ -114,11 +127,20 @@ public final class PackageManagerInstall {
         final String npmVersion = config.npmVersion();
         boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
         if (!isNpmProvided) {
-            factory.getNPMInstaller()
-                    .setNodeVersion("v" + config.nodeVersion().get())
-                    .setNpmVersion(npmVersion)
-                    .setNpmDownloadRoot(config.npmDownloadRoot())
-                    .install();
+            StartupLogCompressor npmInstallerLogCompressor = null;
+            try {
+                npmInstallerLogCompressor = new StartupLogCompressor("npm installer", consoleInstalledBuildItem,
+                        loggingSetupBuildItem);
+                factory.getNPMInstaller()
+                        .setNodeVersion("v" + config.nodeVersion().get())
+                        .setNpmVersion(npmVersion)
+                        .setNpmDownloadRoot(config.npmDownloadRoot())
+                        .install();
+                npmInstallerLogCompressor.close();
+            } catch (InstallationException e) {
+                npmInstallerLogCompressor.closeAndDumpCaptured();
+                throw e;
+            }
         }
 
         // Use yarn if yarnVersion is set (and npm is provided)

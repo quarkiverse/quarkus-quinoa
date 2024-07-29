@@ -46,6 +46,8 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
+import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
+import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
@@ -111,7 +113,9 @@ public class QuinoaProcessor {
     public InstalledPackageManagerBuildItem install(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             LiveReloadBuildItem liveReload,
-            OutputTargetBuildItem outputTarget) throws IOException {
+            OutputTargetBuildItem outputTarget,
+            Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
+            LoggingSetupBuildItem loggingSetupBuildItem) throws IOException {
         if (configuredQuinoa != null) {
             final QuinoaConfig resolvedConfig = configuredQuinoa.resolvedConfig();
             Optional<String> packageManagerBinary = resolvedConfig.packageManager();
@@ -120,13 +124,16 @@ public class QuinoaProcessor {
                 final PackageManagerInstall.Installation result = PackageManagerInstall.install(
                         resolvedConfig.packageManagerInstall(),
                         configuredQuinoa.projectDir(),
-                        configuredQuinoa.uiDir());
+                        configuredQuinoa.uiDir(),
+                        consoleInstalledBuildItem,
+                        loggingSetupBuildItem);
                 packageManagerBinary = Optional.of(result.getPackageManagerBinary());
                 paths.add(result.getNodeDirPath());
             }
 
             final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
-                    resolvedConfig.packageManagerCommand(), configuredQuinoa.uiDir(), paths);
+                    resolvedConfig.packageManagerCommand(), configuredQuinoa.uiDir(), paths, consoleInstalledBuildItem,
+                    loggingSetupBuildItem);
             final Path targetPackageJson = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME).resolve(BUILD_FILE);
             final Path currentPackageJson = configuredQuinoa.packageJson();
             if (resolvedConfig.forceInstall()
@@ -271,10 +278,10 @@ public class QuinoaProcessor {
         try (Stream<Path> paths = Files.walk(targetDir, FileVisitOption.FOLLOW_LINKS).filter(Files::isRegularFile)) {
             final var files = paths.toList();
             final HashSet<BuiltResourcesBuildItem.BuiltResource> entries = new HashSet<>(files.size());
-            LOG.infof("Quinoa target directory: '%s'", targetDir);
+            LOG.infof("Quinoa target directory: '%s' containing %d resources", targetDir, files.size());
             for (Path file : files) {
                 final String name = "/" + targetDir.relativize(file).toString().replace('\\', '/');
-                LOG.infof("Quinoa generated resource: '%s'", name);
+                LOG.debugf("Quinoa generated resource: '%s'", name);
                 entries.add(new BuiltResourcesBuildItem.BuiltResource(name, Files.readAllBytes(file)));
             }
             return entries;
