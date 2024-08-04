@@ -288,3 +288,12 @@ quarkus.quinoa.enable-spa-routing=true
 ----
 
 WARNING: Currently, for technical reasons, the Quinoa SPA routing configuration won't work with RESTEasy Classic. See xref:advanced-guides.adoc#spa-routing[SPA routing] for a workaround.
+
+Dynamic routes in Svelte may also use invalid URL's accoring to the URL specific with `+` symbol in the URL.  See: https://github.com/quarkiverse/quarkus-quinoa/issues/591
+
+To mitigate that you must disable Vert.X URL validation to work with dynamic routing using `-Dvertx.disableURIValidation=true` for example:
+
+[source,bash]
+----
+mvn quarkus:dev -Dvertx.disableURIValidation=true
+----
