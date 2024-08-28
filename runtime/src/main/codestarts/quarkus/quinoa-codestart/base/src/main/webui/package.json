@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "express": "^4.19.2",
     "vite": "^5.3.4"
   }
 }
