@@ -52,7 +52,7 @@ npm install -g @angular/cli
 ng new my-first-project
 ----
 a|
-- https://angular.io/guide/setup-local[ng]
+- https://angular.dev/tools/cli/setup-local[ng]
 | <<angular-test-config>>
 
 a|
