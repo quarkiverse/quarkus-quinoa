@@ -252,6 +252,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "lmagnette",
+      "name": "Loïc Magnette",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6390187?v=4",
+      "profile": "https://github.com/lmagnette",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
