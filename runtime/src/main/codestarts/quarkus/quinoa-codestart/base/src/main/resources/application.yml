@@ -3,3 +3,4 @@ quarkus:
     package-manager-install:
       ~: true
       node-version: 20.10.0
+    ui-root-path: quinoa

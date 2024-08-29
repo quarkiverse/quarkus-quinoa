@@ -344,7 +344,8 @@ public class PackageManagerRunner {
                     connection.setReadTimeout(2000);
                     connection.connect();
                     int code = connection.getResponseCode();
-                    return code == 200 ? ipAddress : null;
+                    // in both cases the server is started, for 404 it might be started on another path
+                    return (code == 200 || code == 404) ? ipAddress : null;
                 } catch (ConnectException | SocketTimeoutException e) {
                     // Try the next address
                 } catch (IOException e) {

@@ -4,12 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "vite --base=/quinoa",
+    "build": "vite build --base=/quinoa",
+    "preview": "vite preview --base=/quinoa"
   },
   "devDependencies": {
-    "express": "^4.19.2",
     "vite": "^5.3.4"
   }
 }

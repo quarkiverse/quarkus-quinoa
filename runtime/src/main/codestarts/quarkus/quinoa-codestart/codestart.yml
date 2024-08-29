@@ -4,6 +4,6 @@ type: code
 tags: extension-codestart
 metadata:
   title: Quinoa
-  description: This is a tiny webpack app to get started with Quinoa. It generates a quinoa.html page and a script.
-  path: /quinoa.html
+  description: Quinoa codestart added a tiny Vite app in src/main/webui. The page is configured to be visible on <a href="/quinoa">/quinoa</a>.
+  path: /quinoa
   related-guide-section: https://quarkiverse.github.io/quarkiverse-docs/quarkus-quinoa/dev/index.html
