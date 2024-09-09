@@ -18,7 +18,6 @@
     <module>deployment</module>
     <module>runtime</module>
     <module>testing</module>
-    <module>docs</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
@@ -101,6 +100,18 @@
     </pluginManagement>
   </build>
   <profiles>
+    <profile>
+      <id>docs</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>docs</module>
+      </modules>
+    </profile>
     <profile>
       <id>it</id>
       <activation>
