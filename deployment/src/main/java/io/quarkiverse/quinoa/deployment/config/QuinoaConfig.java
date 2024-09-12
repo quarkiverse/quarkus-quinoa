@@ -134,6 +134,14 @@ public interface QuinoaConfig {
      */
     DevServerConfig devServer();
 
+    /**
+    * Runs package manager publish command.
+    * This is handy when the using justBuild() option to
+    * publish built web module or component to a registry.
+    */
+    @WithDefault("false")
+    boolean publish();
+
     static List<String> getNormalizedIgnoredPathPrefixes(QuinoaConfig config,
             NonApplicationRootPathBuildItem nonApplicationRootPath) {
         return config.ignoredPathPrefixes()
@@ -266,6 +274,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!DevServerConfig.isEqual(q1.devServer(), q2.devServer())) {
+            return false;
+        }
+        if (!Objects.equals(q1.publish(), q2.publish())) {
             return false;
         }
         return true;
