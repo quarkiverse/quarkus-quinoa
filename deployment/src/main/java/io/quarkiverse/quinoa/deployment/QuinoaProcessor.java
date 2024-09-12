@@ -201,7 +201,23 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {
+    public void publishBuiltPackage(
+            ConfiguredQuinoaBuildItem configuredQuinoa,
+            InstalledPackageManagerBuildItem installedPackageManager,
+            Optional<TargetDirBuildItem> targetDir) {
+        if (configuredQuinoa == null || !configuredQuinoa.resolvedConfig().publish()) {
+            return null;
+        }
+        
+        if (targetDir.isEmpty()) {
+            return;
+        }
+
+        final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
+    }
+    
+    @BuildStep
+    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {        
         if (targetDir.isEmpty()) {
             return null;
         }
