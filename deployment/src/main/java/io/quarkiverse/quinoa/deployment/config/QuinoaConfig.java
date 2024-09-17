@@ -135,10 +135,12 @@ public interface QuinoaConfig {
     DevServerConfig devServer();
 
     /**
-    * Runs package manager publish command.
-    * This is handy when the using justBuild() option to
-    * publish built web module or component to a registry.
-    */
+     * Runs additionally package manager publish command.
+     * This is handy when using together with the justBuild() option to
+     * publish built web package to a registry.
+     * The command is executed after the build command and can be customized
+     * with the {@link PackageManagerCommandConfig#publish()} and {@link PackageManagerCommandConfig#publishEnv()}.
+     */
     @WithDefault("false")
     boolean publish();
 

@@ -62,4 +62,14 @@ public class PackageManagerCommandConfigDelegate implements PackageManagerComman
     public Map<String, String> devEnv() {
         return delegate.devEnv();
     }
+
+    @Override
+    public Optional<String> publish() {
+        return delegate.publish();
+    }
+
+    @Override
+    public Map<String, String> publishEnv() {
+        return delegate.publishEnv();
+    }
 }

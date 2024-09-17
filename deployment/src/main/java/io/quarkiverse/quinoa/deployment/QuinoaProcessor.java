@@ -41,6 +41,7 @@ import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Produce;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
@@ -48,6 +49,7 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
+import io.quarkus.deployment.pkg.builditem.ArtifactResultBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
@@ -201,23 +203,25 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
+    @Produce(ArtifactResultBuildItem.class)
     public void publishBuiltPackage(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
             Optional<TargetDirBuildItem> targetDir) {
         if (configuredQuinoa == null || !configuredQuinoa.resolvedConfig().publish()) {
-            return null;
+            return;
         }
-        
+
         if (targetDir.isEmpty()) {
             return;
         }
 
         final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
+        packageManagerRunner.publish();
     }
-    
+
     @BuildStep
-    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {        
+    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {
         if (targetDir.isEmpty()) {
             return null;
         }

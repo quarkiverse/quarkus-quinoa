@@ -105,6 +105,15 @@ public class PackageManagerRunner {
         }
     }
 
+    public void publish() {
+        final PackageManager.Command publish = packageManager.publish();
+        LOG.infof("Running Quinoa package manager publish command: %s", publish.commandWithArguments);
+        if (!exec(publish)) {
+            throw new RuntimeException(
+                    format("Error in Quinoa while running package manager publish command: %s", publish.commandWithArguments));
+        }
+    }
+
     public void stopDev(Process process) {
         if (process == null || !process.isAlive()) {
             return;
