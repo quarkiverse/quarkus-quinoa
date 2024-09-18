@@ -261,6 +261,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "threadlock05",
+      "name": "threadlock05",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173927177?v=4",
+      "profile": "https://github.com/threadlock05",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
