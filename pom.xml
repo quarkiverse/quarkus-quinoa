@@ -39,7 +39,7 @@
     <quarkus.version>3.12.0</quarkus.version>
     <quarkus-playright.version>1.0.0</quarkus-playright.version>
     <assertj.version>3.26.3</assertj.version>
-    <frontend-plugin.version>1.15.0</frontend-plugin.version>
+    <frontend-plugin.version>1.15.1</frontend-plugin.version>
   </properties>
 
   <developers>
@@ -47,19 +47,13 @@
         <name>Andy Damevin</name>
         <email>ia3andy@gmail.com</email>
         <organization>Red Hat</organization>
-        <organizationUrl>http://www.redhat.com</organizationUrl>
+        <organizationUrl>https://www.redhat.com</organizationUrl>
     </developer>
       <developer>
         <name>Emil Lefkof</name>
         <email>mellowaredev@gmail.com</email>
         <organization>KSM Technology</organization>
         <organizationUrl>https://www.ksmpartners.com/</organizationUrl>
-    </developer>
-    <developer>
-        <name>Shivam Sharma</name>
-        <email>meshivam81@gmail.com</email>
-        <organization>Hyperfoil</organization>
-        <organizationUrl>https://github.com/Hyperfoil</organizationUrl>
     </developer>
 </developers>
 

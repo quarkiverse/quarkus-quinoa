@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +60,8 @@ public class VertxFileDownloader implements FileDownloader {
         this.webClient = WebClient.create(vertx, options);
     }
 
-    public void download(String downloadUrl, String destination, String userName, String password) throws DownloadException {
+    public void download(String downloadUrl, String destination, String userName, String password,
+            Map<String, String> httpHeaders) throws DownloadException {
         System.setProperty("https.protocols", "TLSv1.2");
         String fixedDownloadUrl = downloadUrl;
 
@@ -77,6 +79,12 @@ public class VertxFileDownloader implements FileDownloader {
                 if (userName != null && password != null) {
                     httpRequest.basicAuthentication(userName, password);
                 }
+                if (httpHeaders != null) {
+                    for (Map.Entry<String, String> httpHeader : httpHeaders.entrySet()) {
+                        httpRequest.putHeader(httpHeader.getKey(), httpHeader.getValue());
+                    }
+                }
+
                 final Future<HttpResponse<Void>> future = httpRequest
                         .expect(ResponsePredicate.SC_SUCCESS)
                         .as(BodyCodec.pipe(destinationFile))
@@ -94,5 +102,4 @@ public class VertxFileDownloader implements FileDownloader {
             throw new RuntimeException(e);
         }
     }
-
 }
