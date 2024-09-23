@@ -270,6 +270,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "edeandrea",
+      "name": "Eric Deandrea",
+      "avatar_url": "https://avatars.githubusercontent.com/u/363447?v=4",
+      "profile": "https://developers.redhat.com/author/eric-deandrea",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
