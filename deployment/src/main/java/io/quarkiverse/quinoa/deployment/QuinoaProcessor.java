@@ -34,6 +34,7 @@ import io.quarkiverse.quinoa.deployment.framework.FrameworkType;
 import io.quarkiverse.quinoa.deployment.items.BuiltResourcesBuildItem;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
 import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
+import io.quarkiverse.quinoa.deployment.items.PublishedPackageBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
@@ -41,7 +42,7 @@ import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.annotations.Produce;
+import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
@@ -49,7 +50,6 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
-import io.quarkus.deployment.pkg.builditem.ArtifactResultBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
@@ -188,6 +188,12 @@ public class QuinoaProcessor {
                     Set.of("quarkus.quinoa.build-dir"));
         }
 
+        // doesn't make sense to copy from ui build dir to quinoa target dir
+        // in case of `just-build` option enabled
+        if (configuredQuinoa.resolvedConfig().justBuild()) {
+            return new TargetDirBuildItem(buildDir);
+        }
+
         final Path targetBuildDir = initializeTargetDirectory(outputTarget).resolve(TARGET_BUILD_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
         try {
@@ -203,28 +209,37 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    @Produce(ArtifactResultBuildItem.class)
-    public void publishBuiltPackage(
+    public PublishedPackageBuildItem publishBuiltPackage(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
             Optional<TargetDirBuildItem> targetDir) {
         if (configuredQuinoa == null || !configuredQuinoa.resolvedConfig().publish()) {
-            return;
+            return new PublishedPackageBuildItem(true);
         }
 
         if (targetDir.isEmpty()) {
-            return;
+            LOG.warn("Target dir is empty - unable to run publish command.");
+            return new PublishedPackageBuildItem(true);
         }
 
         final PackageManagerRunner packageManagerRunner = installedPackageManager.getPackageManager();
         packageManagerRunner.publish();
+        return new PublishedPackageBuildItem(false);
     }
 
     @BuildStep
-    public BuiltResourcesBuildItem prepareBuiltResources(Optional<TargetDirBuildItem> targetDir) throws IOException {
+    @Consume(PublishedPackageBuildItem.class) // just to order build steps
+    public BuiltResourcesBuildItem prepareBuiltResources(
+            ConfiguredQuinoaBuildItem configuredQuinoa,
+            Optional<TargetDirBuildItem> targetDir) throws IOException {
         if (targetDir.isEmpty()) {
             return null;
         }
+        if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
+            // no need to configure vertx static resources when `just-build` activated
+            return null;
+        }
+
         return new BuiltResourcesBuildItem(lookupBuiltResources(targetDir.get().getBuildDirectory()));
     }
 

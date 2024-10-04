@@ -17,7 +17,7 @@ public interface PackageManagerCommandConfig {
     String DEFAULT_BUILD_COMMAND = "run build";
     String DEFAULT_TEST_COMMAND = "run test";
     String DEFAULT_PUBLISH_COMMAND = "run publish";
-    
+
     /**
      * Custom command for installing all packages.
      * e.g. «ci --cache $CACHE_DIR/.npm --prefer-offline»
@@ -117,7 +117,7 @@ public interface PackageManagerCommandConfig {
         }
         if (!Objects.equals(p1.publishEnv(), p2.publishEnv())) {
             return false;
-        }        
+        }
         return true;
     }
 }
