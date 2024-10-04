@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-30-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [npm](https://docs.npmjs.com/) : [React](https://react.dev/learn), [Angular](https://angular.dev/overview), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), [Svelte](https://svelte.dev/docs/introduction), [Astro](https://docs.astro.build/en/getting-started/), [SolidJS](https://www.solidjs.com/guides/getting-started) …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
@@ -127,6 +127,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/threadlock05"><img src="https://avatars.githubusercontent.com/u/173927177?v=4?s=100" width="100px;" alt="threadlock05"/><br /><sub><b>threadlock05</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Athreadlock05" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://developers.redhat.com/author/eric-deandrea"><img src="https://avatars.githubusercontent.com/u/363447?v=4?s=100" width="100px;" alt="Eric Deandrea"/><br /><sub><b>Eric Deandrea</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Aedeandrea" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alex-kovalenko1982"><img src="https://avatars.githubusercontent.com/u/69167029?v=4?s=100" width="100px;" alt="Alex Kovalenko"/><br /><sub><b>Alex Kovalenko</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=alex-kovalenko1982" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
