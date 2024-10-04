@@ -261,6 +261,24 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "threadlock05",
+      "name": "threadlock05",
+      "avatar_url": "https://avatars.githubusercontent.com/u/173927177?v=4",
+      "profile": "https://github.com/threadlock05",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "edeandrea",
+      "name": "Eric Deandrea",
+      "avatar_url": "https://avatars.githubusercontent.com/u/363447?v=4",
+      "profile": "https://developers.redhat.com/author/eric-deandrea",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
