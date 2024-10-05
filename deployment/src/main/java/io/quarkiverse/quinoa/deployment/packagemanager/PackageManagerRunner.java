@@ -23,9 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 import org.jboss.logging.Logger;
 
@@ -167,16 +165,12 @@ public class PackageManagerRunner {
                 loggingSetup,
                 DEV_PROCESS_THREAD_PREDICATE);
         Process p = process(dev);
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                stopDev(p);
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> stopDev(p)));
         if (checkPath == null) {
             LOG.infof("Quinoa is configured to continue without check if the live coding server is up");
             return new DevServer(p, network.getHost(), logCompressor);
         }
-        String ipAddress = null;
+        String ipAddress;
         try {
             int i = 0;
             while ((ipAddress = isDevServerUp(network, checkPath)) == null) {
@@ -219,7 +213,7 @@ public class PackageManagerRunner {
     }
 
     private Process process(PackageManager.Command command) {
-        Process process = null;
+        Process process;
         final ProcessBuilder builder = new ProcessBuilder()
                 .directory(directory.toFile())
                 .command(runner(command));
@@ -235,7 +229,7 @@ public class PackageManagerRunner {
     }
 
     private boolean exec(PackageManager.Command command) {
-        Process process = null;
+        Process process;
         HandleOutput handleOutput = null;
         try {
             final ProcessBuilder processBuilder = new ProcessBuilder();
@@ -259,7 +253,7 @@ public class PackageManagerRunner {
                 handleOutput.close();
             }
         }
-        return process != null && process.exitValue() == 0;
+        return process.exitValue() == 0;
     }
 
     private String[] runner(PackageManager.Command command) {
@@ -336,12 +330,7 @@ public class PackageManagerRunner {
                         HttpsURLConnection httpsConnection = (HttpsURLConnection) url.openConnection();
                         if (network.isTlsAllowInsecure()) {
                             httpsConnection.setSSLSocketFactory(SslUtil.createNonValidatingSslContext().getSocketFactory());
-                            httpsConnection.setHostnameVerifier(new HostnameVerifier() {
-                                @Override
-                                public boolean verify(String hostname, SSLSession session) {
-                                    return true;
-                                }
-                            });
+                            httpsConnection.setHostnameVerifier((hostname, session) -> true);
                         }
                         connection = httpsConnection;
                     } else {
@@ -367,28 +356,6 @@ public class PackageManagerRunner {
         return null;
     }
 
-    public static class DevServer {
-        private final Process process;
-        private final String hostIPAddress;
-
-        private final StartupLogCompressor logCompressor;
-
-        public DevServer(Process process, String hostIPAddress, StartupLogCompressor logCompressor) {
-            this.process = process;
-            this.hostIPAddress = hostIPAddress;
-            this.logCompressor = logCompressor;
-        }
-
-        public Process process() {
-            return process;
-        }
-
-        public String hostIPAddress() {
-            return hostIPAddress;
-        }
-
-        public StartupLogCompressor logCompressor() {
-            return logCompressor;
-        }
+    public record DevServer(Process process, String hostIPAddress, StartupLogCompressor logCompressor) {
     }
 }

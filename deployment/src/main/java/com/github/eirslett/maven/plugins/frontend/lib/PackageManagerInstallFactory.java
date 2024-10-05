@@ -7,8 +7,6 @@ import io.vertx.core.Vertx;
 public class PackageManagerInstallFactory {
 
     private static final Platform defaultPlatform = Platform.guess();
-    private static final String DEFAULT_CACHE_PATH = "cache";
-    private final Vertx vertx;
 
     private final Path uiDir;
     private final Path installDir;
@@ -18,7 +16,6 @@ public class PackageManagerInstallFactory {
     private final String password;
 
     public PackageManagerInstallFactory(Vertx vertx, Path uiDir, Path installDir, String userName, String password) {
-        this.vertx = vertx;
         this.uiDir = uiDir;
         this.installDir = installDir;
         this.cacheResolver = getDefaultCacheResolver(installDir);
@@ -63,7 +60,7 @@ public class PackageManagerInstallFactory {
         return new DefaultInstallConfig(installDir.toFile(), uiDir.toFile(), this.cacheResolver, defaultPlatform);
     }
 
-    private static final CacheResolver getDefaultCacheResolver(Path root) {
+    private static CacheResolver getDefaultCacheResolver(Path root) {
         return new DirectoryCacheResolver(root.resolve("cache").toFile());
     }
 

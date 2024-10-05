@@ -55,6 +55,7 @@ public class VertxFileDownloader implements FileDownloader {
             if (proxyUser != null && proxyPassword != null) {
                 options.getProxyOptions().setUsername(proxyUser).setPassword(proxyPassword);
             }
+            LOG.tracef("Using Proxy %", options.getProxyOptions().toString());
         }
 
         this.webClient = WebClient.create(vertx, options);
@@ -90,7 +91,8 @@ public class VertxFileDownloader implements FileDownloader {
                         .as(BodyCodec.pipe(destinationFile))
                         .send();
                 future.onComplete((r) -> latch.countDown());
-                latch.await(5, TimeUnit.MINUTES);
+                boolean result = latch.await(5, TimeUnit.MINUTES);
+                LOG.tracef("Latch Result %", result);
                 if (!future.succeeded()) {
                     throw new DownloadException("Could not download " + downloadUrl, future.cause());
                 }

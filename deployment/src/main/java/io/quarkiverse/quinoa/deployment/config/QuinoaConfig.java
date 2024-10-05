@@ -36,14 +36,14 @@ public interface QuinoaConfig {
      */
     @WithParentName
     @ConfigDocDefault("enabled (disabled in test mode)")
-    public Optional<Boolean> enabled();
+    Optional<Boolean> enabled();
 
     /**
      * Indicate if Quinoa should just do the build part.
      * If true, Quinoa will NOT serve the Web UI built resources.
      * This is handy when the output of the build is used
      * to be served via something else (nginx, cdn, ...)
-     * Quinoa put the built files in 'target/quinoa/build' (or 'build/quinoa/build with Gradle).
+     * Quinoa put the built files in 'target/quinoa/build' (or 'build/quinoa/build' with Gradle).
      */
     @WithDefault("false")
     boolean justBuild();
@@ -56,7 +56,7 @@ public interface QuinoaConfig {
     String uiRootPath();
 
     /**
-     * Path to the Web UI (NodeJS) root directory (relative to the project root).
+     * Path to the Web UI (Node.js) root directory (relative to the project root).
      */
     @WithDefault(DEFAULT_WEB_UI_DIR)
     String uiDir();

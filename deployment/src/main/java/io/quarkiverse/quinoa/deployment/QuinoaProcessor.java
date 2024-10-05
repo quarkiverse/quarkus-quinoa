@@ -129,8 +129,8 @@ public class QuinoaProcessor {
                         configuredQuinoa.uiDir(),
                         consoleInstalledBuildItem,
                         loggingSetupBuildItem);
-                packageManagerBinary = Optional.of(result.getPackageManagerBinary());
-                paths.add(result.getNodeDirPath());
+                packageManagerBinary = Optional.of(result.packageManagerBinary());
+                paths.add(result.nodeDirPath());
             }
 
             final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
@@ -175,7 +175,7 @@ public class QuinoaProcessor {
                 && liveReload.getChangedResources().stream()
                         .noneMatch(r -> r.startsWith(packageManagerRunner.getDirectory().toString()))
                 && contextObject != null) {
-            return new TargetDirBuildItem(contextObject.getLocation());
+            return new TargetDirBuildItem(contextObject.location());
         }
         if (configuredQuinoa.resolvedConfig().runTests()) {
             packageManagerRunner.test();
@@ -452,16 +452,7 @@ public class QuinoaProcessor {
         return targetBuildDir;
     }
 
-    private static class QuinoaLiveContext {
-        private final Path location;
-
-        private QuinoaLiveContext(Path location) {
-            this.location = location;
-        }
-
-        public Path getLocation() {
-            return location;
-        }
+    private record QuinoaLiveContext(Path location) {
     }
 
     public static class ProjectDirs {
