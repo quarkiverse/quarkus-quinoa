@@ -27,7 +27,7 @@ There are multiple versions available please check which one for your Quarkus re
 | ![1.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=1.&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-2.0+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/2.16.6.Final) |
 | ![2.2.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.2&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.2+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.2.0.Final) |
 | ![2.3.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.3&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.8+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.8.0) |
-| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.12+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.12.0) |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.15+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.15.0) |
 
 ## Getting started
 
