@@ -19,6 +19,8 @@ public interface PackageManager {
 
     Command test();
 
+    Command publish();
+
     Command dev();
 
     public static PackageManager resolve(PackageManagerType type, String binary,

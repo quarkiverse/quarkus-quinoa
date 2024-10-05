@@ -91,4 +91,9 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
         return delegate.devServer();
     }
 
+    @Override
+    public boolean publish() {
+        return delegate.publish();
+    }
+
 }

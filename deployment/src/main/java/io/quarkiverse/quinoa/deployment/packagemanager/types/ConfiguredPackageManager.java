@@ -2,6 +2,7 @@ package io.quarkiverse.quinoa.deployment.packagemanager.types;
 
 import static io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig.DEFAULT_BUILD_COMMAND;
 import static io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig.DEFAULT_INSTALL_COMMAND;
+import static io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig.DEFAULT_PUBLISH_COMMAND;
 import static io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig.DEFAULT_TEST_COMMAND;
 
 import java.io.File;
@@ -69,6 +70,13 @@ class ConfiguredPackageManager implements PackageManager {
         return new Command(
                 environment(Map.of(), testEnv),
                 prepareCommandWithArguments(commandsConfig.test().orElse(DEFAULT_TEST_COMMAND)));
+    }
+
+    @Override
+    public Command publish() {
+        return new Command(
+                environment(Map.of(), commandsConfig.publishEnv()),
+                prepareCommandWithArguments(commandsConfig.publish().orElse(DEFAULT_PUBLISH_COMMAND)));
     }
 
     @Override

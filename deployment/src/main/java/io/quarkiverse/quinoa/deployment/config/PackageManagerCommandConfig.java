@@ -16,6 +16,7 @@ public interface PackageManagerCommandConfig {
     String DEFAULT_INSTALL_COMMAND = "install";
     String DEFAULT_BUILD_COMMAND = "run build";
     String DEFAULT_TEST_COMMAND = "run test";
+    String DEFAULT_PUBLISH_COMMAND = "run publish";
 
     /**
      * Custom command for installing all packages.
@@ -75,6 +76,17 @@ public interface PackageManagerCommandConfig {
      */
     Map<String, String> devEnv();
 
+    /**
+     * Custom command for publishing the package.
+     */
+    @WithDefault(DEFAULT_PUBLISH_COMMAND)
+    Optional<String> publish();
+
+    /**
+     * Environment variables for publish command execution.
+     */
+    Map<String, String> publishEnv();
+
     static boolean isEqual(PackageManagerCommandConfig p1, PackageManagerCommandConfig p2) {
         if (!Objects.equals(p1.install(), p2.install())) {
             return false;
@@ -98,6 +110,12 @@ public interface PackageManagerCommandConfig {
             return false;
         }
         if (!Objects.equals(p1.devEnv(), p2.devEnv())) {
+            return false;
+        }
+        if (!Objects.equals(p1.publish(), p2.publish())) {
+            return false;
+        }
+        if (!Objects.equals(p1.publishEnv(), p2.publishEnv())) {
             return false;
         }
         return true;

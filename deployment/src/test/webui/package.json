@@ -8,7 +8,8 @@
     "build": "npm run node-version && mkdirp build && cross-env-shell \"echo $MODE>build/index.html\" && copyfiles -u 1 public/* build/",
     "build-something": "mkdirp build && cross-env-shell \"echo $BUILD>build/index.html\" && copyfiles -u 1 public/* build/",
     "start": "cross-env MODE=live-coding npm run build && node server.js",
-    "postinstall": "echo hello> node_modules/installed"
+    "postinstall": "echo hello> node_modules/installed",
+    "publish": "npm pack"
   },
   "keywords": [],
   "author": "",

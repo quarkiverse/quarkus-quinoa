@@ -134,6 +134,16 @@ public interface QuinoaConfig {
      */
     DevServerConfig devServer();
 
+    /**
+     * Runs additionally package manager publish command.
+     * This is handy when using together with the justBuild() option to
+     * publish built web package to a registry.
+     * The command is executed after the build command and can be customized
+     * with the {@link PackageManagerCommandConfig#publish()} and {@link PackageManagerCommandConfig#publishEnv()}.
+     */
+    @WithDefault("false")
+    boolean publish();
+
     static List<String> getNormalizedIgnoredPathPrefixes(QuinoaConfig config,
             NonApplicationRootPathBuildItem nonApplicationRootPath) {
         return config.ignoredPathPrefixes()
@@ -266,6 +276,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!DevServerConfig.isEqual(q1.devServer(), q2.devServer())) {
+            return false;
+        }
+        if (!Objects.equals(q1.publish(), q2.publish())) {
             return false;
         }
         return true;
