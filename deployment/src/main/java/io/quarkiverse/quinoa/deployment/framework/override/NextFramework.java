@@ -23,7 +23,7 @@ public class NextFramework extends GenericFramework {
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
             Optional<String> detectedDevScript,
             boolean isCustomized) {
-        if (delegate.packageManagerCommand().build().equals("run build") && packageJson.isPresent()) {
+        if (delegate.packageManagerCommand().build().orElse("???").equals("run build") && packageJson.isPresent()) {
             JsonObject scripts = packageJson.get().getJsonObject("scripts");
             if (scripts != null) {
                 String buildScript = scripts.getString("build");

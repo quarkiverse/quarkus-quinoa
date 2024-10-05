@@ -2,7 +2,6 @@ package io.quarkiverse.quinoa;
 
 import static io.quarkus.vertx.http.runtime.RouteConstants.ROUTE_ORDER_DEFAULT;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -35,7 +34,7 @@ public class QuinoaRecorder {
         return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), network);
     }
 
-    public Handler<RoutingContext> quinoaSPARoutingHandler(List<String> ignoredPathPrefixes) throws IOException {
+    public Handler<RoutingContext> quinoaSPARoutingHandler(List<String> ignoredPathPrefixes) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Quinoa SPA routing handler is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
         }
@@ -105,7 +104,7 @@ public class QuinoaRecorder {
     }
 
     static void next(ClassLoader cl, RoutingContext ctx) {
-        // make sure we don't lose the correct TCCL to Vert.x...
+        // make sure we don't lose the correct thread context to Vert.x...
         Thread.currentThread().setContextClassLoader(cl);
         ctx.next();
     }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -74,7 +75,7 @@ public final class PackageManagerInstall {
                 }
             }
         } finally {
-            vertx.close();
+            Objects.requireNonNull(vertx).close();
         }
 
         throw new RuntimeException("Error while installing NodeJS", thrown);
@@ -107,7 +108,7 @@ public final class PackageManagerInstall {
             nodeInstallerLogCompressor = new StartupLogCompressor("node installer", consoleInstalledBuildItem,
                     loggingSetupBuildItem);
             factory.getNodeInstaller()
-                    .setNodeVersion("v" + config.nodeVersion().get())
+                    .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                     .setNodeDownloadRoot(config.nodeDownloadRoot())
                     .setNpmVersion(config.npmVersion())
                     .install();
@@ -122,7 +123,7 @@ public final class PackageManagerInstall {
             }
         }
 
-        // Use npm if npmVersion is different from provided or if no other version is set (then it will use the version provided by nodejs)
+        // Use npm if npmVersion is different from provided or if no other version is set (then it will use the version provided by Node.js)
         String executionPath = NPM_PATH;
         final String npmVersion = config.npmVersion();
         boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
@@ -132,7 +133,7 @@ public final class PackageManagerInstall {
                 npmInstallerLogCompressor = new StartupLogCompressor("npm installer", consoleInstalledBuildItem,
                         loggingSetupBuildItem);
                 factory.getNPMInstaller()
-                        .setNodeVersion("v" + config.nodeVersion().get())
+                        .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                         .setNpmVersion(npmVersion)
                         .setNpmDownloadRoot(config.npmDownloadRoot())
                         .install();
@@ -149,7 +150,7 @@ public final class PackageManagerInstall {
             executionPath = YARN_PATH;
             factory.getYarnInstaller()
                     .setIsYarnBerry(isYarnBerry(uiDir))
-                    .setYarnVersion("v" + config.yarnVersion().get())
+                    .setYarnVersion("v" + config.yarnVersion().orElse("???"))
                     .setYarnDownloadRoot(config.yarnDownloadRoot())
                     .setIsYarnBerry(true)
                     .install();
@@ -160,7 +161,7 @@ public final class PackageManagerInstall {
         if (pnpmVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty()) {
             executionPath = PNPM_PATH;
             factory.getPnpmInstaller()
-                    .setNodeVersion("v" + config.nodeVersion().get())
+                    .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                     .setPnpmVersion(pnpmVersion.get())
                     .setPnpmDownloadRoot(config.pnpmDownloadRoot())
                     .install();
@@ -201,22 +202,7 @@ public final class PackageManagerInstall {
         return path.contains(" ") ? "\"".concat(path).concat("\"") : path;
     }
 
-    public static class Installation {
-        private final String nodeDirPath;
-        private final String packageManagerBinary;
-
-        public Installation(String nodeDirPath, String packageManagerBinary) {
-            this.nodeDirPath = nodeDirPath;
-            this.packageManagerBinary = packageManagerBinary;
-        }
-
-        public String getNodeDirPath() {
-            return nodeDirPath;
-        }
-
-        public String getPackageManagerBinary() {
-            return packageManagerBinary;
-        }
+    public record Installation(String nodeDirPath, String packageManagerBinary) {
     }
 
 }

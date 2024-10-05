@@ -175,17 +175,7 @@ public enum FrameworkType {
         return null;
     }
 
-    static class DetectedFramework {
-        public final FrameworkType type;
-
-        public final String devScript;
-        public final boolean isCustomized;
-
-        public DetectedFramework(FrameworkType type, String devScript, boolean isCustomized) {
-            this.type = type;
-            this.devScript = devScript;
-            this.isCustomized = isCustomized;
-        }
+    record DetectedFramework(FrameworkType type, String devScript, boolean isCustomized) {
 
         @Override
         public boolean equals(Object o) {
@@ -195,11 +185,6 @@ public enum FrameworkType {
                 return false;
             DetectedFramework that = (DetectedFramework) o;
             return isCustomized == that.isCustomized && type == that.type && Objects.equals(devScript, that.devScript);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(type, devScript, isCustomized);
         }
 
         @Override

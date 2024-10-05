@@ -28,7 +28,7 @@ public interface DevServerConfig {
 
     /**
      * Port of the server to forward requests to.
-     * The dev server process (i.e npm start) is managed like a dev service by Quarkus.
+     * The dev server process (i.e. npm start) is managed like a dev service by Quarkus.
      * If the external server responds with a 404, it is ignored by Quinoa and processed like any other backend request.
      */
     @ConfigDocDefault("framework detection or fallback to empty")

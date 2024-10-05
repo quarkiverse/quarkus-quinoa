@@ -70,7 +70,7 @@ class QuinoaDevWebSocketProxyHandler {
                         LOG.infof("Quinoa Dev WebSocket Client Connected: %s:%s%s", networkConfiguration.getHost(),
                                 networkConfiguration.getPort(), forwardUri);
                         clientWs.set(clientContext.result());
-                        // messages from NodeJS forwarded back to browser
+                        // messages from Node.js forwarded back to browser
                         clientWs.get().exceptionHandler(
                                 (e) -> LOG.errorf(e, "Quinoa Dev WebSocket Client closed with error: %s", e.getMessage()))
                                 .closeHandler((__) -> {
@@ -81,7 +81,7 @@ class QuinoaDevWebSocketProxyHandler {
                                     serverWs.writeTextMessage(msg);
                                 });
 
-                        // messages from browser forwarded to NodeJS
+                        // messages from browser forwarded to Node.js
                         serverWs.textMessageHandler((msg) -> {
                             LOG.debugf("Quinoa Dev WebSocket Server message:  %s", msg);
                             final WebSocket w = clientWs.get();
