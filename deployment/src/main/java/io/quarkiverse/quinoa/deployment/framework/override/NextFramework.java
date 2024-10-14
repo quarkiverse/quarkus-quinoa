@@ -32,8 +32,9 @@ public class NextFramework extends GenericFramework {
                     LOG.warn(
                             "Make sure you define  \"build\": \"next build \", in the package.json to make Next work with Quinoa.");
                 }
-                
-                if (!packageJson.get().containsKey("output") || !OUTPUT.equals(packageJson.get().getString("output"))) {
+
+                String output = packageJson.get().getString("output", null);
+                if (!OUTPUT.equals(output)) {
                     LOG.warn(
                             "Make sure you define  \"output\": \"export \", in the package.json to make Next work with Quinoa.");
                 }
