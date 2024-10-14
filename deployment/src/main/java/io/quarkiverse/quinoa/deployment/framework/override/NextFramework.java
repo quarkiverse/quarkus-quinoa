@@ -14,6 +14,7 @@ import io.quarkiverse.quinoa.deployment.config.delegate.QuinoaConfigDelegate;
 public class NextFramework extends GenericFramework {
 
     private static final Logger LOG = Logger.getLogger(NextFramework.class);
+    private static final String EXPECTED_OUTPUT_VALUE = "export";
 
     public NextFramework() {
         super("out", "dev", 3000);
@@ -31,8 +32,9 @@ public class NextFramework extends GenericFramework {
                     LOG.warn(
                             "Make sure you define  \"build\": \"next build \", in the package.json to make Next work with Quinoa.");
                 }
-                String output = packageJson.get().getString("output");
-                if (!"export".equals(output)) {
+
+                String output = packageJson.get().getString("output", null);
+                if (!EXPECTED_OUTPUT_VALUE.equals(output)) {
                     LOG.warn(
                             "Make sure you define  \"output\": \"export \", in the package.json to make Next work with Quinoa.");
                 }
