@@ -24,6 +24,8 @@ public class NextFramework extends GenericFramework {
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
             Optional<String> detectedDevScript,
             boolean isCustomized) {
+        LOG.warn("Next.js version 13 and above are not fully supported yet. Please make sure to use version 12 or below.");
+
         if (delegate.packageManagerCommand().build().orElse("???").equals("run build") && packageJson.isPresent()) {
             JsonObject scripts = packageJson.get().getJsonObject("scripts");
             if (scripts != null) {
@@ -40,6 +42,7 @@ public class NextFramework extends GenericFramework {
                 }
             }
         }
+
         return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized)) {
 
             @Override
