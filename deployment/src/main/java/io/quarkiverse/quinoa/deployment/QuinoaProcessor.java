@@ -35,15 +35,18 @@ import io.quarkiverse.quinoa.deployment.items.BuiltResourcesBuildItem;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
 import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.items.PublishedPackageBuildItem;
+import io.quarkiverse.quinoa.deployment.items.QuinoaCurateOutcomeBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
+import io.quarkus.deployment.BootstrapConfig;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.Record;
+import io.quarkus.deployment.builditem.AppModelProviderBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
@@ -75,6 +78,8 @@ public class QuinoaProcessor {
     private static final String TARGET_BUILD_DIR_NAME = "build";
     private static final String BUILD_FILE = "package.json";
 
+    BootstrapConfig config;
+
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
@@ -84,7 +89,8 @@ public class QuinoaProcessor {
     public ConfiguredQuinoaBuildItem prepareQuinoaDirectory(
             LaunchModeBuildItem launchMode,
             QuinoaConfig userConfig,
-            OutputTargetBuildItem outputTarget) throws IOException {
+            OutputTargetBuildItem outputTarget,
+            QuinoaCurateOutcomeBuildItem curatedOutcome) throws IOException {
         if (!isEnabled(userConfig)) {
             LOG.info("Quinoa is disabled.");
             return null;
@@ -95,7 +101,7 @@ public class QuinoaProcessor {
             return null;
         }
         final String configuredDir = userConfig.uiDir();
-        final ProjectDirs projectDirs = resolveProjectDirs(userConfig, outputTarget);
+        final ProjectDirs projectDirs = resolveProjectDirs(userConfig, curatedOutcome);
         if (projectDirs == null) {
             return null;
         }
@@ -109,6 +115,11 @@ public class QuinoaProcessor {
         final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson);
 
         return new ConfiguredQuinoaBuildItem(projectDirs.projectRootDir, projectDirs.uiDir, packageJson, resolvedConfig);
+    }
+
+    @BuildStep
+    QuinoaCurateOutcomeBuildItem curateOutcome(AppModelProviderBuildItem appModelProvider) {
+        return new QuinoaCurateOutcomeBuildItem(appModelProvider.validateAndGet(config));
     }
 
     @BuildStep
@@ -398,8 +409,8 @@ public class QuinoaProcessor {
     }
 
     private static ProjectDirs resolveProjectDirs(QuinoaConfig config,
-            OutputTargetBuildItem outputTarget) {
-        Path projectRoot = findProjectRoot(outputTarget.getOutputDirectory());
+            QuinoaCurateOutcomeBuildItem curatedOutcome) {
+        Path projectRoot = curatedOutcome.getApplicationModuleDirectory();
         Path configuredUIDirPath = Path.of(config.uiDir().trim());
         if (projectRoot == null || !Files.isDirectory(projectRoot)) {
             if (configuredUIDirPath.isAbsolute() && Files.isDirectory(configuredUIDirPath)) {
