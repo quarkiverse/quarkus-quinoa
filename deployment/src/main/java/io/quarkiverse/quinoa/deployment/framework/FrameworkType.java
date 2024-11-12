@@ -45,7 +45,7 @@ public enum FrameworkType {
     SOLID_START(Set.of("vinxi dev"), generic(".output", "dev", 3000)),
     ASTRO(Set.of("astro dev"), generic("dist", "dev", 3000)),
     NEXT(Set.of("next"), new NextFramework()),
-    NUXT(Set.of("nuxt dev"), generic("dist", "dev", 3000)),
+    NUXT(Set.of("nuxt dev"), generic(".output", "dev", 3000)),
     ANGULAR(Set.of("ng serve"), new AngularFramework()),
     EMBER(Set.of("ember-cli serve"), generic("dist", "serve", 4200)),
     GATSBY(Set.of("gatsby develop"), generic("dist", "develop", 8000)),
