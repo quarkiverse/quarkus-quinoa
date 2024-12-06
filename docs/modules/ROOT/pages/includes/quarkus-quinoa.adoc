@@ -729,7 +729,7 @@ a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-publish]]
 
 [.description]
 --
-Runs package manager publish command. This is handy when the using justBuild() option to publish built web module or component to a registry.
+Runs additionally package manager publish command. This is handy when using together with the justBuild() option to publish built web package to a registry. The command is executed after the build command and can be customized with the `PackageManagerCommandConfig++#++publish()` and `PackageManagerCommandConfig++#++publishEnv()`.
 
 ifdef::add-copy-button-to-env-var[]
 Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PUBLISH+++[]
