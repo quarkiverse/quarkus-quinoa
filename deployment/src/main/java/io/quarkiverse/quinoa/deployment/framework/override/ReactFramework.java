@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.framework.override;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -19,8 +20,8 @@ public class ReactFramework extends GenericFramework {
 
     @Override
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson, Optional<String> detectedDevScript,
-            boolean isCustomized) {
-        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized)) {
+            boolean isCustomized, Path uiDir) {
+        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized, uiDir)) {
 
             @Override
             public PackageManagerCommandConfig packageManagerCommand() {

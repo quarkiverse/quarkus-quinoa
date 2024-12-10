@@ -72,9 +72,10 @@ public enum FrameworkType {
         return factory;
     }
 
-    public static QuinoaConfig overrideConfig(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile) {
+    public static QuinoaConfig overrideConfig(LaunchModeBuildItem launchMode, QuinoaConfig config, Path packageJsonFile,
+            Path uiDir) {
         if (!config.framework().detection()) {
-            return UNKNOWN_FRAMEWORK.override(config, Optional.empty(), Optional.empty(), true);
+            return UNKNOWN_FRAMEWORK.override(config, Optional.empty(), Optional.empty(), true, uiDir);
         }
 
         final JsonObject packageJson = readPackageJson(packageJsonFile);
@@ -82,14 +83,14 @@ public enum FrameworkType {
 
         if (detectedFramework.isEmpty()) {
             LOG.trace("Quinoa could not auto-detect the frameworkType from package.json file.");
-            return UNKNOWN_FRAMEWORK.override(config, Optional.of(packageJson), Optional.empty(), true);
+            return UNKNOWN_FRAMEWORK.override(config, Optional.of(packageJson), Optional.empty(), true, uiDir);
         }
 
         final FrameworkType frameworkType = detectedFramework.get().type;
         LOG.infof("Quinoa detected '%s' frameworkType from package.json file.", frameworkType);
 
         return frameworkType.factory.override(config, Optional.of(packageJson), Optional.of(detectedFramework.get().devScript),
-                detectedFramework.get().isCustomized);
+                detectedFramework.get().isCustomized, uiDir);
     }
 
     private static JsonObject readPackageJson(Path packageJsonFile) {

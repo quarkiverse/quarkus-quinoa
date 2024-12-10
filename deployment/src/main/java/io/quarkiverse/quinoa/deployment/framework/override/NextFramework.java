@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.framework.override;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import jakarta.json.JsonObject;
@@ -22,8 +23,7 @@ public class NextFramework extends GenericFramework {
 
     @Override
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
-            Optional<String> detectedDevScript,
-            boolean isCustomized) {
+            Optional<String> detectedDevScript, boolean isCustomized, Path uiDir) {
         LOG.warn("Next.js version 13 and above are not fully supported yet. Please make sure to use version 12 or below.");
 
         if (delegate.packageManagerCommand().build().orElse("???").equals("run build") && packageJson.isPresent()) {
@@ -43,7 +43,7 @@ public class NextFramework extends GenericFramework {
             }
         }
 
-        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized)) {
+        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized, uiDir)) {
 
             @Override
             public DevServerConfig devServer() {

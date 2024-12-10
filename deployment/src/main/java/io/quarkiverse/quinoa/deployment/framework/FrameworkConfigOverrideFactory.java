@@ -1,5 +1,6 @@
 package io.quarkiverse.quinoa.deployment.framework;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import jakarta.json.JsonObject;
@@ -13,5 +14,5 @@ public interface FrameworkConfigOverrideFactory {
     String getDefaultDevScriptName();
 
     QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson, Optional<String> detectedDevScript,
-            boolean isCustomized);
+            boolean isCustomized, Path uiDir);
 }

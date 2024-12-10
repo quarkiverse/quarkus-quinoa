@@ -3,6 +3,7 @@ package io.quarkiverse.quinoa.deployment.framework.override;
 import static io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig.DEFAULT_DEV_SCRIPT_NAME;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.DEFAULT_BUILD_DIR;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import jakarta.json.JsonObject;
@@ -53,7 +54,7 @@ public class GenericFramework implements FrameworkConfigOverrideFactory {
 
     @Override
     public QuinoaConfig override(QuinoaConfig originalConfig, Optional<JsonObject> packageJson,
-            Optional<String> detectedDevScript, boolean isCustomized) {
+            Optional<String> detectedDevScript, boolean isCustomized, Path uiDir) {
         final String devScript = detectedDevScript.orElse(defaultScriptName);
         return new QuinoaConfigDelegate(originalConfig) {
             @Override
