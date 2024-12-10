@@ -299,6 +299,15 @@
         "bug",
         "doc"
       ]
+    },
+    {
+      "login": "xjarvik",
+      "name": "xjarvik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54638086?v=4",
+      "profile": "https://github.com/xjarvik",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
