@@ -106,7 +106,7 @@ public class QuinoaProcessor {
 
         initializeTargetDirectory(outputTarget);
 
-        final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson);
+        final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson, projectDirs.uiDir);
 
         return new ConfiguredQuinoaBuildItem(projectDirs.projectRootDir, projectDirs.uiDir, packageJson, resolvedConfig);
     }

@@ -11,7 +11,6 @@ import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.config.delegate.PackageManagerCommandConfigDelegate;
 import io.quarkiverse.quinoa.deployment.config.delegate.QuinoaConfigDelegate;
-import io.quarkus.logging.Log;
 
 public class AngularFramework extends GenericFramework {
 
@@ -24,13 +23,14 @@ public class AngularFramework extends GenericFramework {
 
     @Override
     public QuinoaConfig override(QuinoaConfig originalConfig, Optional<JsonObject> packageJson,
-            Optional<String> detectedDevScript, boolean isCustomized) {
+            Optional<String> detectedDevScript, boolean isCustomized, Path uiDir) {
         final String devScript = detectedDevScript.orElse(getDefaultDevScriptName());
-        return new QuinoaConfigDelegate(super.override(originalConfig, packageJson, detectedDevScript, isCustomized)) {
+        return new QuinoaConfigDelegate(super.override(originalConfig, packageJson, detectedDevScript, isCustomized,
+                uiDir)) {
             @Override
             public Optional<String> buildDir() {
                 return Optional.of(originalConfig.buildDir().orElseGet(() -> {
-                    final JsonObject angularJson = readAngularJson(originalConfig);
+                    final JsonObject angularJson = readAngularJson(uiDir);
                     final JsonObject projectList = angularJson.getJsonObject("projects");
                     final JsonObject builder = projectList.values().stream()
                             .map(JsonValue::asJsonObject)
@@ -50,10 +50,8 @@ public class AngularFramework extends GenericFramework {
                 }));
             }
 
-            private static JsonObject readAngularJson(QuinoaConfig configuration) {
-                Log.debug("=== Configuration ===" + configuration);
-                try (JsonReader reader = Json
-                        .createReader(Files.newInputStream(Path.of(configuration.uiDir() + "/" + ANGULAR_JSON_FILE)))) {
+            private static JsonObject readAngularJson(Path uiDir) {
+                try (JsonReader reader = Json.createReader(Files.newInputStream(uiDir.resolve(ANGULAR_JSON_FILE)))) {
                     return reader.readObject();
                 } catch (IOException | JsonException e) {
                     throw new RuntimeException("Quinoa failed to read the angular.json file. %s", e);
