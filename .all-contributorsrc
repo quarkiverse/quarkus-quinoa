@@ -308,6 +308,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "blazmrak",
+      "name": "Blaz Mrak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25981532?v=4",
+      "profile": "https://github.com/blazmrak",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
