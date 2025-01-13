@@ -300,3 +300,15 @@ To mitigate that you must disable Vert.X URL validation to work with dynamic rou
 ----
 mvn quarkus:dev -Dvertx.disableURIValidation=true
 ----
+
+[#nuxt-config]
+=== Nuxt Configuration
+
+Dynamic routes in Nuxt use invalid URL symbols in the URL, specifically `[`.  See: https://github.com/quarkiverse/quarkus-quinoa/issues/591
+
+To mitigate that you must disable Vert.X URL validation to work with dynamic routing using `-Dvertx.disableURIValidation=true` for example:
+
+[source,bash]
+----
+mvn quarkus:dev -Dvertx.disableURIValidation=true
+----
