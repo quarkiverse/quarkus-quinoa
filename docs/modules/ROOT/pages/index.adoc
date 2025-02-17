@@ -36,7 +36,7 @@ Then start the live-coding:
 quarkus dev
 ----
 
-And navigate to http://0.0.0.0:8080/quinoa.html
+And navigate to http://localhost:8080/quinoa/index.html
 
 You could also just add the extension (but you won't get the starter code):
 
