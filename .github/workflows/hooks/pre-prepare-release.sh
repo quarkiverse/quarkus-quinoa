@@ -4,4 +4,4 @@
 #-------------------------------------
 
 # Install pnpm
-npm install -g pnpm@~8.1.0
+npm install -g pnpm@~8.6.12
