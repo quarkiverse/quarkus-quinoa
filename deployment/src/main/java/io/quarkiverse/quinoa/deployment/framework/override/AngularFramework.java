@@ -40,13 +40,7 @@ public class AngularFramework extends GenericFramework {
                                     "Quinoa failed to determine which application must be started in the angular.json file."))
                             .getJsonObject("architect")
                             .getJsonObject("build");
-
-                    final String builderName = builder.getString("builder");
-                    String fullBuildDir = builder.getJsonObject("options").getString("outputPath");
-                    if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
-                        fullBuildDir = String.format("%s/browser", fullBuildDir);
-                    }
-                    return fullBuildDir;
+                    return getBuildDir(builder);
                 }));
             }
 
@@ -54,7 +48,7 @@ public class AngularFramework extends GenericFramework {
                 try (JsonReader reader = Json.createReader(Files.newInputStream(uiDir.resolve(ANGULAR_JSON_FILE)))) {
                     return reader.readObject();
                 } catch (IOException | JsonException e) {
-                    throw new RuntimeException("Quinoa failed to read the angular.json file. %s", e);
+                    throw new RuntimeException("Quinoa failed to read the angular.json file.", e);
                 }
             }
 
@@ -78,4 +72,23 @@ public class AngularFramework extends GenericFramework {
             }
         };
     }
+
+    static String getBuildDir(JsonObject build) {
+        final String builderName = build.getString("builder");
+        JsonValue outputPath = build.getJsonObject("options").get("outputPath");
+        if (outputPath instanceof JsonString outputPathStr) {
+            String fullBuildDir = outputPathStr.getString();
+            if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
+                fullBuildDir = String.format("%s/browser", fullBuildDir);
+            }
+            return fullBuildDir;
+        }
+        if (outputPath instanceof JsonObject outputPathObj) {
+            return String.format("%s/%s",
+                    outputPathObj.getString("base"),
+                    outputPathObj.getString("browser", "browser"));
+        }
+        throw new RuntimeException("Unexpected type of outputPath in the angular.json file.");
+    }
+
 }

@@ -1,0 +1,6 @@
+{
+  "builder": "@angular-devkit/build-angular:browser",
+  "options": {
+    "outputPath": "dist/acme-frontend"
+  }
+}
