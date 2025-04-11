@@ -1,0 +1,6 @@
+{
+  "builder": "@angular-devkit/build-angular:application",
+  "options": {
+    "outputPath": "dist/acme-frontend"
+  }
+}
