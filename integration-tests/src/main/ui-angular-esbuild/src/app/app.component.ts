@@ -6,13 +6,12 @@ import { Observable } from "rxjs";
 
 @Component({
   selector: "app-root",
-  standalone: true,
   imports: [RouterOutlet, AsyncPipe],
   templateUrl: "./app.component.html",
-  styleUrl: "./app.component.css",
+  styleUrl: "./app.component.css"
 })
 export class AppComponent {
-  protected title = "quinoa-app";
+  title = "quinoa-app";
   protected message: Observable<string> = inject(HttpClient).get(
     "/bar/foo/api/quinoa",
     {
