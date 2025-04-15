@@ -335,6 +335,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "sbober",
+      "name": "Sebastian Bober",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58520?v=4",
+      "profile": "https://github.com/sbober",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
