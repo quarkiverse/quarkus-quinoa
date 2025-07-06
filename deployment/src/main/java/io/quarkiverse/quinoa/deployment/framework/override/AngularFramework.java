@@ -57,7 +57,7 @@ public class AngularFramework extends GenericFramework {
                 return new PackageManagerCommandConfigDelegate(super.packageManagerCommand()) {
                     @Override
                     public Optional<String> dev() {
-                        final String extraArgs = isCustomized ? "" : " -- --disable-host-check --hmr";
+                        final String extraArgs = isCustomized ? "" : " -- --host=0.0.0.0 --hmr";
                         return Optional.of(originalConfig.packageManagerCommand().dev()
                                 .orElse("run " + devScript + extraArgs));
                     }
