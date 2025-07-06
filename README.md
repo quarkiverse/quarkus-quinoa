@@ -1,7 +1,11 @@
 <div align="center">
-<img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/quarkus.svg" width="67" height="70" ><img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/plus-sign.svg" height="70" ><img src="https://github.com/quarkiverse/quarkus-quinoa/blob/main/docs/modules/ROOT/assets/images/npm-logo.svg" height="70" >
- 
-# Quarkus Quinoa
+  <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <img src="https://raw.githubusercontent.com/quarkiverse/quarkus-quinoa/main/docs/modules/ROOT/assets/images/quarkus.svg" alt="Quarkus logo" style="height: 70px; width: auto;">
+    <img src="https://raw.githubusercontent.com/quarkiverse/quarkus-quinoa/main/docs/modules/ROOT/assets/images/plus-sign.svg" alt="Plus sign" style="height: 70px; width: auto;">
+    <img src="https://raw.githubusercontent.com/quarkiverse/quarkus-quinoa/main/docs/modules/ROOT/assets/images/npm-logo.svg" alt="NPM logo" style="height: 70px; width: auto;">
+  </div>
+
+  <h1>Quarkus Quinoa</h1>
 </div>
 <br>
 
