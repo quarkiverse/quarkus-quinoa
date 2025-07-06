@@ -344,6 +344,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "magori",
+      "name": "Dorian Magnin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20932528?v=4",
+      "profile": "https://github.com/magori",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
