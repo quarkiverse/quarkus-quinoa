@@ -12,17 +12,8 @@ import static java.lang.String.join;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 
@@ -54,7 +45,7 @@ import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.WebsocketSubProtocolsBuildItem;
-import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
+import io.quarkus.vertx.http.runtime.VertxHttpBuildTimeConfig;
 
 public class ForwardedDevProcessor {
 
@@ -187,7 +178,7 @@ public class ForwardedDevProcessor {
     @Record(RUNTIME_INIT)
     public void runtimeInit(
             QuinoaRecorder recorder,
-            HttpBuildTimeConfig httpBuildTimeConfig,
+            VertxHttpBuildTimeConfig httpBuildTimeConfig,
             Optional<ForwardedDevServerBuildItem> devProxy,
             Optional<ConfiguredQuinoaBuildItem> configuredQuinoa,
             CoreVertxBuildItem vertx,

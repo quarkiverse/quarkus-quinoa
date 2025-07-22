@@ -1,10 +1,6 @@
 package io.quarkiverse.quinoa.deployment.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.config.Config;
@@ -16,7 +12,7 @@ import io.quarkus.runtime.annotations.ConfigDocDefault;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
-import io.quarkus.vertx.http.runtime.HttpBuildTimeConfig;
+import io.quarkus.vertx.http.runtime.VertxHttpBuildTimeConfig;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
@@ -166,11 +162,11 @@ public interface QuinoaConfig {
     }
 
     static QuinoaDevProxyHandlerConfig toDevProxyHandlerConfig(final QuinoaConfig config,
-            final HttpBuildTimeConfig httpBuildTimeConfig, final NonApplicationRootPathBuildItem nonApplicationRootPath) {
-        final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes.map(Set::copyOf).orElse(Set.of());
+            final VertxHttpBuildTimeConfig httpBuildTimeConfig, final NonApplicationRootPathBuildItem nonApplicationRootPath) {
+        final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes().map(Set::copyOf).orElse(Set.of());
         return new QuinoaDevProxyHandlerConfig(getNormalizedIgnoredPathPrefixes(config, nonApplicationRootPath),
                 config.devServer().indexPage().orElse(DEFAULT_INDEX_PAGE),
-                httpBuildTimeConfig.enableCompression, compressMediaTypes, config.devServer().directForwarding());
+                httpBuildTimeConfig.enableCompression(), compressMediaTypes, config.devServer().directForwarding());
     }
 
     /**
