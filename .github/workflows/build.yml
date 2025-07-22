@@ -51,11 +51,11 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Maven Version
-        run: mvn --version
+        run: ./mvnw --version
       - name: Build with Maven
-        run: mvn -B formatter:validate install --file pom.xml
+        run: ./mvnw -B formatter:validate install --file pom.xml
       - name: Build with Maven (Native)
-        run: mvn -B install -Dnative -Dquarkus.native.container-build -Dnative.surefire.skip
+        run: ./mvnw -B install -Dnative -Dquarkus.native.container-build -Dnative.surefire.skip
   build-windows:
     runs-on: windows-latest
     steps:
@@ -82,6 +82,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@~8.6.12
       - name: Maven Version
-        run: mvn --version
+        run: ./mvnw --version
       - name: Build with Maven
-        run: mvn -B install --file pom.xml
+        run: ./mvnw -B clean install --file pom.xml
