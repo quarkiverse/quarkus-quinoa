@@ -57,6 +57,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@~8.6.12
 
+      - name: Ensure browsers are installed
+        working-directory: integration-tests
+        run: ./mvnw exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps chromium"
+
       - name: Setup and Run Tests
         run: ./ecosystem-ci/setup-and-test
         env:
