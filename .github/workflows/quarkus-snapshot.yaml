@@ -59,7 +59,7 @@ jobs:
 
       - name: Ensure browsers are installed
         working-directory: integration-tests
-        run: ./mvnw exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps chromium"
+        run: ../mvnw exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps chromium"
 
       - name: Setup and Run Tests
         run: ./ecosystem-ci/setup-and-test
