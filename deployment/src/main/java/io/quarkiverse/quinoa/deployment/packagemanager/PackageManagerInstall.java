@@ -31,7 +31,7 @@ public final class PackageManagerInstall {
     private static final String INSTALL_SUB_PATH = "node";
     public static final String NODE_BINARY = PackageManagerRunner.isWindows() ? "node.exe" : "node";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
-    public static final String PNPM_PATH = INSTALL_SUB_PATH + "/node_modules/pnpm/bin/pnpm.js";
+    public static final String PNPM_PATH = INSTALL_SUB_PATH + "/node_modules/pnpm/bin/pnpm.cjs";
     public static final String YARN_PATH = INSTALL_SUB_PATH + "/yarn/dist/bin/yarn.js";
 
     private PackageManagerInstall() {
