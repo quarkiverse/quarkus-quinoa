@@ -3,6 +3,7 @@ package io.quarkiverse.quinoa.deployment.framework.override;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.json.*;
@@ -32,15 +33,17 @@ public class AngularFramework extends GenericFramework {
                 return Optional.of(originalConfig.buildDir().orElseGet(() -> {
                     final JsonObject angularJson = readAngularJson(uiDir);
                     final JsonObject projectList = angularJson.getJsonObject("projects");
-                    final JsonObject builder = projectList.values().stream()
-                            .map(JsonValue::asJsonObject)
-                            .filter(project -> "application".equals(project.getString("projectType")))
+                    final Map.Entry<String, JsonValue> defaultProjectEntry = projectList.entrySet().stream()
+                            .filter(entry -> "application".equals(entry.getValue().asJsonObject().getString("projectType")))
                             .findFirst()
                             .orElseThrow(() -> new RuntimeException(
-                                    "Quinoa failed to determine which application must be started in the angular.json file."))
+                                    "Quinoa failed to determine which application must be started in the angular.json file."));
+                    final String defaultProjectName = defaultProjectEntry.getKey();
+                    final JsonObject defaultProject = defaultProjectEntry.getValue().asJsonObject();
+                    final JsonObject builder = defaultProject
                             .getJsonObject("architect")
                             .getJsonObject("build");
-                    return getBuildDir(builder);
+                    return getBuildDir(builder, defaultProjectName);
                 }));
             }
 
@@ -73,9 +76,13 @@ public class AngularFramework extends GenericFramework {
         };
     }
 
-    static String getBuildDir(JsonObject build) {
+    static String getBuildDir(JsonObject build, String projectName) {
         final String builderName = build.getString("builder");
         JsonValue outputPath = build.getJsonObject("options").get("outputPath");
+        if (outputPath == null) {
+            // No path found, so assume angular v20 default path
+            return String.format("dist/%s/browser", projectName);
+        }
         if (outputPath instanceof JsonString outputPathStr) {
             String fullBuildDir = outputPathStr.getString();
             if (ANGULAR_DEVKIT_BUILD_ANGULAR_APPLICATION.equals(builderName)) {
