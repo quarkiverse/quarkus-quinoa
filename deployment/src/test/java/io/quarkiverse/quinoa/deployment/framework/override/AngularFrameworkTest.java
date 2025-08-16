@@ -1,14 +1,13 @@
 package io.quarkiverse.quinoa.deployment.framework.override;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.InputStream;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AngularFrameworkTest {
 
@@ -20,11 +19,12 @@ class AngularFrameworkTest {
             "builder-application-output-obj-browser, dist/acme-frontend/ui",
     })
     void testBuilderOutputPath(String jsonResource, String expectedBuildDir) {
+        final String projectName = "acme-frontend";
         // given
         JsonObject givenBuilder = readTestJson(jsonResource);
 
         // when
-        String actual = AngularFramework.getBuildDir(givenBuilder);
+        String actual = AngularFramework.getBuildDir(givenBuilder, projectName);
 
         // then
         assertThat(actual).isEqualTo(expectedBuildDir);
