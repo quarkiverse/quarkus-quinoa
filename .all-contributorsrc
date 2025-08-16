@@ -353,6 +353,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "indiealexh",
+      "name": "Alexander Haslam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1066212?v=4",
+      "profile": "http://indiealexh.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
