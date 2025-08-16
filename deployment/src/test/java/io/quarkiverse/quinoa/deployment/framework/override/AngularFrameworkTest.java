@@ -1,13 +1,14 @@
 package io.quarkiverse.quinoa.deployment.framework.override;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class AngularFrameworkTest {
 
