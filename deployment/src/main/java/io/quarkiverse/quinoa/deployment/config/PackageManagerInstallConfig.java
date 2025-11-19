@@ -88,6 +88,11 @@ public interface PackageManagerInstallConfig {
     @WithName("basic-auth")
     PackageManagerInstallAuthConfig packageManagerInstallAuth();
 
+    /**
+     * Install and use Bun as package manager with this version.
+     */
+    Optional<String> bunVersion();
+
     static boolean isEqual(PackageManagerInstallConfig p1, PackageManagerInstallConfig p2) {
         if (!Objects.equals(p1.enabled(), p2.enabled())) {
             return false;
@@ -120,6 +125,9 @@ public interface PackageManagerInstallConfig {
             return false;
         }
         if (!PackageManagerInstallAuthConfig.isEqual(p1.packageManagerInstallAuth(), p2.packageManagerInstallAuth())) {
+            return false;
+        }
+        if (!Objects.equals(p1.bunVersion(), p2.bunVersion())) {
             return false;
         }
         return true;

@@ -5,3 +5,6 @@
 
 # Install pnpm
 npm install -g pnpm@~8.6.12
+
+# Install bun
+npm install -g bun

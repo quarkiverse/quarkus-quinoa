@@ -71,6 +71,15 @@ public class QuinoaDevUIProcessor {
                         .staticLabel(yarnVersion.get());
                 card.addPage(nodejsPage);
             }
+            final Optional<String> bunVersion = quinoaConfig.packageManagerInstall().bunVersion();
+            if (bunVersion.isPresent()) {
+                final PageBuilder<ExternalPageBuilder> bunPage = Page.externalPageBuilder("Bun")
+                        .icon("font-awesome-brands:square-js")
+                        .url("https://bun.sh/")
+                        .doNotEmbed()
+                        .staticLabel(bunVersion.get());
+                card.addPage(bunPage);
+            }
         }
 
         if (configuredQuinoa.isPresent()) {
