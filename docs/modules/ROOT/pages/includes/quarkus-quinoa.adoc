@@ -282,6 +282,23 @@ endif::add-copy-button-to-env-var[]
 |`https://registry.npmjs.org/pnpm/-/`
 
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version[quarkus.quinoa.package-manager-install.bun-version]`
+
+
+[.description]
+--
+Install and use Bun as package manager with this version. When only `bun-version` is defined (without `node-version`, `npm-version`, `yarn-version`, or `pnpm-version`), Bun will be used as both the package manager and JavaScript runtime, and NodeJS installation will be skipped entirely. Otherwise, Bun installation will be ignored and NodeJS will be used as the JavaScript runtime and the defined package manager.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BUN_VERSION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_PACKAGE_MANAGER_INSTALL_BUN_VERSION+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username]]`link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username[quarkus.quinoa.package-manager-install.basic-auth.username]`
 
 

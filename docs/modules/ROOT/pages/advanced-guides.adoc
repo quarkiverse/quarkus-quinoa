@@ -57,6 +57,20 @@ If NodeJS and NPM are not installed by Quinoa, it is possible to override the pa
 
 NOTE: By default, Quinoa is configured with the commands to call depending on the chosen package manager (to always keep the same behavior and make it easy to switch).
 
+==== Using Bun as Package Manager and Runtime
+
+Bun is a modern JavaScript runtime and toolkit that can replace both NodeJS and traditional package managers. You can configure it as follows:
+
+[source,properties]
+----
+quarkus.quinoa.package-manager-install=true
+quarkus.quinoa.package-manager-install.bun-version=1.3.2 <1>
+----
+
+<1> When **only** `bun-version` is defined (and `node-version`, `npm-version`, `yarn-version`, or `pnpm-version` are not specified), Bun will be used and NodeJS will not be installed. If any other version is defined alongside `bun-version`, Bun will be ignored and NodeJS will be used as the runtime.
+
+NOTE: Bun automatically uses its own runtime when executing scripts—fully compatible with most Node APIs—so installing NodeJS alongside Bun would be redundant. For this reason, defining both `bun-version` and `node-version` (or any other package manager version) disables Bun installation and defaults to NodeJS as the runtime.
+
 [#install-packages]
 === Node packages installation (node_modules)
 
@@ -77,18 +91,19 @@ By default, the following commands and environment variables are used in the dif
 * `npm install` (`npm ci` if `quarkus.quinoa.frozen-lockfile=true`).
 * `pnpm install` (`pnpm install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`).
 * `yarn install` (`yarn install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`).
+* `bun install` (`bun install --frozen-lockfile` if `quarkus.quinoa.frozen-lockfile=true`).
 
 *Build:*
 
-`(npm|pnpm|yarn) run build`, with environment `MODE=pass:[${mode}]` (https://quarkus.io/guides/lifecycle#launch-modes[`dev`, `test` or `prod`])
+`(npm|pnpm|yarn|bun) run build`, with environment `MODE=pass:[${mode}]` (https://quarkus.io/guides/lifecycle#launch-modes[`dev`, `test` or `prod`])
 
 *Test:*
 
-`(npm|pnpm|yarn) test`, with environment `CI=true`
+`(npm|pnpm|yarn|bun) test`, with environment `CI=true`
 
 *Dev:*
 
-`(npm|pnpm|yarn) start`, with environment `BROWSER=none`
+`(npm|pnpm|yarn|bun) start`, with environment `BROWSER=none`
 
 [#override-commands]
 === Override package manager commands
