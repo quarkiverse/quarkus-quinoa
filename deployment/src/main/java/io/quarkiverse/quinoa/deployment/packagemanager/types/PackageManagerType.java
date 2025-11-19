@@ -65,6 +65,8 @@ public enum PackageManagerType {
             return isYarnBerry(directory) ? YARN_BERRY : YARN;
         } else if (Files.isRegularFile(directory.resolve(PNPM.getLockFile()))) {
             return PNPM;
+        } else if (Files.isRegularFile(directory.resolve(BUN.getLockFile()))) {
+            return BUN;
         } else {
             return NPM;
         }

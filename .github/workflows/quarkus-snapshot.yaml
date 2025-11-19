@@ -57,6 +57,9 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@~8.6.12
 
+      - name: Install bun
+        run: npm install -g bun
+
       - name: Ensure browsers are installed
         working-directory: current-repo/testing
         run: ../mvnw exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps chromium"

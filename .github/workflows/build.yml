@@ -50,6 +50,8 @@ jobs:
           key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm
+      - name: Install bun
+        run: npm install -g bun
       - name: Maven Version
         run: ./mvnw --version
       - name: Ensure browsers are installed
@@ -84,6 +86,8 @@ jobs:
           key: maven-repo-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Install pnpm
         run: npm install -g pnpm@~8.6.12
+      - name: Install bun
+        run: npm install -g bun
       - name: Maven Version
         run: ./mvnw --version
       - name: Ensure browsers are installed
