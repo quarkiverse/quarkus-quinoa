@@ -143,7 +143,7 @@ public final class PackageManagerInstall {
             StartupLogCompressor npmInstallerLogCompressor = null;
             try {
                 npmInstallerLogCompressor = new StartupLogCompressor("npm installer", consoleInstalledBuildItem,
-                loggingSetupBuildItem);
+                        loggingSetupBuildItem);
                 factory.getNPMInstaller()
                         .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                         .setNpmVersion(npmVersion)
@@ -235,7 +235,8 @@ public final class PackageManagerInstall {
         final Optional<String> pnpmVersion = config.pnpmVersion();
         final String npmVersion = config.npmVersion();
         boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
-        return bunVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty() && pnpmVersion.isEmpty() && nodeVersion.isEmpty();
+        return bunVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty() && pnpmVersion.isEmpty()
+                && nodeVersion.isEmpty();
     }
 
     public record Installation(String nodeDirPath, String packageManagerBinary) {

@@ -17,7 +17,6 @@ public enum PackageManagerType {
     YARN("yarn", "yarn.lock", "install --frozen-lockfile"),
     YARN_BERRY("yarn", "yarn.lock", "install --immutable"),
     BUN("bun", "bun.lock", "install --frozen-lockfile");
-    ;
 
     public static final String YARN_BERRY_CONFIG_FILE = ".yarnrc.yml";
 
