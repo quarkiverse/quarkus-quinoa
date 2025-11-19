@@ -15,7 +15,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-40-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-41-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Quinoa is a Quarkus extension which eases the development, the build and serving of single page apps or web components (built with [npm](https://docs.npmjs.com/) : [React](https://react.dev/learn), [Angular](https://angular.dev/overview), [Vue](https://vuejs.org/guide/introduction.html), [Lit](https://lit.dev/), [Svelte](https://svelte.dev/docs/introduction), [Astro](https://docs.astro.build/en/getting-started/), [SolidJS](https://www.solidjs.com/guides/getting-started) …) alongside [Quarkus](https://quarkus.io/). It is possible to use it with a Quarkus backend in a single project.
@@ -143,6 +143,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/magori"><img src="https://avatars.githubusercontent.com/u/20932528?v=4?s=100" width="100px;" alt="Dorian Magnin"/><br /><sub><b>Dorian Magnin</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Amagori" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://indiealexh.com"><img src="https://avatars.githubusercontent.com/u/1066212?v=4?s=100" width="100px;" alt="Alexander Haslam"/><br /><sub><b>Alexander Haslam</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=indiealexh" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://mauritssilvis.nl"><img src="https://avatars.githubusercontent.com/u/34771046?v=4?s=100" width="100px;" alt="Maurits Silvis"/><br /><sub><b>Maurits Silvis</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/issues?q=author%3Amauritssilvis" title="Bug reports">🐛</a> <a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=mauritssilvis" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/martindotpy"><img src="https://avatars.githubusercontent.com/u/114754842?v=4?s=100" width="100px;" alt="Martín Alexander Ramos Yampufé"/><br /><sub><b>Martín Alexander Ramos Yampufé</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-quinoa/commits?author=martindotpy" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
