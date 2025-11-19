@@ -30,9 +30,11 @@ public final class PackageManagerInstall {
     private static final Logger LOG = Logger.getLogger(PackageManagerInstall.class);
     private static final String INSTALL_SUB_PATH = "node";
     public static final String NODE_BINARY = PackageManagerRunner.isWindows() ? "node.exe" : "node";
+    public static final String BUN_BINARY = PackageManagerRunner.isWindows() ? "bun.exe" : "bun";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
     public static final String PNPM_PATH = INSTALL_SUB_PATH + "/node_modules/pnpm/bin/pnpm.cjs";
     public static final String YARN_PATH = INSTALL_SUB_PATH + "/yarn/dist/bin/yarn.js";
+    public static final String BUN_PATH = "bun/" + BUN_BINARY;
 
     private PackageManagerInstall() {
 
@@ -43,11 +45,16 @@ public final class PackageManagerInstall {
             Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
             LoggingSetupBuildItem loggingSetupBuildItem) {
         Path installDir = resolveInstallDir(config, projectDir).normalize();
-        if (config.nodeVersion().isEmpty()) {
-            throw new ConfigurationException("node-version is required to install package manager",
+
+        // Check if using Bun (which doesn't require Node.js)
+        boolean isBunOnly = isBunOnly(config);
+
+        if (!isBunOnly && config.nodeVersion().isEmpty()) {
+            throw new ConfigurationException(
+                    "node-version is required to install package manager (not required when using only bun-version)",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
         }
-        if (Integer.parseInt(config.nodeVersion().get().split("[.]")[0]) < 4) {
+        if (!isBunOnly && Integer.parseInt(config.nodeVersion().get().split("[.]")[0]) < 4) {
             throw new ConfigurationException("Quinoa is not compatible with Node prior to v4.0.0",
                     Set.of("quarkus.quinoa.package-manager-install.node-version"));
         }
@@ -101,25 +108,30 @@ public final class PackageManagerInstall {
     private static Installation attemptInstall(PackageManagerInstallConfig config, Path uiDir, Path installDir,
             PackageManagerInstallFactory factory,
             Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
-
             LoggingSetupBuildItem loggingSetupBuildItem) throws InstallationException {
-        StartupLogCompressor nodeInstallerLogCompressor = null;
-        try {
-            nodeInstallerLogCompressor = new StartupLogCompressor("node installer", consoleInstalledBuildItem,
-                    loggingSetupBuildItem);
-            factory.getNodeInstaller()
-                    .setNodeVersion("v" + config.nodeVersion().orElse("???"))
-                    .setNodeDownloadRoot(config.nodeDownloadRoot())
-                    .setNpmVersion(config.npmVersion())
-                    .install();
-            nodeInstallerLogCompressor.close();
-        } catch (InstallationException e) {
-            nodeInstallerLogCompressor.closeAndDumpCaptured();
-            if (e.getCause() instanceof DirectoryNotEmptyException && e.getCause().getMessage().contains("tmp")) {
-                LOG.warnf("Quinoa was not able to delete the Node install temporary directory: %s",
-                        e.getCause().getMessage());
-            } else {
-                throw e;
+        // Check if using Bun only
+        boolean isBunOnly = isBunOnly(config);
+
+        // Only install Node.js if not using Bun only
+        if (!isBunOnly) {
+            StartupLogCompressor nodeInstallerLogCompressor = null;
+            try {
+                nodeInstallerLogCompressor = new StartupLogCompressor("node installer", consoleInstalledBuildItem,
+                        loggingSetupBuildItem);
+                factory.getNodeInstaller()
+                        .setNodeVersion("v" + config.nodeVersion().orElse("???"))
+                        .setNodeDownloadRoot(config.nodeDownloadRoot())
+                        .setNpmVersion(config.npmVersion())
+                        .install();
+                nodeInstallerLogCompressor.close();
+            } catch (InstallationException e) {
+                nodeInstallerLogCompressor.closeAndDumpCaptured();
+                if (e.getCause() instanceof DirectoryNotEmptyException && e.getCause().getMessage().contains("tmp")) {
+                    LOG.warnf("Quinoa was not able to delete the Node install temporary directory: %s",
+                            e.getCause().getMessage());
+                } else {
+                    throw e;
+                }
             }
         }
 
@@ -131,7 +143,7 @@ public final class PackageManagerInstall {
             StartupLogCompressor npmInstallerLogCompressor = null;
             try {
                 npmInstallerLogCompressor = new StartupLogCompressor("npm installer", consoleInstalledBuildItem,
-                        loggingSetupBuildItem);
+                loggingSetupBuildItem);
                 factory.getNPMInstaller()
                         .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                         .setNpmVersion(npmVersion)
@@ -167,8 +179,15 @@ public final class PackageManagerInstall {
                     .install();
         }
 
-        return resolveInstalledExecutorBinary(installDir, executionPath);
+        // Use bun if bunVersion is set (and npm is provided and nodeVersion, yarnVersion and pnpmVersion are not set)
+        if (isBunOnly) {
+            executionPath = BUN_PATH;
+            factory.getBunInstaller()
+                    .setBunVersion("v" + config.bunVersion().orElse("???"))
+                    .install();
+        }
 
+        return resolveInstalledExecutorBinary(installDir, executionPath, isBunOnly);
     }
 
     private static Path resolveInstallDir(PackageManagerInstallConfig config, Path projectDir) {
@@ -184,13 +203,20 @@ public final class PackageManagerInstall {
         return projectDir.resolve(installPath);
     }
 
-    private static Installation resolveInstalledExecutorBinary(Path installDirectory, String executionPath) {
-        final Path nodeDirPath = installDirectory.resolve(INSTALL_SUB_PATH)
-                .toAbsolutePath();
+    private static Installation resolveInstalledExecutorBinary(Path installDirectory, String executionPath, boolean isBunOnly) {
+        final Path nodeDirPath = installDirectory.resolve(!isBunOnly ? INSTALL_SUB_PATH : "").toAbsolutePath();
         final Path executorPath = installDirectory.resolve(executionPath).toAbsolutePath();
         final String platformNodeDirPath = normalizePath(nodeDirPath.toString());
         final String platformExecutorPath = normalizePath(executorPath.toString());
-        final String packageManagerBinary = NODE_BINARY + " " + quotePathWithSpaces(platformExecutorPath);
+
+        // If using Bun, the binary IS the executor (no need to prepend node)
+        final String packageManagerBinary;
+        if (isBunOnly) {
+            packageManagerBinary = quotePathWithSpaces(platformExecutorPath);
+        } else {
+            packageManagerBinary = NODE_BINARY + " " + quotePathWithSpaces(platformExecutorPath);
+        }
+
         return new Installation(platformNodeDirPath, packageManagerBinary);
     }
 
@@ -200,6 +226,16 @@ public final class PackageManagerInstall {
 
     public static String quotePathWithSpaces(String path) {
         return path.contains(" ") ? "\"".concat(path).concat("\"") : path;
+    }
+
+    private static boolean isBunOnly(PackageManagerInstallConfig config) {
+        final Optional<String> nodeVersion = config.nodeVersion();
+        final Optional<String> bunVersion = config.bunVersion();
+        final Optional<String> yarnVersion = config.yarnVersion();
+        final Optional<String> pnpmVersion = config.pnpmVersion();
+        final String npmVersion = config.npmVersion();
+        boolean isNpmProvided = PackageManagerInstallConfig.NPM_PROVIDED.equalsIgnoreCase(npmVersion);
+        return bunVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty() && pnpmVersion.isEmpty() && nodeVersion.isEmpty();
     }
 
     public record Installation(String nodeDirPath, String packageManagerBinary) {

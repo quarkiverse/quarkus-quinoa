@@ -16,6 +16,7 @@ public enum PackageManagerType {
     NPM("npm", "package-lock.json", "ci"),
     YARN("yarn", "yarn.lock", "install --frozen-lockfile"),
     YARN_BERRY("yarn", "yarn.lock", "install --immutable"),
+    BUN("bun", "bun.lock", "install --frozen-lockfile");
     ;
 
     public static final String YARN_BERRY_CONFIG_FILE = ".yarnrc.yml";
@@ -54,7 +55,7 @@ public enum PackageManagerType {
     public static PackageManagerType resolveConfiguredPackageManagerType(String configuredBinary,
             PackageManagerType detectedType) {
         final PackageManagerType configuredBinaryType = resolveBinaryType(configuredBinary);
-        if (YARN_BERRY.equals(detectedType) && configuredBinaryType.equals(YARN)) {
+        if (YARN_BERRY.equals(detectedType) && YARN.equals(configuredBinaryType)) {
             return YARN_BERRY;
         }
         return configuredBinaryType;

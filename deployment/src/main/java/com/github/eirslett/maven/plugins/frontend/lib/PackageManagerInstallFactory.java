@@ -52,6 +52,13 @@ public class PackageManagerInstallFactory {
         return yarnInstaller;
     }
 
+    public BunInstaller getBunInstaller() {
+        BunInstaller bunInstaller = new BunInstaller(this.getInstallConfig(), new DefaultArchiveExtractor(), fileDownloader);
+        bunInstaller.setUserName(this.userName);
+        bunInstaller.setPassword(this.password);
+        return bunInstaller;
+    }
+
     private NodeExecutorConfig getExecutorConfig() {
         return new InstallNodeExecutorConfig(this.getInstallConfig());
     }
