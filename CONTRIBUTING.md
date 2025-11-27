@@ -2,7 +2,7 @@
 We are beyond excited to see that you want to contribute! We would love to accept your contributions. Navigate through the following to understand more about contributing.
 
 ### Prerequisites
-- Java 11
+- Java 17
 - Apache Maven
 
 ## Follow the Steps
