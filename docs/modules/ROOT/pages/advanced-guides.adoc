@@ -79,7 +79,7 @@ By default, Quinoa will call the appropriate package manager install command (be
 You may force a new installation using `-Dquarkus.quinoa.force-install=true`.
 
 [#frozen-lockfile]
-NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.frozen-lockfile=true`. In this mode, the lockfile have to be present in the project.
+NOTE: Quinoa will use the appropriate package manager frozen-lockfile command when installing, if the environment `CI=true`, or if `quarkus.quinoa.ci=install`. In this mode, the lockfile have to be present in the project.
 
 [#package-manager-commands]
 === Package manager commands
@@ -118,10 +118,10 @@ quarkus.quinoa.package-manager-command.build-env.BUILD=value # <2>
 ----
 
 <1> This makes `npm ci --cache $CACHE_DIR/.npm --prefer-offline` the command executed in the `install` phase.
-(overriding `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile=true`).
+(overriding `quarkus.quinoa.package-manager` and `quarkus.quinoa.ci=install`).
 <2> set environment variable `BUILD` with value `value`. Environment variables set in config can be added to the  xref:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.package-manager-command.build-env-build-env[listed commands].
 
-WARNING: Using custom commands will override `quarkus.quinoa.package-manager` and `quarkus.quinoa.frozen-lockfile`.
+WARNING: Using custom commands will override `quarkus.quinoa.package-manager` and `quarkus.quinoa.ci`.
 
 WARNING: if NodeJS is installed by Quinoa, you need to enable: `quarkus.quinoa.package-manager-command.prepend-binary` and adapt the command to only specify the arguments (the binary to call will be prepended by Quinoa).
 
@@ -236,6 +236,6 @@ Whenever you execute mvn quarkus:dev, it automatically produces the openapi.json
 
 Most CI images already include NodeJS. if they don't, just make sure to install it alongside Maven/Gradle (and Yarn/PNPM if needed). Then you can use it like any Maven/Gradle project.
 
-Quinoa can be configured to install packages with a xref:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.frozen-lockfile[frozen lockfile].
+Quinoa can be configured to install packages with a xref:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.ci[frozen lockfile].
 
 On compatible CIs, don't forget to enable the Maven/Gradle and NPM/Yarn repository caching.

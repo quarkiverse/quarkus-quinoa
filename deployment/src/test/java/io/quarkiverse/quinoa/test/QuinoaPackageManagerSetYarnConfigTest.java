@@ -18,7 +18,6 @@ public class QuinoaPackageManagerSetYarnConfigTest {
     @RegisterExtension
     static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
             .overrideConfigKey("quarkus.quinoa.package-manager", systemBinary("yarn"))
-            .overrideConfigKey("quarkus.quinoa.frozen-lockfile", "false")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&
                             s.getParameters()[0].equals(systemBinary("yarn") + " run build")));
