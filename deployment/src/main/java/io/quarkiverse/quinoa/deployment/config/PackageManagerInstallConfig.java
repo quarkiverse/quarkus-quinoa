@@ -25,9 +25,11 @@ public interface PackageManagerInstallConfig {
     @WithDefault("false")
     boolean enabled();
 
+
     /**
-     * The directory where NodeJS should be installed (relative to the project root),
-     * It will be installed in a 'node/' subdirectory of this.
+     * The directory (relative to the project root) where Node.js and other binaries should be installed.
+     * Node.js will be installed in a {@code node/} subdirectory of this path and also use a {@code cache/} subdirectory.
+     * This directory must be dedicated to Quinoa, as it may be wiped and re-created.
      */
     @WithDefault(DEFAULT_INSTALL_DIR)
     String installDir();
