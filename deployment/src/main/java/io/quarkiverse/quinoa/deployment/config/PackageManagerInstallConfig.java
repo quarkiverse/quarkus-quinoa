@@ -25,7 +25,6 @@ public interface PackageManagerInstallConfig {
     @WithDefault("false")
     boolean enabled();
 
-
     /**
      * The directory (relative to the project root) where Node.js and other binaries should be installed.
      * Node.js will be installed in a {@code node/} subdirectory of this path and also use a {@code cache/} subdirectory.
