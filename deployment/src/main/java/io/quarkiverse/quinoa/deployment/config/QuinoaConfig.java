@@ -53,6 +53,8 @@ public interface QuinoaConfig {
 
     /**
      * Path to the Web UI (Node.js) root directory (relative to the project root).
+     * <p>
+     * NOTE: It is also possible to specify an absolute directory in the case of re-augmentation for example.
      */
     @WithDefault(DEFAULT_WEB_UI_DIR)
     String uiDir();
