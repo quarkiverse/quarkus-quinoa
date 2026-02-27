@@ -36,8 +36,9 @@ import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.ProcessUtil;
-import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.runtime.LaunchMode;
+
+import io.smallrye.common.os.OS;
 
 public class PackageManagerRunner {
     private static final Logger LOG = Logger.getLogger(PackageManagerRunner.class);
@@ -209,7 +210,7 @@ public class PackageManagerRunner {
     }
 
     public static boolean isWindows() {
-        return QuarkusConsole.IS_WINDOWS;
+        return OS.WINDOWS.isCurrent();
     }
 
     private Process process(PackageManager.Command command) {

@@ -10,8 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import io.quarkus.deployment.util.FileUtil;
-import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.test.QuarkusUnitTest;
+
+import io.smallrye.common.os.OS;
 
 /**
  * This class is in a separate module for QuarkusUnitTest classloading issues
@@ -90,7 +91,7 @@ public class QuinoaQuarkusUnitTest {
     }
 
     public static boolean isWindows() {
-        return QuarkusConsole.IS_WINDOWS;
+        return OS.WINDOWS.isCurrent();
     }
 
     public static void prepareTestWebUI(Path testDir, boolean installed) {
