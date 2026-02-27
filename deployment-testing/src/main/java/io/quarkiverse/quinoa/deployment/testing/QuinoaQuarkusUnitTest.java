@@ -11,7 +11,6 @@ import java.nio.file.StandardCopyOption;
 
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.test.QuarkusUnitTest;
-
 import io.smallrye.common.os.OS;
 
 /**

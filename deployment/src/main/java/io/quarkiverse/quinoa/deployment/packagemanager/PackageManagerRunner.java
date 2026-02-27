@@ -37,7 +37,6 @@ import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.util.ProcessUtil;
 import io.quarkus.runtime.LaunchMode;
-
 import io.smallrye.common.os.OS;
 
 public class PackageManagerRunner {
