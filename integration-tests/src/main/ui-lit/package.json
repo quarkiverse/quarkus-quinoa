@@ -18,7 +18,7 @@
         "by-node-env": "^2.0.1",
         "copy-webpack-plugin": "^11.0.0",
         "cross-env": "^7.0.3",
-        "webpack": "^5.94.0",
+        "webpack": "^5.105.2",
         "webpack-cli": "^5.1.4"
     }
 }
