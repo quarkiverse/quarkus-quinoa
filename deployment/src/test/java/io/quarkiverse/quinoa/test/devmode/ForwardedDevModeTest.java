@@ -29,10 +29,13 @@ public class ForwardedDevModeTest {
                 .statusCode(200)
                 .header("Content-Encoding", Matchers.nullValue())
                 .body(containsString("live-coding"));
+        // POST is not in Quinoa's HANDLED_METHODS (only GET/HEAD/OPTIONS), so the request
+        // is not proxied to the dev server and falls through to Quarkus routing.
+        // Since /api/something doesn't exist, Quarkus returns 404.
         given()
                 .body("{}")
                 .contentType(ContentType.JSON)
                 .when().post("/api/something").then()
-                .statusCode(405);
+                .statusCode(404);
     }
 }
