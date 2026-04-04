@@ -12,7 +12,7 @@ function App() {
   const [value, setValue] = useState(null);
   useEffect(() => {
     if(value == null) {
-      fetchQuinoa(setValue);
+      await fetchQuinoa(setValue);
     }
   }, [value, setValue]);
   return (
