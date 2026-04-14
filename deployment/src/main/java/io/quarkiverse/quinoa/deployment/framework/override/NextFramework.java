@@ -15,47 +15,59 @@ import io.quarkiverse.quinoa.deployment.config.delegate.QuinoaConfigDelegate;
 public class NextFramework extends GenericFramework {
 
     private static final Logger LOG = Logger.getLogger(NextFramework.class);
-    private static final String EXPECTED_OUTPUT_VALUE = "export";
+    static final String STATIC_EXPORT_OUTPUT_VALUE = "export";
+    static final String SSR_BUILD_DIR = ".next";
+    static final String EXPORT_BUILD_DIR = "out";
 
     public NextFramework() {
-        super("out", "dev", 3000);
+        super(EXPORT_BUILD_DIR, "dev", 3000);
     }
 
     @Override
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
             Optional<String> detectedDevScript, boolean isCustomized, Path uiDir) {
-        LOG.warn("Next.js version 13 and above are not fully supported yet. Please make sure to use version 12 or below.");
 
-        if (delegate.packageManagerCommand().build().orElse("???").equals("run build") && packageJson.isPresent()) {
-            JsonObject scripts = packageJson.get().getJsonObject("scripts");
-            if (scripts != null) {
-                String buildScript = scripts.getString("build");
-                if (buildScript == null || buildScript.isEmpty()) {
-                    LOG.warn(
-                            "Make sure you define  \"build\": \"next build \", in the package.json to make Next work with Quinoa.");
-                }
+        final boolean isStaticExport = isStaticExport(packageJson);
 
-                String output = packageJson.get().getString("output", null);
-                if (!EXPECTED_OUTPUT_VALUE.equals(output)) {
-                    LOG.warn(
-                            "Make sure you define  \"output\": \"export \", in the package.json to make Next work with Quinoa.");
-                }
-            }
+        if (isStaticExport) {
+            LOG.info("Quinoa detected Next.js with static export (output: 'export'). Using build output from 'out/'.");
+        } else {
+            LOG.info("Quinoa detected Next.js App Router. SSR mode will be enabled automatically.");
         }
 
-        return new QuinoaConfigDelegate(super.override(delegate, packageJson, detectedDevScript, isCustomized, uiDir)) {
+        // Use the correct build dir depending on whether static export is configured
+        final String buildDir = isStaticExport ? EXPORT_BUILD_DIR : SSR_BUILD_DIR;
+        final QuinoaConfig baseConfig = new GenericFramework(buildDir, "dev", 3000)
+                .override(delegate, packageJson, detectedDevScript, isCustomized, uiDir);
+
+        return new QuinoaConfigDelegate(baseConfig) {
+            @Override
+            public boolean enableSSRMode() {
+                // Auto-enable SSR mode for App Router (non-static-export) builds
+                return !isStaticExport || super.enableSSRMode();
+            }
 
             @Override
             public DevServerConfig devServer() {
                 return new DevServerConfigDelegate(super.devServer()) {
                     @Override
                     public Optional<String> indexPage() {
-                        // In Dev mode Next.js serves everything out of root "/" but in PRD mode it is the
-                        // normal "/index.html".
+                        // In dev mode Next.js serves all routes from root "/"
                         return Optional.of(super.indexPage().orElse("/"));
                     }
                 };
             }
         };
+    }
+
+    /**
+     * Returns true if the package.json signals a static export build
+     * (i.e. it contains {@code "output": "export"} at the top level,
+     * which is the Quinoa convention for opting into {@code next export} mode).
+     */
+    static boolean isStaticExport(Optional<JsonObject> packageJson) {
+        return packageJson
+                .map(json -> STATIC_EXPORT_OUTPUT_VALUE.equals(json.getString("output", null)))
+                .orElse(false);
     }
 }
