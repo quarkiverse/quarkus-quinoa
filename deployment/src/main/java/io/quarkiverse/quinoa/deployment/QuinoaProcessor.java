@@ -107,6 +107,11 @@ public class QuinoaProcessor {
         initializeTargetDirectory(outputTarget);
 
         final QuinoaConfig resolvedConfig = overrideConfig(launchMode, userConfig, packageJson, projectDirs.uiDir);
+        if (resolvedConfig.enableSPARouting() && resolvedConfig.enableSSRMode()) {
+            throw new ConfigurationException(
+                    "Quinoa cannot have both 'enable-spa-routing' and 'enable-ssr-mode' enabled. " +
+                            "Use 'enable-ssr-mode' for SSR frameworks like Next.js, or 'enable-spa-routing' for traditional SPAs.");
+        }
 
         return new ConfiguredQuinoaBuildItem(projectDirs.projectRootDir, projectDirs.uiDir, packageJson, resolvedConfig);
     }
@@ -170,6 +175,12 @@ public class QuinoaProcessor {
         if (launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT
                 && isDevServerMode(configuredQuinoa.resolvedConfig())) {
             return null;
+        }
+        if (configuredQuinoa.resolvedConfig().enableSSRMode() && !configuredQuinoa.resolvedConfig().justBuild()) {
+            LOG.warn("Quinoa SSR mode is enabled in a non-dev-server build. "
+                    + "The build output will NOT be served as static files by Quarkus. "
+                    + "SSR frameworks like Next.js require a Node.js server (e.g. 'next start') to serve pages at runtime. "
+                    + "Consider using 'quarkus.quinoa.just-build=true' and deploying the Node.js server separately.");
         }
         if (liveReload.isLiveReload()
                 && liveReload.getChangedResources().stream()
