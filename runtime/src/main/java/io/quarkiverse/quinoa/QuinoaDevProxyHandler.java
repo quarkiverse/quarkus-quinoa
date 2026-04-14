@@ -118,6 +118,10 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
     private boolean shouldForward(RoutingContext ctx, HttpResponse<Buffer> result) {
         final List<String> contentType = result.headers().getAll(HttpHeaders.CONTENT_TYPE);
         if (contentType != null && contentType.stream().anyMatch(s -> s.contains("text/html"))) {
+            // In SSR mode, always trust HTML responses from the dev server
+            if (config.enableSSRMode) {
+                return true;
+            }
             final String path = QuinoaRecorder.resolvePath(ctx);
             // We forward if the server returns a html, and it was intended:
             // - if the path ends with .html
