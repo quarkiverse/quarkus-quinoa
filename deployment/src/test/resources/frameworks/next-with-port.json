@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "dev": "next dev --port 4000",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}
