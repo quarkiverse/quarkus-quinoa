@@ -400,6 +400,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "LSRaGeUx",
+      "name": "Yan Adam",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116586049?v=4",
+      "profile": "https://github.com/LSRaGeUx",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
