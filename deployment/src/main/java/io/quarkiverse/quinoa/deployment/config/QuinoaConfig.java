@@ -121,6 +121,16 @@ public interface QuinoaConfig {
     boolean enableSPARouting();
 
     /**
+     * Enable SSR (Server-Side Rendering) mode for frameworks like Next.js App Router.
+     * When enabled, requests are proxied directly to the dev server without being rerouted to the index page.
+     * This preserves the original request path for server-side rendering.
+     * Cannot be used together with enable-spa-routing.
+     */
+    @WithDefault("false")
+    @WithName("enable-ssr-mode")
+    boolean enableSSRMode();
+
+    /**
      * List of path prefixes to be ignored by Quinoa (SPA Handler and Dev-Proxy).
      * The paths are normalized and always resolved relative to 'quarkus.quinoa.ui-root-path'.
      */
@@ -166,9 +176,15 @@ public interface QuinoaConfig {
     static QuinoaDevProxyHandlerConfig toDevProxyHandlerConfig(final QuinoaConfig config,
             final VertxHttpBuildTimeConfig httpBuildTimeConfig, final NonApplicationRootPathBuildItem nonApplicationRootPath) {
         final Set<String> compressMediaTypes = httpBuildTimeConfig.compressMediaTypes().map(Set::copyOf).orElse(Set.of());
+        // In SSR mode the dev server handles every route directly, so default the index
+        // page to "/" (i.e. no suffix appended) rather than "index.html".
+        final String indexPage = config.enableSSRMode()
+                ? config.devServer().indexPage().orElse("/")
+                : config.devServer().indexPage().orElse(DEFAULT_INDEX_PAGE);
         return new QuinoaDevProxyHandlerConfig(getNormalizedIgnoredPathPrefixes(config, nonApplicationRootPath),
-                config.devServer().indexPage().orElse(DEFAULT_INDEX_PAGE),
-                httpBuildTimeConfig.enableCompression(), compressMediaTypes, config.devServer().directForwarding());
+                indexPage,
+                httpBuildTimeConfig.enableCompression(), compressMediaTypes, config.devServer().directForwarding(),
+                config.enableSSRMode());
     }
 
     /**
@@ -268,6 +284,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!Objects.equals(q1.enableSPARouting(), q2.enableSPARouting())) {
+            return false;
+        }
+        if (!Objects.equals(q1.enableSSRMode(), q2.enableSSRMode())) {
             return false;
         }
         if (!Objects.equals(q1.ignoredPathPrefixes(), q2.ignoredPathPrefixes())) {

@@ -82,6 +82,11 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     }
 
     @Override
+    public boolean enableSSRMode() {
+        return delegate.enableSSRMode();
+    }
+
+    @Override
     public Optional<List<String>> ignoredPathPrefixes() {
         return delegate.ignoredPathPrefixes();
     }

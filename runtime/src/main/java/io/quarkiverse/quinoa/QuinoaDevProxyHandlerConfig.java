@@ -13,15 +13,17 @@ public class QuinoaDevProxyHandlerConfig {
     public final Set<String> compressMediaTypes;
 
     public final boolean devServerDirectForwarding;
+    public final boolean enableSSRMode;
 
     @RecordableConstructor
     public QuinoaDevProxyHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean enableCompression,
-            Set<String> compressMediaTypes, boolean devServerDirectForwarding) {
+            Set<String> compressMediaTypes, boolean devServerDirectForwarding, boolean enableSSRMode) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;
         this.indexPage = "/".equals(indexPage) ? "" : indexPage;
         this.enableCompression = enableCompression;
         this.compressMediaTypes = compressMediaTypes;
         this.devServerDirectForwarding = devServerDirectForwarding;
+        this.enableSSRMode = enableSSRMode;
     }
 
     @Override
@@ -33,6 +35,7 @@ public class QuinoaDevProxyHandlerConfig {
         QuinoaDevProxyHandlerConfig that = (QuinoaDevProxyHandlerConfig) o;
         return enableCompression == that.enableCompression
                 && devServerDirectForwarding == that.devServerDirectForwarding
+                && enableSSRMode == that.enableSSRMode
                 && Objects.equals(ignoredPathPrefixes, that.ignoredPathPrefixes) && Objects.equals(indexPage, that.indexPage)
                 && Objects.equals(compressMediaTypes, that.compressMediaTypes);
     }
@@ -40,6 +43,6 @@ public class QuinoaDevProxyHandlerConfig {
     @Override
     public int hashCode() {
         return Objects.hash(ignoredPathPrefixes, indexPage, enableCompression, compressMediaTypes,
-                devServerDirectForwarding);
+                devServerDirectForwarding, enableSSRMode);
     }
 }

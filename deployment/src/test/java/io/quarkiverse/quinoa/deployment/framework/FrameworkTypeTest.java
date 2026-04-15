@@ -27,6 +27,9 @@ public class FrameworkTypeTest {
             "angular-exact, ANGULAR, start, false",
             "angular-envs, ANGULAR, start, false",
             "angular-args, ANGULAR, start, true",
+            "next-exact, NEXT, dev, true",
+            "next-with-port, NEXT, dev, true",
+            "next-with-export, NEXT, dev, true",
     })
     void testDetection(String jsonResource, String type, String devScript, Boolean customized) {
 

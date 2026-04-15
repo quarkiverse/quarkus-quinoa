@@ -194,7 +194,9 @@ public class ForwardedDevProcessor {
                 LOG.info("Quinoa is in build only mode");
                 return;
             }
-            LOG.infof("Quinoa is forwarding unhandled requests to port: %d", devProxy.get().getPort());
+            LOG.infof("Quinoa is forwarding unhandled requests to port: %d%s",
+                    devProxy.get().getPort(),
+                    quinoaConfig.enableSSRMode() ? " (SSR mode)" : "");
             final QuinoaDevProxyHandlerConfig handlerConfig = toDevProxyHandlerConfig(quinoaConfig, httpBuildTimeConfig,
                     nonApplicationRootPath);
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(quinoaConfig);
