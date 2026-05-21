@@ -43,6 +43,10 @@ public enum PackageManagerType {
         return isWindows() ? binary + ".cmd" : binary;
     }
 
+    public static String getOSShell() {
+        return isWindows() ? "cmd.exe /c" : "sh -c";
+    }
+
     public String getLockFile() {
         return lockFile;
     }

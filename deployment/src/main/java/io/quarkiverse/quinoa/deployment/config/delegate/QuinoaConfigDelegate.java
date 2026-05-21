@@ -47,6 +47,11 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     }
 
     @Override
+    public Optional<String> packageManagerShell() {
+        return delegate.packageManagerShell();
+    }
+
+    @Override
     public PackageManagerInstallConfig packageManagerInstall() {
         return delegate.packageManagerInstall();
     }

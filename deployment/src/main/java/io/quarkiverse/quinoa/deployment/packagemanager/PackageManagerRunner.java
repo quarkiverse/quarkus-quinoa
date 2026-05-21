@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.detectPackageManagerType;
+import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.getOSShell;
 import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.resolveConfiguredPackageManagerType;
 import static java.lang.String.format;
 
@@ -47,14 +48,16 @@ public class PackageManagerRunner {
     private final Path directory;
 
     private final PackageManager packageManager;
+    private final String shell;
     private final Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem;
     private final LoggingSetupBuildItem loggingSetupBuildItem;
 
-    private PackageManagerRunner(Path directory, PackageManager packageManager,
+    private PackageManagerRunner(Path directory, PackageManager packageManager, String shell,
             Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
             LoggingSetupBuildItem loggingSetupBuildItem) {
         this.directory = directory;
         this.packageManager = packageManager;
+        this.shell = shell;
         this.consoleInstalledBuildItem = consoleInstalledBuildItem;
         this.loggingSetupBuildItem = loggingSetupBuildItem;
     }
@@ -193,6 +196,7 @@ public class PackageManagerRunner {
     }
 
     public static PackageManagerRunner autoDetectPackageManager(Optional<String> configuredBinary,
+            Optional<String> configuredShell,
             PackageManagerCommandConfig packageManagerCommands, Path directory, List<String> paths,
             Optional<ConsoleInstalledBuildItem> consoleInstalledBuildItem,
             LoggingSetupBuildItem loggingSetupBuildItem) {
@@ -204,7 +208,8 @@ public class PackageManagerRunner {
             binary = configuredBinary.get();
             type = resolveConfiguredPackageManagerType(binary, type);
         }
-        return new PackageManagerRunner(directory, PackageManager.resolve(type, binary, packageManagerCommands, paths),
+        String shell = configuredShell.orElseGet(() -> getOSShell());
+        return new PackageManagerRunner(directory, PackageManager.resolve(type, binary, packageManagerCommands, paths), shell,
                 consoleInstalledBuildItem, loggingSetupBuildItem);
     }
 
@@ -257,11 +262,11 @@ public class PackageManagerRunner {
     }
 
     private String[] runner(PackageManager.Command command) {
-        if (isWindows()) {
-            return new String[] { "cmd.exe", "/c", command.commandWithArguments };
-        } else {
-            return new String[] { "sh", "-c", command.commandWithArguments };
-        }
+        String[] shellParts = shell.split("\\s+");
+        String[] result = new String[shellParts.length + 1];
+        System.arraycopy(shellParts, 0, result, 0, shellParts.length);
+        result[shellParts.length] = command.commandWithArguments;
+        return result;
     }
 
     private static class HandleOutput implements Runnable, Closeable {
