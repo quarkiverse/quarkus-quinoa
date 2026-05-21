@@ -76,6 +76,15 @@ public interface QuinoaConfig {
     Optional<String> packageManager();
 
     /**
+     * The shell to use for running the package manager commands.
+     * On Windows, defaults to "cmd.exe /c", on Unix-like systems, defaults to "sh -c".
+     * This can be set to use an alternative shell like "powershell.exe -Command" or a Cygwin shell.
+     * The value should be the shell executable followed by its argument (e.g. "powershell.exe -Command").
+     */
+    @ConfigDocDefault("\"cmd.exe /c\" on Windows, \"sh -c\" on Unix-like systems")
+    Optional<String> packageManagerShell();
+
+    /**
      * Configuration for installing the package manager
      */
     PackageManagerInstallConfig packageManagerInstall();
@@ -263,6 +272,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!Objects.equals(q1.packageManager(), q2.packageManager())) {
+            return false;
+        }
+        if (!Objects.equals(q1.packageManagerShell(), q2.packageManagerShell())) {
             return false;
         }
         if (!PackageManagerInstallConfig.isEqual(q1.packageManagerInstall(), q2.packageManagerInstall())) {

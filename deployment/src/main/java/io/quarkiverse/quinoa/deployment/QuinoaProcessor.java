@@ -139,6 +139,7 @@ public class QuinoaProcessor {
             }
 
             final PackageManagerRunner packageManagerRunner = autoDetectPackageManager(packageManagerBinary,
+                    resolvedConfig.packageManagerShell(),
                     resolvedConfig.packageManagerCommand(), configuredQuinoa.uiDir(), paths, consoleInstalledBuildItem,
                     loggingSetupBuildItem);
             final Path targetPackageJson = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME).resolve(BUILD_FILE);
