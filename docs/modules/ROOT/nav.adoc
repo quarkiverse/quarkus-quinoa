@@ -1,6 +1,3 @@
-include::./includes/attributes.adoc[]
-:config-file: application.properties
-
 * xref:index.adoc[Getting started]
 * xref:main-concepts.adoc[Main Concepts]
 * xref:web-frameworks.adoc[Web Frameworks]
