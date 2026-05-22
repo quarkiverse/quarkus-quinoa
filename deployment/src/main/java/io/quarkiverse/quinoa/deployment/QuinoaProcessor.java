@@ -36,6 +36,7 @@ import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
 import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.items.PublishedPackageBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
+import io.quarkiverse.quinoa.deployment.items.TauriBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
@@ -166,7 +167,8 @@ public class QuinoaProcessor {
             InstalledPackageManagerBuildItem installedPackageManager,
             OutputTargetBuildItem outputTarget,
             LaunchModeBuildItem launchMode,
-            LiveReloadBuildItem liveReload) throws IOException {
+            LiveReloadBuildItem liveReload,
+            Optional<TauriBuildItem> tauriBuild) throws IOException {
         if (configuredQuinoa == null) {
             return null;
         }
@@ -200,9 +202,11 @@ public class QuinoaProcessor {
                     Set.of("quarkus.quinoa.build-dir"));
         }
 
+        final boolean isJustBuild = configuredQuinoa.resolvedConfig().justBuild()
+                || (tauriBuild.isPresent() && !tauriBuild.get().exportTargets().isEmpty());
         // doesn't make sense to copy from ui build dir to quinoa target dir
         // in case of `just-build` option enabled
-        if (configuredQuinoa.resolvedConfig().justBuild()) {
+        if (isJustBuild) {
             return new TargetDirBuildItem(buildDir);
         }
 
@@ -243,12 +247,16 @@ public class QuinoaProcessor {
     @Consume(PublishedPackageBuildItem.class) // just to order build steps
     public BuiltResourcesBuildItem prepareBuiltResources(
             ConfiguredQuinoaBuildItem configuredQuinoa,
-            Optional<TargetDirBuildItem> targetDir) throws IOException {
+            Optional<TargetDirBuildItem> targetDir,
+            Optional<TauriBuildItem> tauriBuild) throws IOException {
         if (targetDir.isEmpty()) {
             return null;
         }
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
-            // no need to configure vertx static resources when `just-build` activated
+            return null;
+        }
+        if (tauriBuild.isPresent() && !tauriBuild.get().exportTargets().isEmpty()) {
+            LOG.info("Quinoa is in Tauri mode: static resources will be embedded by Tauri");
             return null;
         }
 
@@ -277,9 +285,14 @@ public class QuinoaProcessor {
     public void produceGeneratedStaticResources(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             BuildProducer<GeneratedStaticResourceBuildItem> generatedStaticResourceProducer,
-            Optional<BuiltResourcesBuildItem> uiResources) {
+            Optional<BuiltResourcesBuildItem> uiResources,
+            Optional<TauriBuildItem> tauriBuild) {
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
             LOG.info("Quinoa is in build only mode");
+            return;
+        }
+        if (tauriBuild.isPresent() && !tauriBuild.get().exportTargets().isEmpty()) {
+            LOG.info("Quinoa is in Tauri mode: static resources served by Tauri webview");
             return;
         }
         if (uiResources.isPresent() && !uiResources.get().resources().isEmpty()) {
