@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
+import io.quarkiverse.quinoa.deployment.config.TauriConfig;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
+import io.quarkiverse.quinoa.deployment.items.TauriBuildItem;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -25,7 +27,8 @@ public class QuinoaDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     void createCard(BuildProducer<CardPageBuildItem> cardPageBuildItemBuildProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
-            Optional<ConfiguredQuinoaBuildItem> configuredQuinoa) {
+            Optional<ConfiguredQuinoaBuildItem> configuredQuinoa,
+            Optional<TauriBuildItem> tauriBuild) {
         if (configuredQuinoa.isEmpty()) {
             return;
         }
@@ -92,6 +95,19 @@ public class QuinoaDevUIProcessor {
                         .staticLabel(String.valueOf(port.get()));
                 card.addPage(portPage);
             }
+        }
+
+        if (tauriBuild.isPresent()) {
+            TauriConfig tauriConfig = tauriBuild.get().tauriConfig();
+            final PageBuilder<ExternalPageBuilder> tauriPage = Page.externalPageBuilder("Tauri")
+                    .icon("font-awesome-solid:window-maximize")
+                    .url("https://tauri.app/")
+                    .doNotEmbed()
+                    .staticLabel(tauriBuild.get().exportTargets().stream()
+                            .map(t -> t.name().toLowerCase())
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("enabled"));
+            card.addPage(tauriPage);
         }
 
         card.setCustomCard("qwc-quinoa-card.js");

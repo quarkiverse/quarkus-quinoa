@@ -8,6 +8,7 @@ import io.quarkiverse.quinoa.deployment.config.FrameworkConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
+import io.quarkiverse.quinoa.deployment.config.TauriConfig;
 import io.quarkiverse.quinoa.deployment.config.SbomConfig;
 
 public class QuinoaConfigDelegate implements QuinoaConfig {
@@ -100,6 +101,11 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     @Override
     public DevServerConfig devServer() {
         return delegate.devServer();
+    }
+
+    @Override
+    public TauriConfig tauri() {
+        return delegate.tauri();
     }
 
     @Override
