@@ -39,6 +39,8 @@ import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerInstall;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
+import io.quarkiverse.quinoa.deployment.sbom.CdxgenRunner;
+import io.quarkiverse.quinoa.deployment.sbom.CycloneDxBomParser;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -51,9 +53,11 @@ import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
+import io.quarkus.deployment.sbom.SbomContributionBuildItem;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
+import io.quarkus.sbom.SbomContribution;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
@@ -482,6 +486,203 @@ public class QuinoaProcessor {
 
         public Path getUIDir() {
             return uiDir;
+        }
+    }
+
+    /**
+     * Produces an SBOM contribution build item by running cdxgen to generate
+     * a CycloneDX SBOM and parsing the result into component descriptors.
+     * <p>
+     * Development dependencies are included or excluded based on the SBOM configuration
+     * and the current launch mode. By default, dev dependencies are included in
+     * development mode and excluded in production builds.
+     *
+     * @param configured the configured Quinoa build item, if present
+     * @param installed the installed package manager build item, if present
+     * @param launchMode the current launch mode
+     * @param config the Quinoa configuration
+     * @param sbomProducer the producer for SBOM contribution build items
+     */
+    @BuildStep
+    void produceSbomContribution(
+            Optional<ConfiguredQuinoaBuildItem> configured,
+            Optional<InstalledPackageManagerBuildItem> installed,
+            LaunchModeBuildItem launchMode,
+            OutputTargetBuildItem outputTarget,
+            QuinoaConfig config,
+            BuildProducer<SbomContributionBuildItem> sbomProducer) {
+        if (configured.isEmpty() || installed.isEmpty()) {
+            return;
+        }
+        if (!config.sbom().enabled()) {
+            return;
+        }
+
+        final PackageManagerRunner packageManagerRunner = installed.get().getPackageManager();
+        final Path uiDir = configured.get().uiDir();
+        final Path packageJson = configured.get().packageJson();
+        final List<String> paths = packageManagerRunner.getPaths();
+
+        final Path sbomCacheDir = outputTarget.getOutputDirectory().resolve(TARGET_DIR_NAME).resolve("cdxgen");
+        final Path cachedSbom = sbomCacheDir.resolve("sbom-cdxgen.json");
+        final Path cachedPackageJson = sbomCacheDir.resolve("sbom-package.json");
+        final Path lockFile = uiDir.resolve(packageManagerRunner.getType().getLockFile());
+        final Path cachedLockFile = sbomCacheDir.resolve("sbom-lockfile");
+        final Path cachedConfigFingerprint = sbomCacheDir.resolve("sbom-config");
+        final String configFingerprint = sbomConfigFingerprint(config);
+
+        final boolean cacheHit = isSbomCacheValid(packageJson, cachedPackageJson, lockFile, cachedLockFile,
+                configFingerprint, cachedConfigFingerprint, cachedSbom);
+        if (cacheHit) {
+            LOG.info("Reusing cached SBOM (inputs unchanged)");
+        } else {
+            int timeoutSeconds = config.sbom().timeout();
+            if (timeoutSeconds < 1) {
+                LOG.warnf("Invalid SBOM timeout %d, using default 300s", timeoutSeconds);
+                timeoutSeconds = 300;
+            }
+
+            try {
+                Files.createDirectories(sbomCacheDir);
+                CdxgenRunner.generate(uiDir, paths, packageManagerRunner.getType(),
+                        config.sbom().cdxgenVersion(), timeoutSeconds, cachedSbom);
+            } catch (Exception e) {
+                LOG.warn("Failed to generate SBOM with cdxgen", e);
+                return;
+            }
+        }
+
+        final SbomContribution contribution;
+        try {
+            contribution = CycloneDxBomParser.parse(cachedSbom, packageJson);
+        } catch (Exception e) {
+            deleteQuietly(cachedSbom);
+            deleteQuietly(cachedPackageJson);
+            deleteQuietly(cachedLockFile);
+            deleteQuietly(cachedConfigFingerprint);
+            throw new RuntimeException("Failed to parse cdxgen SBOM output", e);
+        }
+
+        if (!cacheHit) {
+            try {
+                Files.copy(packageJson, cachedPackageJson, StandardCopyOption.REPLACE_EXISTING);
+                if (Files.isRegularFile(lockFile)) {
+                    Files.copy(lockFile, cachedLockFile, StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    deleteQuietly(cachedLockFile);
+                }
+                Files.writeString(cachedConfigFingerprint, configFingerprint);
+            } catch (IOException e) {
+                LOG.debug("Failed to update SBOM cache", e);
+            }
+        }
+
+        if (contribution.components().isEmpty()) {
+            return;
+        }
+
+        final SbomContribution result;
+        if (shouldIncludeDevDependencies(config, launchMode)) {
+            result = contribution;
+        } else {
+            result = CycloneDxBomParser.excludeDevDependencies(contribution);
+        }
+        if (!result.components().isEmpty()) {
+            sbomProducer.produce(new SbomContributionBuildItem(result));
+        }
+    }
+
+    /**
+     * Checks whether the cached SBOM is still valid by comparing the current
+     * package.json, lock file, and SBOM configuration fingerprint against
+     * their cached counterparts.
+     *
+     * @param currentPackageJson path to the current package.json
+     * @param cachedPackageJson path to the cached copy of package.json
+     * @param currentLockFile path to the current lock file
+     * @param cachedLockFile path to the cached copy of the lock file
+     * @param configFingerprint the current SBOM configuration fingerprint string
+     * @param cachedConfigFingerprint path to the cached configuration fingerprint file
+     * @param cachedSbom path to the cached SBOM output file
+     * @return {@code true} if all cached inputs match and the cached SBOM exists
+     */
+    private static boolean isSbomCacheValid(Path currentPackageJson, Path cachedPackageJson,
+            Path currentLockFile, Path cachedLockFile,
+            String configFingerprint, Path cachedConfigFingerprint,
+            Path cachedSbom) {
+        try {
+            if (!Files.isRegularFile(cachedSbom)) {
+                return false;
+            }
+            if (!filesEqual(currentPackageJson, cachedPackageJson)) {
+                return false;
+            }
+            if (!filesEqual(currentLockFile, cachedLockFile)
+                    && (Files.isRegularFile(currentLockFile) || Files.isRegularFile(cachedLockFile))) {
+                return false;
+            }
+            return Files.isRegularFile(cachedConfigFingerprint)
+                    && configFingerprint.equals(Files.readString(cachedConfigFingerprint));
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Compares two files for equality by checking existence, size, and byte content.
+     * Returns {@code false} if either path does not point to a regular file.
+     *
+     * @param a path to the first file
+     * @param b path to the second file
+     * @return {@code true} if both files exist, have the same size, and identical content
+     * @throws IOException if an I/O error occurs reading the files
+     */
+    private static boolean filesEqual(Path a, Path b) throws IOException {
+        if (!Files.isRegularFile(a) || !Files.isRegularFile(b)) {
+            return false;
+        }
+        if (Files.size(a) != Files.size(b)) {
+            return false;
+        }
+        return Arrays.equals(Files.readAllBytes(a), Files.readAllBytes(b));
+    }
+
+    /**
+     * Builds a fingerprint string from the SBOM-relevant configuration properties.
+     * Used to detect configuration changes that should invalidate the cached SBOM.
+     *
+     * @param config the Quinoa configuration
+     * @return a string representing the current SBOM configuration
+     */
+    private static String sbomConfigFingerprint(QuinoaConfig config) {
+        return config.sbom().cdxgenVersion().orElse("latest")
+                + "\n" + config.sbom().timeout();
+    }
+
+    /**
+     * Determines whether development dependencies should be included in the SBOM.
+     * <p>
+     * If the configuration explicitly sets {@code includeDevDependencies}, that value is used.
+     * Otherwise, dev dependencies are included only in development mode.
+     *
+     * @param config the Quinoa configuration
+     * @param launchMode the current launch mode
+     * @return {@code true} if dev dependencies should be included
+     */
+    private static boolean shouldIncludeDevDependencies(QuinoaConfig config, LaunchModeBuildItem launchMode) {
+        return config.sbom().includeDevDependencies()
+                .orElse(launchMode.getLaunchMode() == LaunchMode.DEVELOPMENT);
+    }
+
+    /**
+     * Deletes a file if it exists, silently ignoring any I/O errors.
+     *
+     * @param path the path to delete
+     */
+    private static void deleteQuietly(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
         }
     }
 

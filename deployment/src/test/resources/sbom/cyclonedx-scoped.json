@@ -1,0 +1,66 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "version": 1,
+  "components": [
+    {
+      "group": "@lit",
+      "name": "reactive-element",
+      "version": "2.0.4",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "scopedfakehash"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40lit/reactive-element@2.0.4",
+      "type": "library",
+      "bom-ref": "pkg:npm/@lit/reactive-element@2.0.4",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "package-lock.json"
+        }
+      ]
+    },
+    {
+      "group": "@lit-labs",
+      "name": "ssr-dom-shim",
+      "version": "1.2.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "transitivefakehash"
+        }
+      ],
+      "purl": "pkg:npm/%40lit-labs/ssr-dom-shim@1.2.1",
+      "type": "library",
+      "bom-ref": "pkg:npm/@lit-labs/ssr-dom-shim@1.2.1",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "package-lock.json"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:npm/@lit/reactive-element@2.0.4",
+      "dependsOn": [
+        "pkg:npm/@lit-labs/ssr-dom-shim@1.2.1"
+      ]
+    },
+    {
+      "ref": "pkg:npm/@lit-labs/ssr-dom-shim@1.2.1",
+      "dependsOn": []
+    }
+  ]
+}

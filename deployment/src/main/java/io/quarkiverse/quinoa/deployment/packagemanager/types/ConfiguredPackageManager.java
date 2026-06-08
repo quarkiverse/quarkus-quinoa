@@ -50,6 +50,16 @@ class ConfiguredPackageManager implements PackageManager {
     }
 
     @Override
+    public List<String> paths() {
+        return paths;
+    }
+
+    @Override
+    public PackageManagerType type() {
+        return type;
+    }
+
+    @Override
     public Command build(LaunchMode mode) {
         // MODE=dev/test/prod to be able to build differently depending on the mode
         // NODE_ENV=development/production

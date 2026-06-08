@@ -15,6 +15,21 @@ public interface PackageManager {
 
     String binary();
 
+    /**
+     * Returns the additional filesystem paths required by the package manager,
+     * such as the Node.js installation directory.
+     *
+     * @return list of additional paths, may be empty
+     */
+    List<String> paths();
+
+    /**
+     * Returns the type of the package manager (e.g. npm, yarn, pnpm, bun).
+     *
+     * @return the package manager type
+     */
+    PackageManagerType type();
+
     Command build(LaunchMode mode);
 
     Command test();
