@@ -161,6 +161,11 @@ public interface QuinoaConfig {
     @WithDefault("false")
     boolean publish();
 
+    /**
+     * SBOM (Software Bill of Materials) configuration.
+     */
+    SbomConfig sbom();
+
     static List<String> getNormalizedIgnoredPathPrefixes(QuinoaConfig config,
             NonApplicationRootPathBuildItem nonApplicationRootPath) {
         return config.ignoredPathPrefixes()
@@ -308,6 +313,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!Objects.equals(q1.publish(), q2.publish())) {
+            return false;
+        }
+        if (!SbomConfig.isEqual(q1.sbom(), q2.sbom())) {
             return false;
         }
         return true;

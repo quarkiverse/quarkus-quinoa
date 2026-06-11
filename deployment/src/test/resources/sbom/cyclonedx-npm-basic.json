@@ -1,0 +1,83 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "version": 1,
+  "components": [
+    {
+      "group": "",
+      "name": "lodash",
+      "version": "4.17.21",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ"
+        }
+      ],
+      "purl": "pkg:npm/lodash@4.17.21",
+      "type": "library",
+      "bom-ref": "pkg:npm/lodash@4.17.21",
+      "properties": [
+        {
+          "name": "SrcFile",
+          "value": "package-lock.json"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "vite",
+      "version": "6.4.1",
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "fakehashforvite"
+        }
+      ],
+      "purl": "pkg:npm/vite@6.4.1",
+      "type": "library",
+      "bom-ref": "pkg:npm/vite@6.4.1",
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "group": "",
+      "name": "esbuild",
+      "version": "0.25.2",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "purl": "pkg:npm/esbuild@0.25.2",
+      "type": "library",
+      "bom-ref": "pkg:npm/esbuild@0.25.2",
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:npm/lodash@4.17.21",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/vite@6.4.1",
+      "dependsOn": [
+        "pkg:npm/esbuild@0.25.2"
+      ]
+    },
+    {
+      "ref": "pkg:npm/esbuild@0.25.2",
+      "dependsOn": []
+    }
+  ]
+}

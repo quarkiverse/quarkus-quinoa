@@ -70,6 +70,14 @@ public class PackageManagerRunner {
         return packageManager;
     }
 
+    public List<String> getPaths() {
+        return packageManager.paths();
+    }
+
+    public PackageManagerType getType() {
+        return packageManager.type();
+    }
+
     public void ci() {
         final PackageManager.Command ci = packageManager.ci();
         LOG.infof("Running Quinoa package manager ci command: %s", ci.commandWithArguments);
