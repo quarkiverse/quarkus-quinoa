@@ -18,8 +18,11 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -42,6 +45,7 @@ import io.smallrye.common.os.OS;
 
 public class PackageManagerRunner {
     private static final Logger LOG = Logger.getLogger(PackageManagerRunner.class);
+    private static final Set<String> BLOCKLIST_ENV_VARS = Set.of("PWD", "OLDPWD");
     public static final Predicate<Thread> DEV_PROCESS_THREAD_PREDICATE = thread -> thread.getName()
             .matches("Process (stdout|stderr) streamer");
 
@@ -225,6 +229,7 @@ public class PackageManagerRunner {
         if (!command.envs.isEmpty()) {
             builder.environment().putAll(command.envs);
         }
+        sanitizeEnvironment(builder.environment());
         try {
             process = ProcessUtil.launchProcess(builder, true);
         } catch (IOException e) {
@@ -241,6 +246,7 @@ public class PackageManagerRunner {
             if (!command.envs.isEmpty()) {
                 processBuilder.environment().putAll(command.envs);
             }
+            sanitizeEnvironment(processBuilder.environment());
             process = processBuilder
                     .directory(directory.toFile())
                     .command(runner(command))
@@ -267,6 +273,16 @@ public class PackageManagerRunner {
         System.arraycopy(shellParts, 0, result, 0, shellParts.length);
         result[shellParts.length] = command.commandWithArguments;
         return result;
+    }
+
+    private static void sanitizeEnvironment(Map<String, String> environment) {
+        for (String key : new HashSet<>(BLOCKLIST_ENV_VARS)) {
+            String existing = environment.remove(key);
+            if (existing != null) {
+                LOG.infof("Removing potentially problematic environment variable '%s'=%s from package manager process", key,
+                        existing);
+            }
+        }
     }
 
     private static class HandleOutput implements Runnable, Closeable {
