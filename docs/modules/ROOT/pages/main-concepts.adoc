@@ -32,3 +32,11 @@ image::quinoa-proxy-dev.png[Quinoa Proxy Dev]
 NOTE: Quarkus live-coding will keep watching for the backend changes as usual.
 
 See xref:advanced-guides.adoc#dev-server[Enable the proxied live coding].
+
+=== Tauri Native App Build
+
+When Tauri integration is enabled, Quinoa builds the Web UI and delegates native app packaging to the Tauri CLI. The GraalVM native image is bundled as a sidecar:
+
+image::quinoa-tauri-build.png[Quinoa Tauri Build]
+
+NOTE: See xref:advanced-guides.adoc#tauri-config[Tauri Native App Integration] for configuration details.

@@ -30,6 +30,7 @@ import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.framework.override.AngularFramework;
 import io.quarkiverse.quinoa.deployment.framework.override.NextFramework;
 import io.quarkiverse.quinoa.deployment.framework.override.ReactFramework;
+import io.quarkiverse.quinoa.deployment.framework.override.TauriFramework;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 
 /**
@@ -49,7 +50,8 @@ public enum FrameworkType {
     ANGULAR(Set.of("ng serve"), new AngularFramework()),
     EMBER(Set.of("ember-cli serve"), generic("dist", "serve", 4200)),
     GATSBY(Set.of("gatsby develop"), generic("dist", "develop", 8000)),
-    MIDWAYJS(Set.of("midway-bin dev"), generic("dist", "dev", 7001));
+    MIDWAYJS(Set.of("midway-bin dev"), generic("dist", "dev", 7001)),
+    TAURI(Set.of("tauri dev"), new TauriFramework());
 
     private static final Logger LOG = Logger.getLogger(FrameworkType.class);
 

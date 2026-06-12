@@ -172,6 +172,20 @@ a|
 - https://www.midwayjs.org/[Midway.js]
 |
 
+a|
+[#tauri]
+=== Tauri
+|✓
+a|
+[source,bash]
+----
+npm create tauri-app@latest
+----
+a|
+- https://tauri.app/[Tauri]
+- https://tauri.app/guides/[Tauri Guides]
+| <<tauri-config>>
+
 |===
 
 CAUTION: Next.js versions 13 and above are not fully supported due to several issues, including the lack of support for the `export` output. For example, dynamic routes are not supported for the App Router.

@@ -239,3 +239,101 @@ Most CI images already include NodeJS. if they don't, just make sure to install 
 Quinoa can be configured to install packages with a xref:config-reference.adoc#quarkus-quinoa_quarkus.quinoa.ci[frozen lockfile].
 
 On compatible CIs, don't forget to enable the Maven/Gradle and NPM/Yarn repository caching.
+
+[#tauri-config]
+=== Tauri Native App Integration
+
+Quinoa can integrate with https://tauri.app/[Tauri] to package your Quarkus+GraalVM application as a native desktop, iOS, or Android app. When Tauri is enabled, Quinoa automatically builds the Web UI and orchestrates the Tauri CLI to produce platform-specific binaries.
+
+==== How it works
+
+. Quinoa builds the Web UI as usual (generating static files)
+. If `build-native-image` is enabled, the GraalVM native image is copied as a Tauri sidecar binary to `src-tauri/binaries/`
+. The Tauri CLI is invoked to build the native app for each configured export target
+. The resulting app bundles the Web UI and the Quarkus sidecar together
+
+==== Enabling Tauri
+
+[source,properties]
+----
+quarkus.quinoa.tauri.enabled=true
+----
+
+Quinoa will auto-detect the `src-tauri/` directory if it contains a `tauri.conf.json`. If Tauri is detected (by the presence of a `tauri` script in `package.json`), Quinoa automatically switches to `justBuild` mode so that the static files are embedded in the Tauri bundle instead of served by Quarkus.
+
+==== Export Targets
+
+By default, Tauri builds for `web` and `desktop`. You can customize the targets:
+
+[source,properties]
+----
+quarkus.quinoa.tauri.export=desktop,ios
+----
+
+Valid values: `web`, `desktop`, `ios`, `android`.
+
+NOTE: iOS builds only work on macOS with Xcode installed. Quinoa will skip iOS builds on other platforms with a warning.
+
+==== GraalVM Sidecar
+
+When `build-native-image` is enabled (the default), Quinoa locates the GraalVM native image runner and copies it to `src-tauri/binaries/{sidecarName}-{target-triple}`. This makes the Quarkus backend available as a https://tauri.app/v1/guides/building/sidecar/[Tauri sidecar].
+
+[source,properties]
+----
+quarkus.quinoa.tauri.build-native-image=true
+quarkus.quinoa.tauri.sidecar-name=quarkus-backend
+----
+
+You can also specify the native image binary path explicitly:
+
+[source,properties]
+----
+quarkus.quinoa.tauri.native-image-binary=target/my-app-runner
+----
+
+The Rust target triple is auto-detected via `rustc --print host-tuple` (with fallback based on the current OS). Quinoa also updates `tauri.conf.json` to register the sidecar in the `externalBin` array.
+
+==== Tauri CLI Invocation
+
+When `managed` is enabled (the default), Quinoa invokes the Tauri CLI automatically during the build:
+
+* With npm/pnpm/yarn: `npm run tauri -- build`
+* Fallback (no package manager): `cargo tauri build`
+
+You can pass additional arguments or a custom config file:
+
+[source,properties]
+----
+quarkus.quinoa.tauri.build-args=--bundles,none
+quarkus.quinoa.tauri.build-config=tauri.prod.conf.json
+quarkus.quinoa.tauri.verbose=true
+----
+
+To disable automatic Tauri builds and invoke the CLI manually:
+
+[source,properties]
+----
+quarkus.quinoa.tauri.managed=false
+----
+
+==== Development Mode
+
+In dev mode, Quinoa detects the Tauri integration and logs a reminder to use `cargo tauri dev` from the Tauri directory for live development. You can configure the dev server port:
+
+[source,properties]
+----
+quarkus.quinoa.tauri.dev-server-port=1420
+----
+
+==== Full Configuration Example
+
+[source,properties]
+----
+quarkus.quinoa.tauri.enabled=true
+quarkus.quinoa.tauri.dir=src-tauri
+quarkus.quinoa.tauri.export=desktop,ios
+quarkus.quinoa.tauri.build-native-image=true
+quarkus.quinoa.tauri.sidecar-name=quarkus-backend
+quarkus.quinoa.tauri.managed=true
+quarkus.quinoa.tauri.verbose=true
+----
