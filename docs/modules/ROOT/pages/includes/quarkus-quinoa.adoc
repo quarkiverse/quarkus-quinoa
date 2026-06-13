@@ -7,7 +7,7 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa[`quarkus.quinoa`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa[`+++quarkus.quinoa+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa+++[]
 endif::add-copy-button-to-config-props[]
@@ -28,7 +28,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++enabled (disabled in test mode)+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-just-build]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-just-build[`quarkus.quinoa.just-build`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-just-build]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-just-build[`+++quarkus.quinoa.just-build+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.just-build+++[]
 endif::add-copy-button-to-config-props[]
@@ -49,7 +49,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-root-path]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ui-root-path[`quarkus.quinoa.ui-root-path`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-root-path]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ui-root-path[`+++quarkus.quinoa.ui-root-path+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.ui-root-path+++[]
 endif::add-copy-button-to-config-props[]
@@ -70,7 +70,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ui-dir[`quarkus.quinoa.ui-dir`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ui-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ui-dir[`+++quarkus.quinoa.ui-dir+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.ui-dir+++[]
 endif::add-copy-button-to-config-props[]
@@ -93,7 +93,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++src/main/webui+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-build-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-build-dir[`quarkus.quinoa.build-dir`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-build-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-build-dir[`+++quarkus.quinoa.build-dir+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.build-dir+++[]
 endif::add-copy-button-to-config-props[]
@@ -114,7 +114,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++framework detection with fallback to 'build/'+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager[`quarkus.quinoa.package-manager`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager[`+++quarkus.quinoa.package-manager+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager+++[]
 endif::add-copy-button-to-config-props[]
@@ -135,7 +135,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++auto-detected based on lockfile falling back to 'npm'+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-shell]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-shell[`quarkus.quinoa.package-manager-shell`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-shell]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-shell[`+++quarkus.quinoa.package-manager-shell+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-shell+++[]
 endif::add-copy-button-to-config-props[]
@@ -156,7 +156,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++"cmd.exe /c" on Windows, "sh -c" on Unix-like systems+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install[`quarkus.quinoa.package-manager-install`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install[`+++quarkus.quinoa.package-manager-install+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install+++[]
 endif::add-copy-button-to-config-props[]
@@ -177,7 +177,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-install-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-install-dir[`quarkus.quinoa.package-manager-install.install-dir`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-install-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-install-dir[`+++quarkus.quinoa.package-manager-install.install-dir+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.install-dir+++[]
 endif::add-copy-button-to-config-props[]
@@ -198,7 +198,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++.quinoa/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-node-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-node-version[`quarkus.quinoa.package-manager-install.node-version`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-node-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-node-version[`+++quarkus.quinoa.package-manager-install.node-version+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.node-version+++[]
 endif::add-copy-button-to-config-props[]
@@ -219,7 +219,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-version[`quarkus.quinoa.package-manager-install.npm-version`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-version[`+++quarkus.quinoa.package-manager-install.npm-version+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.npm-version+++[]
 endif::add-copy-button-to-config-props[]
@@ -240,7 +240,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++'provided' means it will use the NPM embedded in NodeJS+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-download-root[`quarkus.quinoa.package-manager-install.npm-download-root`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-npm-download-root[`+++quarkus.quinoa.package-manager-install.npm-download-root+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.npm-download-root+++[]
 endif::add-copy-button-to-config-props[]
@@ -261,7 +261,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++https://registry.npmjs.org/npm/-/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-node-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-node-download-root[`quarkus.quinoa.package-manager-install.node-download-root`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-node-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-node-download-root[`+++quarkus.quinoa.package-manager-install.node-download-root+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.node-download-root+++[]
 endif::add-copy-button-to-config-props[]
@@ -282,7 +282,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++https://nodejs.org/dist/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-version[`quarkus.quinoa.package-manager-install.yarn-version`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-version[`+++quarkus.quinoa.package-manager-install.yarn-version+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.yarn-version+++[]
 endif::add-copy-button-to-config-props[]
@@ -303,7 +303,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-download-root[`quarkus.quinoa.package-manager-install.yarn-download-root`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-yarn-download-root[`+++quarkus.quinoa.package-manager-install.yarn-download-root+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.yarn-download-root+++[]
 endif::add-copy-button-to-config-props[]
@@ -324,7 +324,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++https://github.com/yarnpkg/yarn/releases/download/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-version[`quarkus.quinoa.package-manager-install.pnpm-version`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-version[`+++quarkus.quinoa.package-manager-install.pnpm-version+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.pnpm-version+++[]
 endif::add-copy-button-to-config-props[]
@@ -345,7 +345,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-download-root[`quarkus.quinoa.package-manager-install.pnpm-download-root`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-download-root]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-pnpm-download-root[`+++quarkus.quinoa.package-manager-install.pnpm-download-root+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.pnpm-download-root+++[]
 endif::add-copy-button-to-config-props[]
@@ -366,7 +366,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++https://registry.npmjs.org/pnpm/-/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username[`quarkus.quinoa.package-manager-install.basic-auth.username`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-username[`+++quarkus.quinoa.package-manager-install.basic-auth.username+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.basic-auth.username+++[]
 endif::add-copy-button-to-config-props[]
@@ -387,7 +387,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-password]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-password[`quarkus.quinoa.package-manager-install.basic-auth.password`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-password]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-basic-auth-password[`+++quarkus.quinoa.package-manager-install.basic-auth.password+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.basic-auth.password+++[]
 endif::add-copy-button-to-config-props[]
@@ -408,7 +408,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version[`quarkus.quinoa.package-manager-install.bun-version`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-install-bun-version[`+++quarkus.quinoa.package-manager-install.bun-version+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-install.bun-version+++[]
 endif::add-copy-button-to-config-props[]
@@ -429,7 +429,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install[`quarkus.quinoa.package-manager-command.install`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install[`+++quarkus.quinoa.package-manager-command.install+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.install+++[]
 endif::add-copy-button-to-config-props[]
@@ -450,7 +450,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++install+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env[`quarkus.quinoa.package-manager-command.install-env."install-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-install-env-install-env[`+++quarkus.quinoa.package-manager-command.install-env."install-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.install-env."install-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -471,7 +471,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci[`quarkus.quinoa.package-manager-command.ci`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci[`+++quarkus.quinoa.package-manager-command.ci+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.ci+++[]
 endif::add-copy-button-to-config-props[]
@@ -492,7 +492,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++Detected based on package manager+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env[`quarkus.quinoa.package-manager-command.ci-env."ci-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-ci-env-ci-env[`+++quarkus.quinoa.package-manager-command.ci-env."ci-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.ci-env."ci-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -513,7 +513,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build[`quarkus.quinoa.package-manager-command.build`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build[`+++quarkus.quinoa.package-manager-command.build+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.build+++[]
 endif::add-copy-button-to-config-props[]
@@ -534,7 +534,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++run build+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env[`quarkus.quinoa.package-manager-command.build-env."build-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-build-env-build-env[`+++quarkus.quinoa.package-manager-command.build-env."build-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.build-env."build-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -555,7 +555,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test[`quarkus.quinoa.package-manager-command.test`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test[`+++quarkus.quinoa.package-manager-command.test+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.test+++[]
 endif::add-copy-button-to-config-props[]
@@ -576,7 +576,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++run test+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env[`quarkus.quinoa.package-manager-command.test-env."test-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-test-env-test-env[`+++quarkus.quinoa.package-manager-command.test-env."test-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.test-env."test-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -597,7 +597,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |`+++CI=true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev[`quarkus.quinoa.package-manager-command.dev`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev[`+++quarkus.quinoa.package-manager-command.dev+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.dev+++[]
 endif::add-copy-button-to-config-props[]
@@ -618,7 +618,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++framework detection with fallback to 'start'+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env[`quarkus.quinoa.package-manager-command.dev-env."dev-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-dev-env-dev-env[`+++quarkus.quinoa.package-manager-command.dev-env."dev-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.dev-env."dev-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -639,7 +639,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-publish]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-publish[`quarkus.quinoa.package-manager-command.publish`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-publish]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-publish[`+++quarkus.quinoa.package-manager-command.publish+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.publish+++[]
 endif::add-copy-button-to-config-props[]
@@ -660,7 +660,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++run publish+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-publish-env-publish-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-publish-env-publish-env[`quarkus.quinoa.package-manager-command.publish-env."publish-env"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-package-manager-command-publish-env-publish-env]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-package-manager-command-publish-env-publish-env[`+++quarkus.quinoa.package-manager-command.publish-env."publish-env"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.package-manager-command.publish-env."publish-env"+++[]
 endif::add-copy-button-to-config-props[]
@@ -681,7 +681,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-run-tests]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-run-tests[`quarkus.quinoa.run-tests`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-run-tests]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-run-tests[`+++quarkus.quinoa.run-tests+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.run-tests+++[]
 endif::add-copy-button-to-config-props[]
@@ -702,7 +702,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ci]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ci[`quarkus.quinoa.ci`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ci]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ci[`+++quarkus.quinoa.ci+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.ci+++[]
 endif::add-copy-button-to-config-props[]
@@ -723,7 +723,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true if environment CI=true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-force-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-force-install[`quarkus.quinoa.force-install`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-force-install]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-force-install[`+++quarkus.quinoa.force-install+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.force-install+++[]
 endif::add-copy-button-to-config-props[]
@@ -744,7 +744,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-framework-detection]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-framework-detection[`quarkus.quinoa.framework.detection`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-framework-detection]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-framework-detection[`+++quarkus.quinoa.framework.detection+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.framework.detection+++[]
 endif::add-copy-button-to-config-props[]
@@ -765,7 +765,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-enable-spa-routing]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-enable-spa-routing[`quarkus.quinoa.enable-spa-routing`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-enable-spa-routing]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-enable-spa-routing[`+++quarkus.quinoa.enable-spa-routing+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.enable-spa-routing+++[]
 endif::add-copy-button-to-config-props[]
@@ -786,7 +786,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-enable-ssr-mode]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-enable-ssr-mode[`quarkus.quinoa.enable-ssr-mode`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-enable-ssr-mode]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-enable-ssr-mode[`+++quarkus.quinoa.enable-ssr-mode+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.enable-ssr-mode+++[]
 endif::add-copy-button-to-config-props[]
@@ -807,7 +807,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ignored-path-prefixes]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ignored-path-prefixes[`quarkus.quinoa.ignored-path-prefixes`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-ignored-path-prefixes]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-ignored-path-prefixes[`+++quarkus.quinoa.ignored-path-prefixes+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.ignored-path-prefixes+++[]
 endif::add-copy-button-to-config-props[]
@@ -828,7 +828,7 @@ endif::add-copy-button-to-env-var[]
 |list of string
 |`+++ignore values configured by 'quarkus.resteasy-reactive.path'+++`, `+++ 'quarkus.rest.path'+++`, `+++ 'quarkus.resteasy.path' and 'quarkus.http.non-application-root-path'+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server[`quarkus.quinoa.dev-server`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server[`+++quarkus.quinoa.dev-server+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server+++[]
 endif::add-copy-button-to-config-props[]
@@ -849,7 +849,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-managed]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-managed[`quarkus.quinoa.dev-server.managed`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-managed]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-managed[`+++quarkus.quinoa.dev-server.managed+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.managed+++[]
 endif::add-copy-button-to-config-props[]
@@ -870,7 +870,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-port]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-port[`quarkus.quinoa.dev-server.port`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-port]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-port[`+++quarkus.quinoa.dev-server.port+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.port+++[]
 endif::add-copy-button-to-config-props[]
@@ -891,7 +891,7 @@ endif::add-copy-button-to-env-var[]
 |int
 |`+++framework detection or fallback to empty+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-host]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-host[`quarkus.quinoa.dev-server.host`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-host]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-host[`+++quarkus.quinoa.dev-server.host+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.host+++[]
 endif::add-copy-button-to-config-props[]
@@ -912,7 +912,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++localhost+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls[`quarkus.quinoa.dev-server.tls`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls[`+++quarkus.quinoa.dev-server.tls+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.tls+++[]
 endif::add-copy-button-to-config-props[]
@@ -933,7 +933,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure[`quarkus.quinoa.dev-server.tls-allow-insecure`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-tls-allow-insecure[`+++quarkus.quinoa.dev-server.tls-allow-insecure+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.tls-allow-insecure+++[]
 endif::add-copy-button-to-config-props[]
@@ -954,7 +954,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-check-path]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-check-path[`quarkus.quinoa.dev-server.check-path`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-check-path]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-check-path[`+++quarkus.quinoa.dev-server.check-path+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.check-path+++[]
 endif::add-copy-button-to-config-props[]
@@ -975,7 +975,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++/+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-websocket]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-websocket[`quarkus.quinoa.dev-server.websocket`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-websocket]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-websocket[`+++quarkus.quinoa.dev-server.websocket+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.websocket+++[]
 endif::add-copy-button-to-config-props[]
@@ -996,7 +996,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-check-timeout]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-check-timeout[`quarkus.quinoa.dev-server.check-timeout`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-check-timeout]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-check-timeout[`+++quarkus.quinoa.dev-server.check-timeout+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.check-timeout+++[]
 endif::add-copy-button-to-config-props[]
@@ -1017,7 +1017,7 @@ endif::add-copy-button-to-env-var[]
 |int
 |`+++30000+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-logs]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-logs[`quarkus.quinoa.dev-server.logs`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-logs]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-logs[`+++quarkus.quinoa.dev-server.logs+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.logs+++[]
 endif::add-copy-button-to-config-props[]
@@ -1038,7 +1038,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-index-page]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-index-page[`quarkus.quinoa.dev-server.index-page`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-index-page]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-index-page[`+++quarkus.quinoa.dev-server.index-page+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.index-page+++[]
 endif::add-copy-button-to-config-props[]
@@ -1059,7 +1059,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++auto-detected falling back to index.html+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-direct-forwarding]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-direct-forwarding[`quarkus.quinoa.dev-server.direct-forwarding`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-dev-server-direct-forwarding]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-dev-server-direct-forwarding[`+++quarkus.quinoa.dev-server.direct-forwarding+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.dev-server.direct-forwarding+++[]
 endif::add-copy-button-to-config-props[]
@@ -1080,7 +1080,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-publish]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-publish[`quarkus.quinoa.publish`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-publish]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-publish[`+++quarkus.quinoa.publish+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.publish+++[]
 endif::add-copy-button-to-config-props[]
