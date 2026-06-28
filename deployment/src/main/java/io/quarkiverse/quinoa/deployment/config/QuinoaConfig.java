@@ -152,6 +152,13 @@ public interface QuinoaConfig {
     DevServerConfig devServer();
 
     /**
+     * Configuration for Tauri native app integration.
+     * When enabled, Quinoa will build the Web UI and optionally compile a GraalVM native image
+     * for packaging as a Tauri sidecar, supporting desktop, iOS, and Android targets.
+     */
+    TauriConfig tauri();
+
+    /**
      * Runs additionally package manager publish command.
      * This is handy when using together with the justBuild() option to
      * publish built web package to a registry.
@@ -305,6 +312,9 @@ public interface QuinoaConfig {
             return false;
         }
         if (!DevServerConfig.isEqual(q1.devServer(), q2.devServer())) {
+            return false;
+        }
+        if (!TauriConfig.isEqual(q1.tauri(), q2.tauri())) {
             return false;
         }
         if (!Objects.equals(q1.publish(), q2.publish())) {
