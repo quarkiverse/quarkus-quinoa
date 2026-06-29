@@ -8,6 +8,7 @@ import io.quarkiverse.quinoa.deployment.config.FrameworkConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
+import io.quarkiverse.quinoa.deployment.config.SbomConfig;
 
 public class QuinoaConfigDelegate implements QuinoaConfig {
     private final QuinoaConfig delegate;
@@ -104,6 +105,11 @@ public class QuinoaConfigDelegate implements QuinoaConfig {
     @Override
     public boolean publish() {
         return delegate.publish();
+    }
+
+    @Override
+    public SbomConfig sbom() {
+        return delegate.sbom();
     }
 
 }
