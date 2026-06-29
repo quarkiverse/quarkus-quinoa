@@ -18,6 +18,7 @@
     <module>deployment</module>
     <module>runtime</module>
     <module>testing</module>
+    <module>docs-rag</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:quarkiverse/quarkus-quinoa.git</connection>
@@ -36,10 +37,10 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>3.36.0</quarkus.version>
-    <quarkus-playright.version>2.3.4</quarkus-playright.version>
+    <quarkus.version>3.37.0</quarkus.version>
+    <quarkus-playright.version>2.3.7</quarkus-playright.version>
     <assertj.version>3.27.7</assertj.version>
-    <frontend-plugin.version>2.0.0</frontend-plugin.version>
+    <frontend-plugin.version>2.0.1</frontend-plugin.version>
   </properties>
 
   <developers>
@@ -79,6 +80,11 @@
         <plugin>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-maven-plugin</artifactId>
+          <version>${quarkus.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-config-doc-maven-plugin</artifactId>
           <version>${quarkus.version}</version>
         </plugin>
         <plugin>
