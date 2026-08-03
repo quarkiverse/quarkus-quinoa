@@ -1080,6 +1080,258 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++false+++`
 
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-enabled]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-enabled[`+++quarkus.quinoa.tauri.enabled+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Enable Tauri native app integration. When enabled, Quinoa will build the Web UI and optionally compile a GraalVM native image for packaging as a Tauri sidecar, supporting desktop, iOS, and Android targets.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++false+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-dir]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-dir[`+++quarkus.quinoa.tauri.dir+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.dir+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Path to the Tauri project directory (relative to the project root). This directory should contain the tauri.conf.json file.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_DIR+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_DIR+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++auto-detected from src-tauri/tauri.conf.json presence+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-export]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-export[`+++quarkus.quinoa.tauri.export+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.export+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Target platforms for the Tauri build. Valid values: web, desktop, ios, android. When "web" is included, static web files are built by Quinoa normally. When "desktop", "ios", or "android" are included, the Tauri CLI will be invoked to build native apps.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_EXPORT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_EXPORT+++`
+endif::add-copy-button-to-env-var[]
+--
+|list of string
+|`+++web+++`, `+++desktop+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-build-native-image]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-build-native-image[`+++quarkus.quinoa.tauri.build-native-image+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.build-native-image+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+When true, Quinoa will attempt to locate and copy the GraalVM native image as a Tauri sidecar binary before building the Tauri application.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_BUILD_NATIVE_IMAGE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_BUILD_NATIVE_IMAGE+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-sidecar-name]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-sidecar-name[`+++quarkus.quinoa.tauri.sidecar-name+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.sidecar-name+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Name of the sidecar binary as registered in Tauri's externalBin configuration. The native image will be copied to src-tauri/binaries/++{++sidecarName++}++-++{++target-triple++}++.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_SIDECAR_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_SIDECAR_NAME+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++quarkus-backend+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-native-image-binary]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-native-image-binary[`+++quarkus.quinoa.tauri.native-image-binary+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.native-image-binary+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Path to the GraalVM native image binary. If not set, Quinoa will auto-detect the runner binary in the build output directory.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_NATIVE_IMAGE_BINARY+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_NATIVE_IMAGE_BINARY+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++auto-detected (target/*-runner)+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-main-class]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-main-class[`+++quarkus.quinoa.tauri.main-class+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.main-class+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Main class of the Quarkus application used for native image building. If not set, Quarkus will use its default detection.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_MAIN_CLASS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_MAIN_CLASS+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++auto-detected from quarkus.package.main-class+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-managed]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-managed[`+++quarkus.quinoa.tauri.managed+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.managed+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+When true, Quinoa will manage the Tauri build process automatically. When false, the Tauri CLI must be invoked manually.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_MANAGED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_MANAGED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-build-args]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-build-args[`+++quarkus.quinoa.tauri.build-args+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.build-args+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Additional arguments to pass to the Tauri CLI build command.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_BUILD_ARGS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_BUILD_ARGS+++`
+endif::add-copy-button-to-env-var[]
+--
+|list of string
+|`+++empty (no additional arguments)+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-build-config]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-build-config[`+++quarkus.quinoa.tauri.build-config+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.build-config+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Path to an additional Tauri configuration file to merge during build. This can be used to provide platform-specific overrides.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_BUILD_CONFIG+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_BUILD_CONFIG+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|`+++empty (no additional config)+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-verbose]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-verbose[`+++quarkus.quinoa.tauri.verbose+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.verbose+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Enable verbose output from the Tauri CLI.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_VERBOSE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_VERBOSE+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++false+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-tauri-dev-server-port]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-tauri-dev-server-port[`+++quarkus.quinoa.tauri.dev-server-port+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.tauri.dev-server-port+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Port for the Tauri dev server in development mode. Set to 0 to let Tauri auto-assign a port.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_TAURI_DEV_SERVER_PORT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_TAURI_DEV_SERVER_PORT+++`
+endif::add-copy-button-to-env-var[]
+--
+|int
+|`+++0+++`
+
 a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-publish]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-publish[`+++quarkus.quinoa.publish+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.quinoa.publish+++[]
@@ -1100,6 +1352,90 @@ endif::add-copy-button-to-env-var[]
 --
 |boolean
 |`+++false+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-sbom-enabled]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-sbom-enabled[`+++quarkus.quinoa.sbom.enabled+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.sbom.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Whether SBOM generation is enabled.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_SBOM_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_SBOM_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-sbom-include-dev-dependencies]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-sbom-include-dev-dependencies[`+++quarkus.quinoa.sbom.include-dev-dependencies+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.sbom.include-dev-dependencies+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Whether to include development dependencies in the SBOM. If not set, dev dependencies are included in dev mode and excluded in production.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_SBOM_INCLUDE_DEV_DEPENDENCIES+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_SBOM_INCLUDE_DEV_DEPENDENCIES+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-sbom-cdxgen-version]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-sbom-cdxgen-version[`+++quarkus.quinoa.sbom.cdxgen-version+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.sbom.cdxgen-version+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+The cdxgen version to use. If not set, the latest version is used.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_SBOM_CDXGEN_VERSION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_SBOM_CDXGEN_VERSION+++`
+endif::add-copy-button-to-env-var[]
+--
+|string
+|
+
+a|icon:lock[title=Fixed at build time] [[quarkus-quinoa_quarkus-quinoa-sbom-timeout]] [.property-path]##link:#quarkus-quinoa_quarkus-quinoa-sbom-timeout[`+++quarkus.quinoa.sbom.timeout+++`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.quinoa.sbom.timeout+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Timeout in seconds for the cdxgen process.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_QUINOA_SBOM_TIMEOUT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_QUINOA_SBOM_TIMEOUT+++`
+endif::add-copy-button-to-env-var[]
+--
+|int
+|`+++300+++`
 
 |===
 
