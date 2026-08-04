@@ -263,6 +263,9 @@ public class PackageManagerRunner {
             handleOutput = new HandleOutput(process.getInputStream(), consoleInstalledBuildItem, loggingSetupBuildItem);
             handleOutput.run();
             process.waitFor();
+            if (process.exitValue() != 0) {
+                handleOutput.closeAndDumpCaptured();
+            }
         } catch (IOException e) {
             throw new RuntimeException("Input/Output error while executing command.", e);
         } catch (InterruptedException e) {
@@ -337,6 +340,12 @@ public class PackageManagerRunner {
         public void close() {
             if (closed.compareAndSet(false, true)) {
                 logCompressor.close();
+            }
+        }
+
+        public void closeAndDumpCaptured() {
+            if (closed.compareAndSet(false, true)) {
+                logCompressor.closeAndDumpCaptured();
             }
         }
     }
