@@ -8,8 +8,8 @@ import io.quarkiverse.quinoa.deployment.config.FrameworkConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerCommandConfig;
 import io.quarkiverse.quinoa.deployment.config.PackageManagerInstallConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
-import io.quarkiverse.quinoa.deployment.config.TauriConfig;
 import io.quarkiverse.quinoa.deployment.config.SbomConfig;
+import io.quarkiverse.quinoa.deployment.config.TauriConfig;
 
 public class QuinoaConfigDelegate implements QuinoaConfig {
     private final QuinoaConfig delegate;
