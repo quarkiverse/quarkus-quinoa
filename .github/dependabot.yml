@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     ignore:
       - dependency-name: "io.quarkus:quarkus-bom"
       - dependency-name: "io.quarkus:quarkus-maven-plugin"
@@ -33,4 +33,4 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
