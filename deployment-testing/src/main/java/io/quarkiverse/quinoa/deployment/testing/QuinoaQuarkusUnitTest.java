@@ -78,6 +78,7 @@ public class QuinoaQuarkusUnitTest {
                     }
                 })
                 .setLogRecordPredicate(log -> true)
+                .overrideConfigKey("quarkus.quinoa", "true")
                 .overrideConfigKey("quarkus.quinoa.ui-dir", testDir.toString());
     }
 
