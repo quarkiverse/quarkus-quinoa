@@ -39,7 +39,6 @@ import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
-import io.quarkus.deployment.util.ProcessUtil;
 import io.quarkus.runtime.LaunchMode;
 import io.smallrye.common.os.OS;
 
@@ -239,11 +238,48 @@ public class PackageManagerRunner {
         }
         sanitizeEnvironment(builder.environment());
         try {
-            process = ProcessUtil.launchProcess(builder, true);
+            builder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+            builder.redirectError(ProcessBuilder.Redirect.PIPE);
+            process = builder.start();
+            streamToSysOutSysErr(process);
         } catch (IOException e) {
             throw new RuntimeException("Input/Output error while running process.", e);
         }
         return process;
+    }
+
+    private static void streamToSysOutSysErr(Process process) {
+        Thread convergingStream = new Thread(
+                new ProcessStreamReader(process.getInputStream(), System.out), "Process stdout streamer");
+        convergingStream.setDaemon(true);
+        convergingStream.start();
+        Thread convergingErrorStream = new Thread(
+                new ProcessStreamReader(process.getErrorStream(), System.err), "Process stderr streamer");
+        convergingErrorStream.setDaemon(true);
+        convergingErrorStream.start();
+    }
+
+    private static class ProcessStreamReader implements Runnable {
+        private final InputStream processStream;
+        private final java.io.PrintStream consumer;
+
+        ProcessStreamReader(InputStream processStream, java.io.PrintStream consumer) {
+            this.processStream = processStream;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void run() {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(processStream, java.nio.charset.StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    consumer.println(line);
+                }
+            } catch (IOException e) {
+                LOG.debug("Failed to stream process output", e);
+            }
+        }
     }
 
     private boolean exec(PackageManager.Command command) {

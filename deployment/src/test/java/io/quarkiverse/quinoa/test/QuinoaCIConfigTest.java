@@ -9,17 +9,17 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaCIConfigTest {
 
     private static final String NAME = "ci";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
             .initialLockfile(PackageManagerType.NPM.getLockFile())
             .ci(null)
-            .toQuarkusUnitTest()
+            .toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.ci", "true")
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager ci command: %s") &&

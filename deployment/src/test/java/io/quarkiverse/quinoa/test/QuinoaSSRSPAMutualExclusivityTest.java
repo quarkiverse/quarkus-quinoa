@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaSSRSPAMutualExclusivityTest {
 
     private static final String NAME = "ssr-spa-mutual-exclusivity";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
+            .toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.enable-spa-routing", "true")
             .overrideConfigKey("quarkus.quinoa.enable-ssr-mode", "true")
             .assertException(e -> {

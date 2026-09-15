@@ -63,9 +63,7 @@ class QuinoaDevWebSocketProxyHandler {
                         .setHeaders(serverWs.headers())
                         .setSubProtocols(subProtocols)
                         .setAllowOriginHeader(false);
-                serverWs.accept();
-
-                httpClient.webSocket(options, clientContext -> {
+                httpClient.webSocket(options).onComplete(clientContext -> {
                     if (clientContext.succeeded()) {
                         LOG.infof("Quinoa Dev WebSocket Client Connected: %s:%s%s", networkConfiguration.getHost(),
                                 networkConfiguration.getPort(), forwardUri);

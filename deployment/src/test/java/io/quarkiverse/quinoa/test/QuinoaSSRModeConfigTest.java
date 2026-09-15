@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaSSRModeConfigTest {
 
     private static final String NAME = "ssr-mode-config";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
+            .toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.enable-ssr-mode", "true");
 
     @Test

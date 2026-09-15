@@ -11,15 +11,15 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaPackageManagerLockfileDetectBunTest {
     private static final String NAME = "package-manager-lockfile-detect-bun";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
             .initialLockfile(PackageManagerType.BUN.getLockFile())
-            .toQuarkusUnitTest()
+            .toQuarkusExtensionTest()
             .assertLogRecords(l -> assertThat(l)
                     .anyMatch(s -> "Running Quinoa package manager build command: %s".equals(s.getMessage()) &&
                             (systemBinary(PackageManagerType.BUN.getBinary()) + " run build").equals(s.getParameters()[0])));

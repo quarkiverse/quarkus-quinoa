@@ -12,13 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaAbsoluteUIDirTest {
     private static final String NAME = "test-webui-absolute-dir";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(getUIDir().resolve("webui")).toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(getUIDir().resolve("webui"))
+            .toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.package.output-directory", getUIDir().resolve("target").toAbsolutePath().toString())
             .assertLogRecords(l -> {
                 assertThat(l)

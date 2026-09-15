@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaDefaultConfigTest {
 
     private static final String NAME = "default-config";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
+            .toQuarkusExtensionTest()
             .assertLogRecords(l -> {
                 assertThat(l)
                         .anyMatch(s -> s.getMessage().equals("Running Quinoa package manager build command: %s") &&

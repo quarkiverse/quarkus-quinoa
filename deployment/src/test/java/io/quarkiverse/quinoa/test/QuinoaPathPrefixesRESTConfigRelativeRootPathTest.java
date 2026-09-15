@@ -9,15 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaPathPrefixesRESTConfigRelativeRootPathTest {
 
     private static final String NAME = "resteasy-reactive-path-config-relative-root-path";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME)
-            .toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME)
+            .toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.http.root-path", "root/path")
             .overrideConfigKey("quarkus.rest.path", "foo/reactive")
             .overrideConfigKey("quarkus.resteasy.path", "foo/classic")
