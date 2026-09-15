@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaIgnorePathPrefixesConfigTest {
     private static final String NAME = "ignore-path-prefixes";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.ignored-path-prefixes", "/foo/bar,/api,q,a/b")
             .overrideConfigKey("quarkus.quinoa.enable-spa-routing", "true")
             .assertLogRecords(l -> assertThat(l)

@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaNoPackageJsonTest {
     private static final String NAME = "no-package-json";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.ui-dir", "src/test/empty-webui")
             .assertException(e -> {
                 assertThat(e).hasMessage("No package.json found in Web UI directory: 'src/test/empty-webui'");

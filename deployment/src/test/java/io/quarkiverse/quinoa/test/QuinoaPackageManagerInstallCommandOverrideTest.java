@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaPackageManagerInstallCommandOverrideTest {
     private static final String NAME = "package-manager-install-command-override";
     public static final String INSTALL_DIR = "target/node-" + NAME;
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.package-manager-install", "true")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.node-version", "20.10.0")
             .overrideConfigKey("quarkus.quinoa.package-manager-install.install-dir", INSTALL_DIR)

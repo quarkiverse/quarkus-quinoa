@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.quinoa.deployment.testing.QuinoaQuarkusUnitTest;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class QuinoaPackageManagerNPMOverrideBuildEnvTest {
     private static final String NAME = "package-manager-npm-override-build";
     private static final String BUILD_COMMAND = "run build-something";
 
     @RegisterExtension
-    static final QuarkusUnitTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusUnitTest()
+    static final QuarkusExtensionTest config = QuinoaQuarkusUnitTest.create(NAME).toQuarkusExtensionTest()
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build", BUILD_COMMAND)
             .overrideConfigKey("quarkus.quinoa.package-manager-command.build-env.BUILD", "develop")
             .assertLogRecords(l -> assertThat(l)

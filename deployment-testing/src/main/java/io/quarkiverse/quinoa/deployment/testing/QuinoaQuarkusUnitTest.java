@@ -10,11 +10,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import io.quarkus.deployment.util.FileUtil;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 import io.smallrye.common.os.OS;
 
 /**
- * This class is in a separate module for QuarkusUnitTest classloading issues
+ * This class is in a separate module for QuarkusExtensionTest classloading issues
  */
 public class QuinoaQuarkusUnitTest {
 
@@ -58,8 +58,8 @@ public class QuinoaQuarkusUnitTest {
         return this;
     }
 
-    public QuarkusUnitTest toQuarkusUnitTest() {
-        return new QuarkusUnitTest()
+    public QuarkusExtensionTest toQuarkusExtensionTest() {
+        return new QuarkusExtensionTest()
                 .setAllowTestClassOutsideDeployment(true)
                 .setBeforeAllCustomizer(new Runnable() {
                     @Override
