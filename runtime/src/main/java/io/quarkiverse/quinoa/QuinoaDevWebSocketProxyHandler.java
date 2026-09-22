@@ -77,6 +77,9 @@ class QuinoaDevWebSocketProxyHandler {
                                 }).textMessageHandler((msg) -> {
                                     LOG.debugf("Quinoa Dev WebSocket Client message: %s", msg);
                                     serverWs.writeTextMessage(msg);
+                                }).binaryMessageHandler((buffer) -> {
+                                    LOG.debugf("Quinoa Dev WebSocket Client binary message: %d bytes", buffer.length());
+                                    serverWs.writeBinaryMessage(buffer);
                                 });
 
                         // messages from browser forwarded to Node.js
@@ -85,6 +88,12 @@ class QuinoaDevWebSocketProxyHandler {
                             final WebSocket w = clientWs.get();
                             if (w != null && !w.isClosed()) {
                                 w.writeTextMessage(msg);
+                            }
+                        }).binaryMessageHandler((buffer) -> {
+                            LOG.debugf("Quinoa Dev WebSocket Server binary message: %d bytes", buffer.length());
+                            final WebSocket w = clientWs.get();
+                            if (w != null && !w.isClosed()) {
+                                w.writeBinaryMessage(buffer);
                             }
                         });
                     } else {
