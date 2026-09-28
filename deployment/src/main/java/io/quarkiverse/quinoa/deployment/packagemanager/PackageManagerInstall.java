@@ -1,7 +1,6 @@
 package io.quarkiverse.quinoa.deployment.packagemanager;
 
 import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType.isYarnBerry;
-import static io.vertx.core.spi.resolver.ResolverProvider.DISABLE_DNS_RESOLVER_PROP_NAME;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -29,6 +28,7 @@ public final class PackageManagerInstall {
 
     private static final Logger LOG = Logger.getLogger(PackageManagerInstall.class);
     private static final String INSTALL_SUB_PATH = "node";
+    private static final String DISABLE_DNS_RESOLVER_PROP_NAME = "vertx.disableDnsResolver";
     public static final String NODE_BINARY = PackageManagerRunner.isWindows() ? "node.exe" : "node";
     public static final String BUN_BINARY = PackageManagerRunner.isWindows() ? "bun.exe" : "bun";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";

@@ -77,7 +77,7 @@ class QuinoaDevWebSocketProxyHandler {
             // messages sent by the dev server right after the handshake (e.g. Vite 'connected') are held until
             // the browser side is upgraded
             clientWs.pause();
-            request.toWebSocket(r -> {
+            request.toWebSocket().onComplete(r -> {
                 if (r.failed()) {
                     LOG.error("Error while upgrading request to WebSocket", r.cause());
                     clientWs.close();
