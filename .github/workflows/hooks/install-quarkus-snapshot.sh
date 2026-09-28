@@ -27,7 +27,8 @@ gh release view "${TAG}" --repo "${SNAPSHOT_REPO}" --json body --jq .body
 gh release download "${TAG}" --repo "${SNAPSHOT_REPO}" --pattern maven-repo.tar.gz --dir "${DOWNLOAD_DIR}" --clobber
 
 mkdir -p ~/.m2/repository
-tar -xzf "${DOWNLOAD_DIR}/maven-repo.tar.gz" -C ~/.m2/repository
+# read the archive from stdin: on Windows, GNU tar would take the drive letter of a path argument for a remote host
+tar -xzf - -C ~/.m2/repository < "${DOWNLOAD_DIR}/maven-repo.tar.gz"
 rm -f "${DOWNLOAD_DIR}/maven-repo.tar.gz"
 
 echo "Quarkus snapshot for branch '${QUARKUS_BRANCH}' installed"
