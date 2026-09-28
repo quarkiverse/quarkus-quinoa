@@ -18,12 +18,12 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.OpenOptions;
+import io.vertx.core.http.HttpResponseExpectation;
 import io.vertx.core.net.ProxyOptions;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
-import io.vertx.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.ext.web.codec.BodyCodec;
 
 public class VertxFileDownloader implements FileDownloader {
@@ -87,9 +87,9 @@ public class VertxFileDownloader implements FileDownloader {
                 }
 
                 final Future<HttpResponse<Void>> future = httpRequest
-                        .expect(ResponsePredicate.SC_SUCCESS)
                         .as(BodyCodec.pipe(destinationFile))
-                        .send();
+                        .send()
+                        .expecting(HttpResponseExpectation.SC_SUCCESS);
                 future.onComplete((r) -> latch.countDown());
                 boolean result = latch.await(5, TimeUnit.MINUTES);
                 LOG.tracef("Latch Result %", result);

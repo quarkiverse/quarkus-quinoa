@@ -91,7 +91,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
         headers.remove("Accept-Encoding");
         client.request(request.method(), networkConfiguration.getPort(), networkConfiguration.getHost(), uri)
                 .putHeaders(headers)
-                .send(event -> {
+                .send().onComplete(event -> {
                     if (event.succeeded()) {
                         final int statusCode = event.result().statusCode();
                         switch (statusCode) {

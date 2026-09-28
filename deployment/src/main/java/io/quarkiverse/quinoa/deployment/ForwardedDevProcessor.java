@@ -51,7 +51,8 @@ public class ForwardedDevProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForwardedDevProcessor.class);
     private static final String DEV_SERVICE_NAME = "quinoa-dev-server";
-    private static volatile DevServicesResultBuildItem.RunningDevService devService;
+    private static volatile Closeable devService;
+    private static volatile DevServicesResultBuildItem devServiceItem;
 
     @BuildStep(onlyIf = IsDevelopment.class)
     public ForwardedDevServerBuildItem prepareDevService(
@@ -84,7 +85,7 @@ public class ForwardedDevProcessor {
                             "Quinoa package manager live coding shouldn't running with an empty the dev-server.port");
                 }
                 LOG.debug("Quinoa config did not change; no need to restart.");
-                devServices.produce(devService.toBuildItem());
+                devServices.produce(devServiceItem);
                 networkConfiguration.setHost(devServerConfig.host());
                 networkConfiguration.setPort(devServerConfig.port().get());
                 final String resolvedDevServerHost = PackageManagerRunner.isDevServerUp(networkConfiguration, checkPath);
@@ -146,9 +147,10 @@ public class ForwardedDevProcessor {
                 packageManagerRunner.stopDev(dev.get());
             };
             Map<String, String> devServerConfigMap = createDevServiceMapForDevUI(userConfig);
-            devService = new DevServicesResultBuildItem.RunningDevService(
-                    DEV_SERVICE_NAME, null, onClose, devServerConfigMap);
-            devServices.produce(devService.toBuildItem());
+            devService = onClose;
+            devServiceItem = DevServicesResultBuildItem.discovered()
+                    .feature(DEV_SERVICE_NAME).config(devServerConfigMap).build();
+            devServices.produce(devServiceItem);
             networkConfiguration.setHost(devServer.hostIPAddress());
             return new ForwardedDevServerBuildItem(networkConfiguration);
         } catch (Throwable t) {
