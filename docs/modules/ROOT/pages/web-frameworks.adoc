@@ -223,12 +223,18 @@ This will configure the build to export the static files:
   }
 ----
 
-In Next.js 14+ you need to add the following property in `next.config.js` file:
+In Next.js 14+ you need to add the following property in the Next config file (e.g. `next.config.js`):
 ----
 const nextConfig = {
-  output: 'export',  
+  output: 'export',
 }
 ----
+
+By default, Quinoa expects a static export: it serves the static files generated in `out/`, and `quarkus.quinoa.enable-spa-routing=true` can be used.
+
+For a server-rendered app (without `output: 'export'`), set `quarkus.quinoa.enable-ssr-mode=true` (see xref:advanced-guides.adoc#ssr-mode[SSR mode]). Quinoa then uses `.next/` as build directory, and this build output is *not* served by Quarkus: run the Next.js server (e.g. `next start`) separately. In both cases, `quarkus.quinoa.build-dir` overrides the build directory.
+
+NOTE: In dev mode without `quarkus.quinoa.enable-ssr-mode=true`, the HTML returned by the Next.js dev server is forwarded only for `/` and `.html` paths. A server-rendered app must set this property to get every route forwarded.
 
 [#vite-config]
 === Vite Configuration

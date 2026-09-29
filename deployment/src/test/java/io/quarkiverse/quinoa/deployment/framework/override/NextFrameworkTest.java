@@ -2,64 +2,90 @@ package io.quarkiverse.quinoa.deployment.framework.override;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.InputStream;
+import java.lang.reflect.Proxy;
+import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-
 import org.junit.jupiter.api.Test;
+
+import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 
 class NextFrameworkTest {
 
     @Test
-    void testIsStaticExport_whenOutputExport() {
-        JsonObject json = Json.createObjectBuilder().add("output", "export").build();
-        assertThat(NextFramework.isStaticExport(Optional.of(json))).isTrue();
+    void testDefaultIsStaticExport() {
+        final QuinoaConfig config = override(Map.of());
+        assertThat(config.enableSSRMode()).isFalse();
+        assertThat(config.buildDir()).contains("out");
     }
 
     @Test
-    void testIsStaticExport_whenOutputIsOtherValue() {
-        JsonObject json = Json.createObjectBuilder().add("output", "standalone").build();
-        assertThat(NextFramework.isStaticExport(Optional.of(json))).isFalse();
+    void testSSRModeUsesNextBuildDir() {
+        final QuinoaConfig config = override(Map.of("enableSSRMode", true));
+        assertThat(config.enableSSRMode()).isTrue();
+        assertThat(config.buildDir()).contains(".next");
     }
 
     @Test
-    void testIsStaticExport_whenNoOutputField() {
-        JsonObject json = Json.createObjectBuilder()
-                .add("scripts", Json.createObjectBuilder().add("dev", "next dev"))
-                .build();
-        assertThat(NextFramework.isStaticExport(Optional.of(json))).isFalse();
+    void testBuildDirWinsInStaticExport() {
+        final QuinoaConfig config = override(Map.of("buildDir", Optional.of("custom")));
+        assertThat(config.enableSSRMode()).isFalse();
+        assertThat(config.buildDir()).contains("custom");
     }
 
     @Test
-    void testIsStaticExport_whenEmpty() {
-        assertThat(NextFramework.isStaticExport(Optional.empty())).isFalse();
+    void testBuildDirWinsInSSRMode() {
+        final QuinoaConfig config = override(Map.of("enableSSRMode", true, "buildDir", Optional.of("custom")));
+        assertThat(config.enableSSRMode()).isTrue();
+        assertThat(config.buildDir()).contains("custom");
     }
 
     @Test
-    void testBuildDirIsNextForAppRouter() {
-        JsonObject json = readFixture("next-exact");
-        boolean staticExport = NextFramework.isStaticExport(Optional.of(json));
-        assertThat(staticExport).isFalse();
-        // App Router → .next build dir
-        String buildDir = staticExport ? NextFramework.EXPORT_BUILD_DIR : NextFramework.SSR_BUILD_DIR;
-        assertThat(buildDir).isEqualTo(".next");
+    void testDevIndexPageIsRoot() {
+        assertThat(override(Map.of()).devServer().indexPage()).contains("/");
+        assertThat(override(Map.of("enableSSRMode", true)).devServer().indexPage()).contains("/");
+        assertThat(override(Map.of("indexPage", Optional.of("main.html"))).devServer().indexPage())
+                .contains("main.html");
     }
 
     @Test
-    void testBuildDirIsOutForStaticExport() {
-        JsonObject json = readFixture("next-with-export");
-        boolean staticExport = NextFramework.isStaticExport(Optional.of(json));
-        assertThat(staticExport).isTrue();
-        // Static export → out build dir
-        String buildDir = staticExport ? NextFramework.EXPORT_BUILD_DIR : NextFramework.SSR_BUILD_DIR;
-        assertThat(buildDir).isEqualTo("out");
+    void testDevServerDefaults() {
+        final QuinoaConfig config = override(Map.of());
+        assertThat(config.devServer().port()).contains(3000);
+        assertThat(config.packageManagerCommand().dev()).contains("run dev");
     }
 
-    private JsonObject readFixture(String name) {
-        InputStream stream = NextFrameworkTest.class.getClassLoader()
-                .getResourceAsStream("frameworks/" + name + ".json");
-        return Json.createReader(stream).readObject();
+    private static QuinoaConfig override(Map<String, Object> userValues) {
+        return new NextFramework().override(stub(QuinoaConfig.class, userValues), Optional.empty(), Optional.of("dev"),
+                false, Path.of("."));
+    }
+
+    /**
+     * Stubs a config interface: the given values by method name, otherwise empty/false, and nested config groups
+     * stubbed the same way.
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T stub(Class<T> type, Map<String, Object> values) {
+        return (T) Proxy.newProxyInstance(NextFrameworkTest.class.getClassLoader(), new Class<?>[] { type },
+                (proxy, method, args) -> {
+                    if (values.containsKey(method.getName())) {
+                        return values.get(method.getName());
+                    }
+                    final Class<?> returnType = method.getReturnType();
+                    if (returnType == Optional.class) {
+                        return Optional.empty();
+                    }
+                    if (returnType == boolean.class) {
+                        return false;
+                    }
+                    if (returnType == Map.class) {
+                        return Map.of();
+                    }
+                    if (returnType.isInterface()) {
+                        return stub(returnType, values);
+                    }
+                    return null;
+                });
     }
 }
