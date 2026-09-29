@@ -15,6 +15,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- SlowModelReader in QuinoaWaitsForStoredOpenApiSchemaTest, which forces quarkus-smallrye-openapi -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx-http-deployment</artifactId>
@@ -26,6 +32,10 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-devui-deployment-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.eirslett</groupId>

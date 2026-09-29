@@ -59,6 +59,7 @@ import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.sbom.SbomContribution;
+import io.quarkus.smallrye.openapi.deployment.spi.OpenApiDocumentBuildItem;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
@@ -166,6 +167,7 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
+    @Consume(OpenApiDocumentBuildItem.class) // the stored OpenAPI schema (store-schema-directory) is written by then
     public TargetDirBuildItem processBuild(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
