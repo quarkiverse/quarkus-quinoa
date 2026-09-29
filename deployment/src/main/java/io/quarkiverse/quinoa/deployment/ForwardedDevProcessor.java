@@ -31,6 +31,7 @@ import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CuratedApplicationShutdownBuildItem;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
@@ -40,6 +41,7 @@ import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
+import io.quarkus.smallrye.openapi.deployment.spi.OpenApiDocumentBuildItem;
 import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
@@ -55,6 +57,7 @@ public class ForwardedDevProcessor {
     private static volatile DevServicesResultBuildItem devServiceItem;
 
     @BuildStep(onlyIf = IsDevelopment.class)
+    @Consume(OpenApiDocumentBuildItem.class) // the stored OpenAPI schema (store-schema-directory) is written by then
     public ForwardedDevServerBuildItem prepareDevService(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
