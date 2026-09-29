@@ -130,9 +130,13 @@ public interface QuinoaConfig {
     boolean enableSPARouting();
 
     /**
-     * Enable SSR (Server-Side Rendering) mode for frameworks like Next.js App Router.
-     * When enabled, requests are proxied directly to the dev server without being rerouted to the index page.
-     * This preserves the original request path for server-side rendering.
+     * Enable SSR (Server-Side Rendering) mode for frameworks rendering pages on a server, like a Next.js app without
+     * static export.
+     * In dev mode, the HTML rendered by the dev server is forwarded for every route (not only for the root and
+     * {@code .html} paths) and the root is requested from the dev server as {@code /} instead of {@code /index.html}.
+     * Outside of the dev server, the build output is not served as static resources by Quarkus: the app needs its own
+     * server at runtime (e.g. {@code next start}).
+     * For Next.js, it also switches the default build directory from {@code out} (static export) to {@code .next}.
      * Cannot be used together with enable-spa-routing.
      */
     @WithDefault("false")

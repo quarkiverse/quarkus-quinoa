@@ -204,8 +204,7 @@ public class QuinoaProcessor {
         final String configuredBuildDir = configuredQuinoa.resolvedConfig().buildDir().orElseThrow();
         final Path buildDir = packageManagerRunner.getDirectory().resolve(configuredBuildDir);
         if (!Files.isDirectory(buildDir)) {
-            throw new ConfigurationException("Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'",
-                    Set.of("quarkus.quinoa.build-dir"));
+            throw buildDirNotFound(buildDir, configuredQuinoa.uiDir(), configuredQuinoa.resolvedConfig().enableSSRMode());
         }
 
         final boolean isJustBuild = configuredQuinoa.resolvedConfig().justBuild()
@@ -263,6 +262,11 @@ public class QuinoaProcessor {
         }
         if (tauriBuild.isPresent() && !tauriBuild.get().exportTargets().isEmpty()) {
             LOG.info("Quinoa is in Tauri mode: static resources will be embedded by Tauri");
+            return null;
+        }
+        if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().enableSSRMode()) {
+            // SSR build output (e.g. Next.js '.next/') holds server bundles, it must not be published as static files
+            LOG.info("Quinoa is in SSR mode: the build output is not served as static resources");
             return null;
         }
 
@@ -426,6 +430,18 @@ public class QuinoaProcessor {
         ignoreSet.addAll(IGNORE_WATCH_LOCKFILES);
         ignoreSet.addAll(IGNORE_WATCH_BUILD_DIRS);
         return !ignoreSet.contains(relativeFilePath) && !IGNORE_WATCH_REGEX.matcher(relativeFilePath).matches();
+    }
+
+    private static ConfigurationException buildDirNotFound(Path buildDir, Path uiDir, boolean ssrMode) {
+        final String message = "Quinoa build directory not found: '" + buildDir.toAbsolutePath() + "'";
+        if (!ssrMode && Files.isDirectory(uiDir.resolve(".next"))) {
+            // A '.next' directory is what 'next build' produces for a server-rendered Next.js app
+            return new ConfigurationException(message + ". A '.next' directory exists in the Web UI directory: "
+                    + "for a Next.js static export, add output: 'export' to the Next config file (e.g. next.config.js), "
+                    + "or for a server-rendered app, set quarkus.quinoa.enable-ssr-mode=true.",
+                    Set.of("quarkus.quinoa.build-dir", "quarkus.quinoa.enable-ssr-mode"));
+        }
+        return new ConfigurationException(message, Set.of("quarkus.quinoa.build-dir"));
     }
 
     private static ProjectDirs resolveProjectDirs(QuinoaConfig config,

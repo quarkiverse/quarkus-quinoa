@@ -15,38 +15,35 @@ import io.quarkiverse.quinoa.deployment.config.delegate.QuinoaConfigDelegate;
 public class NextFramework extends GenericFramework {
 
     private static final Logger LOG = Logger.getLogger(NextFramework.class);
-    static final String STATIC_EXPORT_OUTPUT_VALUE = "export";
-    static final String SSR_BUILD_DIR = ".next";
     static final String EXPORT_BUILD_DIR = "out";
+    static final String SSR_BUILD_DIR = ".next";
+    private static final String DEV_SCRIPT_NAME = "dev";
+    private static final int DEV_SERVER_PORT = 3000;
 
     public NextFramework() {
-        super(EXPORT_BUILD_DIR, "dev", 3000);
+        super(EXPORT_BUILD_DIR, DEV_SCRIPT_NAME, DEV_SERVER_PORT);
     }
 
     @Override
     public QuinoaConfig override(QuinoaConfig delegate, Optional<JsonObject> packageJson,
             Optional<String> detectedDevScript, boolean isCustomized, Path uiDir) {
+        // 'quarkus.quinoa.enable-ssr-mode' alone decides between a static export (default) and a server-rendered app
+        final boolean ssrMode = delegate.enableSSRMode();
+        final QuinoaConfig baseConfig = ssrMode
+                ? generic(SSR_BUILD_DIR, DEV_SCRIPT_NAME, DEV_SERVER_PORT)
+                        .override(delegate, packageJson, detectedDevScript, isCustomized, uiDir)
+                : super.override(delegate, packageJson, detectedDevScript, isCustomized, uiDir);
 
-        final boolean isStaticExport = isStaticExport(packageJson);
-
-        if (isStaticExport) {
-            LOG.info("Quinoa detected Next.js with static export (output: 'export'). Using build output from 'out/'.");
+        final String buildDir = baseConfig.buildDir().orElseThrow();
+        if (ssrMode) {
+            LOG.infof("Quinoa is using Next.js in SSR mode (build directory: '%s'), "
+                    + "as 'quarkus.quinoa.enable-ssr-mode' is enabled.", buildDir);
         } else {
-            LOG.info("Quinoa detected Next.js App Router. SSR mode will be enabled automatically.");
+            LOG.infof("Quinoa is using Next.js in static export mode (build directory: '%s'). "
+                    + "Set 'quarkus.quinoa.enable-ssr-mode=true' for a server-rendered app.", buildDir);
         }
 
-        // Use the correct build dir depending on whether static export is configured
-        final String buildDir = isStaticExport ? EXPORT_BUILD_DIR : SSR_BUILD_DIR;
-        final QuinoaConfig baseConfig = new GenericFramework(buildDir, "dev", 3000)
-                .override(delegate, packageJson, detectedDevScript, isCustomized, uiDir);
-
         return new QuinoaConfigDelegate(baseConfig) {
-            @Override
-            public boolean enableSSRMode() {
-                // Auto-enable SSR mode for App Router (non-static-export) builds
-                return !isStaticExport || super.enableSSRMode();
-            }
-
             @Override
             public DevServerConfig devServer() {
                 return new DevServerConfigDelegate(super.devServer()) {
@@ -58,16 +55,5 @@ public class NextFramework extends GenericFramework {
                 };
             }
         };
-    }
-
-    /**
-     * Returns true if the package.json signals a static export build
-     * (i.e. it contains {@code "output": "export"} at the top level,
-     * which is the Quinoa convention for opting into {@code next export} mode).
-     */
-    static boolean isStaticExport(Optional<JsonObject> packageJson) {
-        return packageJson
-                .map(json -> STATIC_EXPORT_OUTPUT_VALUE.equals(json.getString("output", null)))
-                .orElse(false);
     }
 }

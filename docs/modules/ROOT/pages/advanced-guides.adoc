@@ -181,6 +181,21 @@ public class SPARouting {
 }
 ----
 
+[#ssr-mode]
+=== Server-Side Rendering (SSR) mode
+
+Some frameworks render pages on a server (e.g. a Next.js app without static export). To use such an app with Quinoa, enable SSR mode:
+[source,properties]
+----
+quarkus.quinoa.enable-ssr-mode=true
+----
+
+* In dev mode, the dev-server proxy forwards the HTML rendered by the dev server for every route, instead of only for the root and `.html` paths, and the root is requested from the dev server as `/` instead of `/index.html`.
+* Outside of the dev server, the build output is *not* served by Quarkus as static files: the app needs its own Node.js server (e.g. `next start`) at runtime. Consider using `quarkus.quinoa.just-build=true` and deploying the Node.js server separately.
+* For Next.js, the default build directory is `.next/` instead of `out/` (static export), see xref:web-frameworks.adoc#nextjs-config[Next.js Configuration].
+
+NOTE: SSR mode cannot be used together with `quarkus.quinoa.enable-spa-routing`.
+
 [#headers]
 === Http Headers
 
