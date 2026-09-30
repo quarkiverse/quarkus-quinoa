@@ -8,6 +8,7 @@ import org.jboss.logging.Logger;
 import io.quarkus.runtime.util.StringUtil;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocket;
@@ -61,7 +62,7 @@ class QuinoaDevWebSocketProxyHandler {
                 .setURI(forwardUri)
                 .setHeaders(headers)
                 .setSubProtocols(subProtocols)
-                .setAllowOriginHeader(false);
+                .setAllowOriginHeader(request.headers().contains(HttpHeaders.ORIGIN));
         webSocketClient.connect(options).onComplete(clientContext -> {
             if (clientContext.failed()) {
                 // rejecting the handshake lets the browser client know the WebSocket was never opened

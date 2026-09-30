@@ -236,6 +236,8 @@ For a server-rendered app (without `output: 'export'`), set `quarkus.quinoa.enab
 
 NOTE: In dev mode without `quarkus.quinoa.enable-ssr-mode=true`, the HTML returned by the Next.js dev server is forwarded only for `/` and `.html` paths. A server-rendered app must set this property to get every route forwarded.
 
+NOTE: In dev mode, Quinoa relays the `Origin` header of the browser to the Next.js dev server, which only accepts HMR WebSockets from `localhost` by default. When Quarkus dev mode is accessed through another hostname or IP address, add it to `allowedDevOrigins` in the Next config file.
+
 [#vite-config]
 === Vite Configuration
 Configure `vite.config.ts` file with the following changes:
