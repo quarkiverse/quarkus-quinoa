@@ -14,7 +14,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.impl.MimeMapping;
+import io.vertx.core.http.MimeMapping;
 import io.vertx.ext.web.RoutingContext;
 
 @Recorder
@@ -95,7 +95,7 @@ public class QuinoaRecorder {
         if (config.compressMediaTypes.isEmpty()) {
             return false;
         }
-        String contentType = MimeMapping.getMimeTypeForFilename(path);
+        String contentType = MimeMapping.mimeTypeForFilename(path);
         return contentType != null && config.compressMediaTypes.contains(contentType);
     }
 

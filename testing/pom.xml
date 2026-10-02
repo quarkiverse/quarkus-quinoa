@@ -14,9 +14,14 @@
       <artifactId>quarkus-playwright</artifactId>
       <version>${quarkus-playright.version}</version>
     </dependency>
+    <!-- needed by the Playwright Dev Service on Quarkus 4, until quarkus-playwright has a Quarkus 4 build declaring it -->
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-junit5</artifactId>
+      <artifactId>quarkus-devservices</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit</artifactId>
     </dependency>
   </dependencies>
 </project>

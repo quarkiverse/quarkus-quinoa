@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
@@ -196,8 +198,25 @@ public class TauriProcessor {
             return outputTarget.getOutputDirectory().resolve(binaryPath);
         }
 
-        Path targetDir = outputTarget.getOutputDirectory();
-        try (Stream<Path> files = Files.list(targetDir)) {
+        // the native build writes the runner to its package output directory: the build directory by default,
+        // or quarkus.package.output-directory when set
+        Set<Path> searchDirs = new LinkedHashSet<>();
+        searchDirs.add(outputTarget.getOutputDirectory());
+        searchDirs.add(outputTarget.getPackageOutputDirectory());
+        for (Path dir : searchDirs) {
+            Path runner = findRunner(dir);
+            if (runner != null) {
+                return runner;
+            }
+        }
+        return null;
+    }
+
+    private static Path findRunner(Path dir) {
+        if (!Files.isDirectory(dir)) {
+            return null;
+        }
+        try (Stream<Path> files = Files.list(dir)) {
             for (Path file : (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
                 String name = file.getFileName().toString();
                 if (name.endsWith("-runner") || (OS.WINDOWS.isCurrent() && name.endsWith("-runner.exe"))) {
@@ -205,9 +224,8 @@ public class TauriProcessor {
                 }
             }
         } catch (IOException e) {
-            LOG.debug("Failed to list target directory for native image", e);
+            LOG.debugf(e, "Failed to list %s for native image", dir);
         }
-
         return null;
     }
 

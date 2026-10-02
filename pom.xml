@@ -34,11 +34,11 @@
 
   <properties>
     <compiler-plugin.version>3.15.0</compiler-plugin.version>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.version>3.37.2</quarkus.version>
-    <quarkus-playright.version>2.3.8</quarkus-playright.version>
+    <quarkus.version>999-SNAPSHOT</quarkus.version>
+    <quarkus-playright.version>2.3.10</quarkus-playright.version>
     <assertj.version>3.27.7</assertj.version>
     <frontend-plugin.version>2.0.2</frontend-plugin.version>
   </properties>

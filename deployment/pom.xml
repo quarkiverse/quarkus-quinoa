@@ -21,6 +21,13 @@
             <artifactId>microprofile-openapi-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- JSON provider of smallrye-open-api-core: the Quarkus 4 BOM excludes its Jackson 2 dependencies, and only
+             Jackson 3 core and databind are on the test classpath otherwise -->
+        <dependency>
+            <groupId>tools.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx-http-deployment</artifactId>
