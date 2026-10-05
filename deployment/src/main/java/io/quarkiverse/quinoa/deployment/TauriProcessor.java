@@ -25,13 +25,13 @@ import io.quarkiverse.quinoa.deployment.items.TargetDirBuildItem;
 import io.quarkiverse.quinoa.deployment.items.TauriBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkus.deployment.IsDevelopment;
-import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.Produce;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.pkg.builditem.ArtifactResultBuildItem;
 import io.quarkus.deployment.pkg.builditem.OutputTargetBuildItem;
+import io.quarkus.runtime.LaunchMode;
 import io.smallrye.common.os.OS;
 
 public class TauriProcessor {
@@ -84,15 +84,17 @@ public class TauriProcessor {
         return new TauriBuildItem(tauriDir, projectDir, uiDir, exportTargets, tauriConfig);
     }
 
-    @BuildStep(onlyIf = IsNormal.class)
+    @BuildStep
     @Consume(TargetDirBuildItem.class)
     @Produce(ArtifactResultBuildItem.class)
     public void processTauriBuild(
             TauriBuildItem tauriBuild,
             ConfiguredQuinoaBuildItem configuredQuinoa,
             InstalledPackageManagerBuildItem installedPackageManager,
-            OutputTargetBuildItem outputTarget) throws IOException {
-        if (tauriBuild == null) {
+            OutputTargetBuildItem outputTarget,
+            LaunchModeBuildItem launchMode) throws IOException {
+        // Not IsProduction: it also matches LaunchMode.RUN, and quarkus:run must not trigger Tauri bundling
+        if (tauriBuild == null || launchMode.getLaunchMode() != LaunchMode.NORMAL) {
             return;
         }
 
