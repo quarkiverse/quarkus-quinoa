@@ -1193,7 +1193,7 @@ endif::add-copy-button-to-config-props[]
 
 [.description]
 --
-Path to the GraalVM native image binary. If not set, Quinoa will auto-detect the runner binary in the build output directory.
+Path to the GraalVM native image binary. If not set, Quinoa will auto-detect the runner binary in the build output directory, then in `quarkus.package.output-directory` when set. A relative path is resolved from the build output directory.
 
 
 ifdef::add-copy-button-to-env-var[]

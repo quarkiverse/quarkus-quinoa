@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -21,8 +22,10 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.UpgradeRejectedException;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketClient;
 import io.vertx.core.http.WebSocketClientOptions;
 import io.vertx.core.http.WebSocketConnectOptions;
+import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.web.Router;
@@ -33,6 +36,8 @@ class QuinoaDevWebSocketProxyHandlerTest {
 
     private Vertx vertx;
     private final CompletableFuture<Void> devServerWebSocketClosed = new CompletableFuture<>();
+    // Vert.x 5 closes a client once it is no longer reachable, they are kept until Vert.x is closed
+    private final List<Object> clients = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
@@ -92,7 +97,9 @@ class QuinoaDevWebSocketProxyHandlerTest {
         // a raw socket, so nothing on the browser side reacts to the invalid handshake, like with the Lambda event
         // server: the proxy itself must release both sides
         final CompletableFuture<Void> browserSocketClosed = new CompletableFuture<>();
-        final NetSocket socket = await(vertx.createNetClient().connect(proxyPort, HOST));
+        final NetClient netClient = vertx.createNetClient();
+        clients.add(netClient);
+        final NetSocket socket = await(netClient.connect(proxyPort, HOST));
         socket.closeHandler(__ -> browserSocketClosed.complete(null));
         socket.write("GET /ws HTTP/1.1\r\n"
                 + "Host: " + HOST + ":" + proxyPort + "\r\n"
@@ -147,7 +154,7 @@ class QuinoaDevWebSocketProxyHandlerTest {
             throws Exception {
         final BlockingQueue<String> messages = new LinkedBlockingQueue<>();
         // the handler is set on connection, so no message can arrive before it
-        final WebSocket ws = await(vertx.createWebSocketClient(clientOptions)
+        final WebSocket ws = await(webSocketClient(clientOptions)
                 .connect(connectOptions(proxyPort, "/ws", subProtocol))
                 .onSuccess(w -> w.textMessageHandler(messages::add)));
         if (subProtocol != null) {
@@ -163,8 +170,15 @@ class QuinoaDevWebSocketProxyHandlerTest {
 
     private void assertHandshakeRejected(int proxyPort, String path) {
         final ExecutionException e = assertThrows(ExecutionException.class,
-                () -> await(vertx.createWebSocketClient().connect(connectOptions(proxyPort, path, SUB_PROTOCOL))));
+                () -> await(webSocketClient(new WebSocketClientOptions())
+                        .connect(connectOptions(proxyPort, path, SUB_PROTOCOL))));
         assertEquals(500, assertInstanceOf(UpgradeRejectedException.class, e.getCause()).getStatus());
+    }
+
+    private WebSocketClient webSocketClient(WebSocketClientOptions options) {
+        final WebSocketClient client = vertx.createWebSocketClient(options);
+        clients.add(client);
+        return client;
     }
 
     private static WebSocketConnectOptions connectOptions(int port, String uri, String subProtocol) {
