@@ -37,8 +37,10 @@ public class QuinoaAbsoluteUIDirTest {
 
     @Test
     public void testQuinoa() {
-        assertThat(getUIDir().resolve(Path.of("target/quinoa/build/index.html"))).isRegularFile()
+        // Quinoa works in the build directory, quarkus.package.output-directory only relocates the package
+        assertThat(Path.of("target/quinoa/build/index.html")).isRegularFile()
                 .hasContent("test");
+        assertThat(getUIDir().resolve("target/quinoa")).doesNotExist();
         assertThat(getUIDir().resolve("webui").resolve("node_modules/installed")).isRegularFile()
                 .hasContent("hello");
     }

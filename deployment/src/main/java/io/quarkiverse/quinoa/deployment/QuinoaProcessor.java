@@ -9,6 +9,7 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunn
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -218,7 +219,7 @@ public class QuinoaProcessor {
         final Path targetBuildDir = initializeTargetDirectory(outputTarget).resolve(TARGET_BUILD_DIR_NAME);
         FileUtil.deleteDirectory(targetBuildDir);
         try {
-            Files.move(buildDir, targetBuildDir);
+            moveDirectory(buildDir, targetBuildDir);
         } catch (IOException e) {
             String message = String.format(
                     "Error moving directory '%s -> %s'. Please make sure no files are open such as in Files Explorer or other tools.",
@@ -227,6 +228,21 @@ public class QuinoaProcessor {
         }
         liveReload.setContextObject(QuinoaLiveContext.class, new QuinoaLiveContext(targetBuildDir));
         return new TargetDirBuildItem(targetBuildDir);
+    }
+
+    static void moveDirectory(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target);
+        } catch (DirectoryNotEmptyException e) {
+            // a non-empty directory cannot be moved to another file store (e.g. another drive on Windows)
+            try (Stream<Path> paths = Files.walk(source)) {
+                for (Path path : (Iterable<Path>) paths::iterator) {
+                    Files.copy(path, target.resolve(source.relativize(path).toString()),
+                            StandardCopyOption.COPY_ATTRIBUTES);
+                }
+            }
+            FileUtil.deleteDirectory(source);
+        }
     }
 
     @BuildStep
