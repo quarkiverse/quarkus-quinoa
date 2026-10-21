@@ -61,7 +61,9 @@ public interface TauriConfig {
 
     /**
      * Path to the GraalVM native image binary.
-     * If not set, Quinoa will auto-detect the runner binary in the build output directory.
+     * If not set, Quinoa will auto-detect the runner binary in the build output directory,
+     * then in `quarkus.package.output-directory` when set.
+     * A relative path is resolved from the build output directory.
      */
     @ConfigDocDefault("auto-detected (target/*-runner)")
     Optional<String> nativeImageBinary();
