@@ -34,7 +34,10 @@ There are multiple versions available please check which one for your Quarkus re
 | ![2.7.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.7&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.15+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.20.0) |
 | ![2.8.0](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.8.0&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.27+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.27.0) |
 | ![2.8.3](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.8.3&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.33+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.33.0) |
-| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.37+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.37.4) |
+| ![2.9.x](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?versionPrefix=2.9&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-3.37+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/3.37.2) |
+| ![latest](https://img.shields.io/maven-central/v/io.quarkiverse.quinoa/quarkus-quinoa?&color=cyan) | [![Quarkus](https://img.shields.io/badge/Quarkus-4.0+-purple.svg)](https://github.com/quarkusio/quarkus/releases/tag/4.0.0) |
+
+The latest version (3.x) targets Quarkus 4 and requires JDK 21. If you are still on Quarkus 3, stay on 2.9.x.
 
 ## Getting started
 

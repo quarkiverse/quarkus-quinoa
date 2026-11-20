@@ -1,4 +1,4 @@
-:quarkus-version: 3.37.2
+:quarkus-version: 4.0.0
 :quarkus-quinoa-version: 2.9.3
 :maven-version: 3.8.1+
 :extension-status: stable
