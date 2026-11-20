@@ -17,6 +17,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.WebSocket;
+import io.vertx.core.http.WebSocketClient;
 import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.ext.web.Router;
 
@@ -30,6 +31,8 @@ class QuinoaDevWebSocketProxyHandlerHeadersTest {
     private static final String SUB_PROTOCOL = "vite-hmr";
 
     private Vertx vertx;
+    // Vert.x 5 closes a client once it is no longer reachable, it is kept until Vert.x is closed
+    private WebSocketClient client;
     /** completed with the handshake request headers and URI, as received by the dev server */
     private final CompletableFuture<Handshake> devServerHandshake = new CompletableFuture<>();
 
@@ -39,6 +42,7 @@ class QuinoaDevWebSocketProxyHandlerHeadersTest {
     @BeforeEach
     void setUp() {
         vertx = Vertx.vertx();
+        client = vertx.createWebSocketClient();
     }
 
     @AfterEach
@@ -120,7 +124,7 @@ class QuinoaDevWebSocketProxyHandlerHeadersTest {
                 // would generate one if absent): this sends exactly the headers a browser would
                 .setAllowOriginHeader(origin != null)
                 .addSubProtocol(SUB_PROTOCOL);
-        final WebSocket ws = await(vertx.createWebSocketClient().connect(options));
+        final WebSocket ws = await(client.connect(options));
         try {
             return devServerHandshake.get(5, TimeUnit.SECONDS);
         } finally {
