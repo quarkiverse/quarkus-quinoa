@@ -5,6 +5,7 @@ import static io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManag
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +34,8 @@ public final class PackageManagerInstall {
     public static final String BUN_BINARY = PackageManagerRunner.isWindows() ? "bun.exe" : "bun";
     public static final String NPM_PATH = INSTALL_SUB_PATH + "/node_modules/npm/bin/npm-cli.js";
     public static final String PNPM_PATH = INSTALL_SUB_PATH + "/node_modules/pnpm/bin/pnpm.cjs";
+    // pnpm 12+ replaced pnpm.cjs with pnpm.mjs
+    public static final String PNPM_MJS_PATH = INSTALL_SUB_PATH + "/node_modules/pnpm/bin/pnpm.mjs";
     public static final String YARN_PATH = INSTALL_SUB_PATH + "/yarn/dist/bin/yarn.js";
     public static final String BUN_PATH = "bun/" + BUN_BINARY;
 
@@ -171,12 +174,12 @@ public final class PackageManagerInstall {
         // Use pnpm if pnpmVersion is set (and npm is provided and yarnVersion is not set)
         final Optional<String> pnpmVersion = config.pnpmVersion();
         if (pnpmVersion.isPresent() && isNpmProvided && yarnVersion.isEmpty()) {
-            executionPath = PNPM_PATH;
             factory.getPnpmInstaller()
                     .setNodeVersion("v" + config.nodeVersion().orElse("???"))
                     .setPnpmVersion(pnpmVersion.get())
                     .setPnpmDownloadRoot(config.pnpmDownloadRoot())
                     .install();
+            executionPath = resolvePnpmPath(installDir);
         }
 
         // Use bun if bunVersion is set (and npm is provided and nodeVersion, yarnVersion and pnpmVersion are not set)
@@ -201,6 +204,13 @@ public final class PackageManagerInstall {
                     Set.of("quarkus.quinoa.package-manager-install.install-dir"));
         }
         return projectDir.resolve(installPath);
+    }
+
+    public static String resolvePnpmPath(Path installDir) {
+        if (!Files.exists(installDir.resolve(PNPM_PATH)) && Files.exists(installDir.resolve(PNPM_MJS_PATH))) {
+            return PNPM_MJS_PATH;
+        }
+        return PNPM_PATH;
     }
 
     private static Installation resolveInstalledExecutorBinary(Path installDirectory, String executionPath, boolean isBunOnly) {
