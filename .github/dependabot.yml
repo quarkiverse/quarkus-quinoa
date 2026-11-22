@@ -34,3 +34,12 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+  # JS projects here are only integration/test fixtures; suppress version and security update PRs
+  - package-ecosystem: "npm"
+    directories:
+      - "/integration-tests/src/main/*"
+      - "/deployment/src/test/**"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
