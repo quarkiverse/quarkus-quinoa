@@ -1,19 +1,18 @@
 package io.quarkiverse.quinoa;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
-import static io.quarkiverse.quinoa.QuinoaRecorder.next;
-import static io.quarkiverse.quinoa.QuinoaRecorder.resolvePath;
-import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
+import static io.quarkiverse.quinoa.QuinoaHandlers.isIgnored;
+import static io.quarkiverse.quinoa.QuinoaHandlers.next;
+import static io.quarkiverse.quinoa.QuinoaHandlers.resolvePath;
+import static io.quarkiverse.quinoa.QuinoaHandlers.shouldHandleMethod;
 
 import java.util.List;
 import java.util.Objects;
 
 import org.jboss.logging.Logger;
 
-import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
-class QuinoaSPARoutingHandler implements Handler<RoutingContext> {
+class QuinoaSPARoutingHandler implements QuinoaRouteHandler {
     private static final Logger LOG = Logger.getLogger(QuinoaSPARoutingHandler.class);
     private final ClassLoader currentClassLoader;
     private final List<String> ignoredPathPrefixes;

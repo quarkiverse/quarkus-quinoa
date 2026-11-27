@@ -1,16 +1,15 @@
 package io.quarkiverse.quinoa;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.compressIfNeeded;
-import static io.quarkiverse.quinoa.QuinoaRecorder.isIgnored;
-import static io.quarkiverse.quinoa.QuinoaRecorder.next;
-import static io.quarkiverse.quinoa.QuinoaRecorder.shouldHandleMethod;
+import static io.quarkiverse.quinoa.QuinoaHandlers.compressIfNeeded;
+import static io.quarkiverse.quinoa.QuinoaHandlers.isIgnored;
+import static io.quarkiverse.quinoa.QuinoaHandlers.next;
+import static io.quarkiverse.quinoa.QuinoaHandlers.shouldHandleMethod;
 
 import java.util.List;
 
 import org.jboss.logging.Logger;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -22,7 +21,7 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
-class QuinoaDevProxyHandler implements Handler<RoutingContext> {
+class QuinoaDevProxyHandler implements QuinoaRouteHandler {
     private static final Logger LOG = Logger.getLogger(QuinoaDevProxyHandler.class);
     private final List<String> HEADERS_TO_FORWARD = List.of(
             HttpHeaders.ACCEPT_RANGES.toString(),
@@ -122,7 +121,7 @@ class QuinoaDevProxyHandler implements Handler<RoutingContext> {
             if (config.enableSSRMode) {
                 return true;
             }
-            final String path = QuinoaRecorder.resolvePath(ctx);
+            final String path = QuinoaHandlers.resolvePath(ctx);
             // We forward if the server returns a html, and it was intended:
             // - if the path ends with .html
             // - if the path is empty (root)

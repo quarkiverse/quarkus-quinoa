@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import io.quarkus.runtime.annotations.RecordableConstructor;
-
 public class QuinoaDevProxyHandlerConfig {
     public final List<String> ignoredPathPrefixes;
     public final String indexPage;
@@ -15,7 +13,6 @@ public class QuinoaDevProxyHandlerConfig {
     public final boolean devServerDirectForwarding;
     public final boolean enableSSRMode;
 
-    @RecordableConstructor
     public QuinoaDevProxyHandlerConfig(List<String> ignoredPathPrefixes, String indexPage, boolean enableCompression,
             Set<String> compressMediaTypes, boolean devServerDirectForwarding, boolean enableSSRMode) {
         this.ignoredPathPrefixes = ignoredPathPrefixes;

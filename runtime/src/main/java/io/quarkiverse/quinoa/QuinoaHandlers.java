@@ -5,43 +5,48 @@ import static io.quarkus.vertx.http.runtime.RouteConstants.ROUTE_ORDER_DEFAULT;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.jboss.logging.Logger;
 
-import io.quarkus.runtime.annotations.Recorder;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.MimeMapping;
 import io.vertx.ext.web.RoutingContext;
 
-@Recorder
-public class QuinoaRecorder {
-    private static final Logger LOG = Logger.getLogger(QuinoaRecorder.class);
+/**
+ * Runtime factories and helpers for the Quinoa route handlers.
+ * <p>
+ * The factory methods are invoked from {@code ServiceRegistrar} service lambdas registered by the deployment
+ * processors, which is why they are static and only take simple immutable values or services as parameters.
+ */
+public final class QuinoaHandlers {
+    private static final Logger LOG = Logger.getLogger(QuinoaHandlers.class);
     public static final String META_INF_WEB_UI = "META-INF/webui";
     public static final int QUINOA_ROUTE_ORDER = 1100;
     public static final int QUINOA_SPA_ROUTE_ORDER = ROUTE_ORDER_DEFAULT + 30_000;
     public static final Set<HttpMethod> HANDLED_METHODS = Set.of(HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.GET);
 
-    public Handler<RoutingContext> quinoaProxyDevHandler(final QuinoaDevProxyHandlerConfig handlerConfig, Supplier<Vertx> vertx,
+    private QuinoaHandlers() {
+    }
+
+    public static QuinoaRouteHandler quinoaProxyDevHandler(final QuinoaDevProxyHandlerConfig handlerConfig, Vertx vertx,
             QuinoaNetworkConfiguration network) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Quinoa dev proxy-handler is ignoring paths starting with: "
                     + String.join(", ", handlerConfig.ignoredPathPrefixes));
         }
-        return new QuinoaDevProxyHandler(handlerConfig, vertx.get(), network);
+        return new QuinoaDevProxyHandler(handlerConfig, vertx, network);
     }
 
-    public Handler<RoutingContext> quinoaSPARoutingHandler(List<String> ignoredPathPrefixes) {
+    public static QuinoaRouteHandler quinoaSPARoutingHandler(List<String> ignoredPathPrefixes) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Quinoa SPA routing handler is ignoring paths starting with: " + String.join(", ", ignoredPathPrefixes));
         }
         return new QuinoaSPARoutingHandler(ignoredPathPrefixes);
     }
 
-    public void logUiRootPath(final String resolvedUiRootPath) {
+    public static void logUiRootPath(final String resolvedUiRootPath) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Quinoa is available at: " + resolvedUiRootPath);
         }

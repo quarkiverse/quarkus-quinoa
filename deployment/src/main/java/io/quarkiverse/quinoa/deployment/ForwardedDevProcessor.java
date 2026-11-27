@@ -1,11 +1,10 @@
 package io.quarkiverse.quinoa.deployment;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_ROUTE_ORDER;
-import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.QuinoaHandlers.QUINOA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.QuinoaHandlers.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.toDevProxyHandlerConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.DEV_PROCESS_THREAD_PREDICATE;
-import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 import static io.quarkus.deployment.dev.testing.MessageFormat.RESET;
 import static java.lang.String.join;
 
@@ -20,19 +19,20 @@ import java.util.function.BiPredicate;
 import org.jboss.logging.Logger;
 
 import io.quarkiverse.quinoa.QuinoaDevProxyHandlerConfig;
+import io.quarkiverse.quinoa.QuinoaHandlers;
 import io.quarkiverse.quinoa.QuinoaNetworkConfiguration;
-import io.quarkiverse.quinoa.QuinoaRecorder;
+import io.quarkiverse.quinoa.QuinoaRouteHandler;
 import io.quarkiverse.quinoa.deployment.config.DevServerConfig;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.items.ConfiguredQuinoaBuildItem;
 import io.quarkiverse.quinoa.deployment.items.ForwardedDevServerBuildItem;
 import io.quarkiverse.quinoa.deployment.items.InstalledPackageManagerBuildItem;
 import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
+import io.quarkus.core.deployment.service.ServiceRegistrar;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
-import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CuratedApplicationShutdownBuildItem;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
@@ -42,17 +42,20 @@ import io.quarkus.dev.console.QuarkusConsole;
 import io.quarkus.resteasy.reactive.server.spi.ResumeOn404BuildItem;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.smallrye.openapi.deployment.spi.OpenApiDocumentBuildItem;
-import io.quarkus.vertx.core.deployment.CoreVertxBuildItem;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.WebsocketSubProtocolsBuildItem;
 import io.quarkus.vertx.http.runtime.VertxHttpBuildTimeConfig;
+import io.vertx.core.Vertx;
 
 public class ForwardedDevProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForwardedDevProcessor.class);
     private static final String DEV_SERVICE_NAME = "quinoa-dev-server";
+    private static final String LOG_UI_ROOT_PATH_SERVICE = "io.quarkiverse.quinoa.dev.log-ui-root-path";
+    private static final String DEV_PROXY_HANDLER_SERVICE = "io.quarkiverse.quinoa.dev.proxy-handler";
+    private static final String SPA_ROUTING_HANDLER_SERVICE = "io.quarkiverse.quinoa.dev.spa-routing-handler";
     private static volatile Closeable devService;
     private static volatile DevServicesResultBuildItem devServiceItem;
 
@@ -180,13 +183,11 @@ public class ForwardedDevProcessor {
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
-    @Record(RUNTIME_INIT)
     public void runtimeInit(
-            QuinoaRecorder recorder,
+            ServiceRegistrar reg,
             VertxHttpBuildTimeConfig httpBuildTimeConfig,
             Optional<ForwardedDevServerBuildItem> devProxy,
             Optional<ConfiguredQuinoaBuildItem> configuredQuinoa,
-            CoreVertxBuildItem vertx,
             HttpRootPathBuildItem httpRootPath,
             NonApplicationRootPathBuildItem nonApplicationRootPath,
             BuildProducer<RouteBuildItem> routes,
@@ -205,22 +206,53 @@ public class ForwardedDevProcessor {
             final QuinoaDevProxyHandlerConfig handlerConfig = toDevProxyHandlerConfig(quinoaConfig, httpBuildTimeConfig,
                     nonApplicationRootPath);
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(quinoaConfig);
-            recorder.logUiRootPath(httpRootPath.relativePath(uiRootPath));
-            final QuinoaNetworkConfiguration networkConfig = new QuinoaNetworkConfiguration(devProxy.get().isTls(),
-                    devProxy.get().isTlsAllowInsecure(), devProxy.get().getHost(),
-                    devProxy.get().getPort(),
-                    quinoaConfig.devServer().websocket());
+            final String uiRootPathToLog = httpRootPath.relativePath(uiRootPath);
+            reg.forService(LOG_UI_ROOT_PATH_SERVICE)
+                    .onStart(ctx -> QuinoaHandlers.logUiRootPath(uiRootPathToLog));
+
+            // Service lambdas are executed at runtime: only capture simple immutable values (no deployment classes)
+            // and rebuild the runtime config objects inside the lambda.
+            final List<String> ignoredPathPrefixes = List.copyOf(handlerConfig.ignoredPathPrefixes);
+            final String indexPage = handlerConfig.indexPage;
+            final boolean enableCompression = handlerConfig.enableCompression;
+            final Set<String> compressMediaTypes = Set.copyOf(handlerConfig.compressMediaTypes);
+            final boolean devServerDirectForwarding = handlerConfig.devServerDirectForwarding;
+            final boolean enableSSRMode = handlerConfig.enableSSRMode;
+            final boolean tls = devProxy.get().isTls();
+            final boolean tlsAllowInsecure = devProxy.get().isTlsAllowInsecure();
+            final String host = devProxy.get().getHost();
+            final int port = devProxy.get().getPort();
+            final boolean websocket = quinoaConfig.devServer().websocket();
+            reg.forService(QuinoaRouteHandler.class, DEV_PROXY_HANDLER_SERVICE)
+                    .require(Vertx.class)
+                    .onStart((ctx, vertx) -> QuinoaHandlers.quinoaProxyDevHandler(
+                            new QuinoaDevProxyHandlerConfig(ignoredPathPrefixes, indexPage, enableCompression,
+                                    compressMediaTypes, devServerDirectForwarding, enableSSRMode),
+                            vertx,
+                            new QuinoaNetworkConfiguration(tls, tlsAllowInsecure, host, port, websocket)));
+            // Quarkus 4.0 route build items still take a Handler instance: bridging the service with a recorder proxy is
+            // the only option until vertx-http offers a service-based route API (Quarkus itself does the same).
+            @SuppressWarnings("deprecation")
+            final QuinoaRouteHandler devProxyHandler = reg.getRecorderProxy(QuinoaRouteHandler.class,
+                    DEV_PROXY_HANDLER_SERVICE);
             // note that the uiRootPath is resolved relative to 'quarkus.http.root-path' by the RouteBuildItem
             routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_ROUTE_ORDER)
-                    .handler(recorder.quinoaProxyDevHandler(handlerConfig, vertx.getVertx(), networkConfig))
+                    .handler(devProxyHandler)
                     .build());
-            if (quinoaConfig.devServer().websocket()) {
+            if (websocket) {
                 websocketSubProtocols.produce(new WebsocketSubProtocolsBuildItem("*"));
             }
             if (quinoaConfig.enableSPARouting()) {
                 resumeOn404.produce(new ResumeOn404BuildItem());
+                reg.forService(QuinoaRouteHandler.class, SPA_ROUTING_HANDLER_SERVICE)
+                        .onStart(ctx -> QuinoaHandlers.quinoaSPARoutingHandler(ignoredPathPrefixes));
+                // Quarkus 4.0 route build items still take a Handler instance: bridging the service with a recorder proxy is
+                // the only option until vertx-http offers a service-based route API (Quarkus itself does the same).
+                @SuppressWarnings("deprecation")
+                final QuinoaRouteHandler spaRoutingHandler = reg.getRecorderProxy(QuinoaRouteHandler.class,
+                        SPA_ROUTING_HANDLER_SERVICE);
                 routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder.quinoaSPARoutingHandler(handlerConfig.ignoredPathPrefixes))
+                        .handler(spaRoutingHandler)
                         .build());
             }
         }
