@@ -28,8 +28,9 @@ class QuinoaSPARoutingHandler implements QuinoaRouteHandler {
             next(currentClassLoader, ctx);
             return;
         }
+        // decoded path, null if it can't be safely decoded
         String path = resolvePath(ctx);
-        if (!Objects.equals(path, "/") && !isIgnored(path, ignoredPathPrefixes)) {
+        if (path != null && !Objects.equals(path, "/") && !isIgnored(path, ignoredPathPrefixes)) {
             String mountPoint = ctx.mountPoint() != null ? ctx.mountPoint() : "/";
             String routePath = ctx.currentRoute().getPath() != null ? ctx.currentRoute().getPath() : "/";
             String target;

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jboss.logging.Logger;
 
+import io.quarkus.vertx.http.runtime.RoutingUtils;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
@@ -52,10 +53,42 @@ public final class QuinoaHandlers {
         }
     }
 
+    /**
+     * Returns the normalized and percent-decoded (RFC 3986) request path, so it can be matched against configured
+     * (decoded) paths such as {@code quarkus.quinoa.ignored-path-prefixes}, the same way Quarkus does.
+     * <p>
+     * Vert.x normalization only decodes unreserved characters: spaces, non-ASCII characters... remain percent-encoded in
+     * {@link RoutingContext#normalizedPath()}.
+     * <p>
+     * Only use the decoded path for matching: the path forwarded to the dev server must stay encoded.
+     *
+     * @return the decoded path or {@code null} if it cannot be safely decoded (malformed escape sequence or a literal
+     *         {@code '?'}), in which case Quinoa must not handle the request
+     */
+    static String decodedPath(RoutingContext ctx) {
+        try {
+            return RoutingUtils.getNormalizedAndDecodedPath(ctx);
+        } catch (IllegalArgumentException e) {
+            LOG.debugf("Quinoa is not handling request with an invalid path '%s': %s", ctx.normalizedPath(),
+                    e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Returns the decoded request path relative to {@code quarkus.http.root-path} and {@code quarkus.quinoa.ui-root-path}.
+     *
+     * @return the resolved path or {@code null} if the request path cannot be safely decoded (see
+     *         {@link #decodedPath(RoutingContext)})
+     */
     static String resolvePath(RoutingContext ctx) {
+        final String decodedPath = decodedPath(ctx);
+        if (decodedPath == null) {
+            return null;
+        }
         // quarkus.http.root-path
-        String path = (ctx.mountPoint() == null) ? ctx.normalizedPath()
-                : ctx.normalizedPath().substring(
+        String path = (ctx.mountPoint() == null) ? decodedPath
+                : decodedPath.substring(
                         // let's be extra careful here in case Vert.x normalizes the mount points at
                         // some point
                         ctx.mountPoint().endsWith("/") ? ctx.mountPoint().length() - 1 : ctx.mountPoint().length());
