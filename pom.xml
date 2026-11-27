@@ -33,8 +33,8 @@
   </issueManagement>
 
   <properties>
-    <quarkus.version>4.0.0</quarkus.version>
-    <quarkus-playright.version>2.5.0</quarkus-playright.version>
+    <quarkus.version>4.0.1</quarkus.version>
+    <quarkus-playright.version>4.0.0</quarkus-playright.version>
     <assertj.version>3.27.7</assertj.version>
     <frontend-plugin.version>2.0.2</frontend-plugin.version>
   </properties>
