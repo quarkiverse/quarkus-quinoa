@@ -1,6 +1,7 @@
 package io.quarkiverse.quinoa;
 
 import static io.quarkiverse.quinoa.QuinoaHandlers.compressIfNeeded;
+import static io.quarkiverse.quinoa.QuinoaHandlers.decodedPath;
 import static io.quarkiverse.quinoa.QuinoaHandlers.isIgnored;
 import static io.quarkiverse.quinoa.QuinoaHandlers.next;
 import static io.quarkiverse.quinoa.QuinoaHandlers.shouldHandleMethod;
@@ -53,14 +54,17 @@ class QuinoaDevProxyHandler implements QuinoaRouteHandler {
             next(currentClassLoader, ctx);
             return;
         }
-        String path = ctx.normalizedPath();
-        if (isIgnored(path, config.ignoredPathPrefixes)) {
+        // the decoded path is used for matching, while the (still encoded) normalized path is forwarded to the dev server
+        final String decodedPath = decodedPath(ctx);
+        if (decodedPath == null || isIgnored(decodedPath, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
             return;
         }
 
+        final String path = ctx.normalizedPath();
         final String resourcePath = path.endsWith("/") ? path + config.indexPage : path;
-        if (isIgnored(resourcePath, config.ignoredPathPrefixes)) {
+        final String decodedResourcePath = decodedPath.endsWith("/") ? decodedPath + config.indexPage : decodedPath;
+        if (isIgnored(decodedResourcePath, config.ignoredPathPrefixes)) {
             next(currentClassLoader, ctx);
             return;
         }
@@ -125,7 +129,7 @@ class QuinoaDevProxyHandler implements QuinoaRouteHandler {
             // We forward if the server returns a html, and it was intended:
             // - if the path ends with .html
             // - if the path is empty (root)
-            return path.endsWith(".html") || path.equals("/") || path.isEmpty();
+            return path != null && (path.endsWith(".html") || path.equals("/") || path.isEmpty());
         }
         return true;
     }
