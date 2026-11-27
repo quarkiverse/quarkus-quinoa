@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
@@ -397,8 +398,8 @@ public class PackageManagerRunner {
                 try {
                     final String hostAddress = address.getHostAddress();
                     final String ipAddress = address instanceof Inet6Address ? "[" + hostAddress + "]" : hostAddress;
-                    URL url = new URL(String.format("%s://%s:%d%s", network.isTls() ? "https" : "http", ipAddress,
-                            network.getPort(), normalizedPath));
+                    URL url = URI.create(String.format("%s://%s:%d%s", network.isTls() ? "https" : "http", ipAddress,
+                            network.getPort(), normalizedPath)).toURL();
                     HttpURLConnection connection;
                     if (network.isTls()) {
                         HttpsURLConnection httpsConnection = (HttpsURLConnection) url.openConnection();
@@ -420,7 +421,8 @@ public class PackageManagerRunner {
                     return (code == 200 || code == 404) ? ipAddress : null;
                 } catch (ConnectException | SocketTimeoutException e) {
                     // Try the next address
-                } catch (IOException e) {
+                } catch (IOException | IllegalArgumentException e) {
+                    // IllegalArgumentException: invalid URI (e.g. a malformed dev-server check-path)
                     throw new RuntimeException("Error while checking if package manager dev server is up", e);
                 }
             }

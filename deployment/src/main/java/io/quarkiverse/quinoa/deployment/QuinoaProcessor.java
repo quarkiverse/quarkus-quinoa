@@ -1,12 +1,11 @@
 package io.quarkiverse.quinoa.deployment;
 
-import static io.quarkiverse.quinoa.QuinoaRecorder.QUINOA_SPA_ROUTE_ORDER;
+import static io.quarkiverse.quinoa.QuinoaHandlers.QUINOA_SPA_ROUTE_ORDER;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.getNormalizedIgnoredPathPrefixes;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isDevServerMode;
 import static io.quarkiverse.quinoa.deployment.config.QuinoaConfig.isEnabled;
 import static io.quarkiverse.quinoa.deployment.framework.FrameworkType.overrideConfig;
 import static io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner.autoDetectPackageManager;
-import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
@@ -29,7 +28,8 @@ import java.util.stream.Stream;
 
 import org.jboss.logging.Logger;
 
-import io.quarkiverse.quinoa.QuinoaRecorder;
+import io.quarkiverse.quinoa.QuinoaHandlers;
+import io.quarkiverse.quinoa.QuinoaRouteHandler;
 import io.quarkiverse.quinoa.deployment.config.QuinoaConfig;
 import io.quarkiverse.quinoa.deployment.framework.FrameworkType;
 import io.quarkiverse.quinoa.deployment.items.BuiltResourcesBuildItem;
@@ -43,11 +43,11 @@ import io.quarkiverse.quinoa.deployment.packagemanager.PackageManagerRunner;
 import io.quarkiverse.quinoa.deployment.packagemanager.types.PackageManagerType;
 import io.quarkiverse.quinoa.deployment.sbom.CdxgenRunner;
 import io.quarkiverse.quinoa.deployment.sbom.CycloneDxBomParser;
+import io.quarkus.core.deployment.service.ServiceRegistrar;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
-import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
@@ -69,6 +69,8 @@ import io.quarkus.vertx.http.deployment.spi.GeneratedStaticResourceBuildItem;
 public class QuinoaProcessor {
 
     private static final Logger LOG = Logger.getLogger(QuinoaProcessor.class);
+    private static final String LOG_UI_ROOT_PATH_SERVICE = "io.quarkiverse.quinoa.log-ui-root-path";
+    private static final String SPA_ROUTING_HANDLER_SERVICE = "io.quarkiverse.quinoa.spa-routing-handler";
     private static final Set<String> IGNORE_WATCH = Set.of("node_modules", "target");
     private static final Set<String> IGNORE_WATCH_LOCKFILES = Arrays.stream(PackageManagerType.values())
             .map(PackageManagerType::getLockFile).collect(Collectors.toSet());
@@ -334,12 +336,11 @@ public class QuinoaProcessor {
     }
 
     @BuildStep
-    @Record(RUNTIME_INIT)
     public void runtimeInit(
             ConfiguredQuinoaBuildItem configuredQuinoa,
             HttpRootPathBuildItem httpRootPath,
             NonApplicationRootPathBuildItem nonApplicationRootPath,
-            QuinoaRecorder recorder,
+            ServiceRegistrar reg,
             BuildProducer<RouteBuildItem> routes,
             Optional<BuiltResourcesBuildItem> uiResources) throws IOException {
         if (configuredQuinoa != null && configuredQuinoa.resolvedConfig().justBuild()) {
@@ -349,12 +350,21 @@ public class QuinoaProcessor {
             String uiRootPath = QuinoaConfig.getNormalizedUiRootPath(configuredQuinoa.resolvedConfig());
             // the resolvedUiRootPath is only used for logging
             String resolvedUiRootPath = httpRootPath.relativePath(uiRootPath);
-            recorder.logUiRootPath(resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/");
+            final String uiRootPathToLog = resolvedUiRootPath.endsWith("/") ? resolvedUiRootPath : resolvedUiRootPath + "/";
+            reg.forService(LOG_UI_ROOT_PATH_SERVICE)
+                    .onStart(ctx -> QuinoaHandlers.logUiRootPath(uiRootPathToLog));
             if (Objects.requireNonNull(configuredQuinoa).resolvedConfig().enableSPARouting()) {
+                final List<String> ignoredPathPrefixes = List.copyOf(
+                        getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig(), nonApplicationRootPath));
+                reg.forService(QuinoaRouteHandler.class, SPA_ROUTING_HANDLER_SERVICE)
+                        .onStart(ctx -> QuinoaHandlers.quinoaSPARoutingHandler(ignoredPathPrefixes));
+                // Quarkus 4.0 route build items still take a Handler instance: bridging the service with a recorder proxy is
+                // the only option until vertx-http offers a service-based route API (Quarkus itself does the same).
+                @SuppressWarnings("deprecation")
+                final QuinoaRouteHandler spaRoutingHandler = reg.getRecorderProxy(QuinoaRouteHandler.class,
+                        SPA_ROUTING_HANDLER_SERVICE);
                 routes.produce(RouteBuildItem.builder().orderedRoute(uiRootPath + "*", QUINOA_SPA_ROUTE_ORDER)
-                        .handler(recorder
-                                .quinoaSPARoutingHandler(getNormalizedIgnoredPathPrefixes(configuredQuinoa.resolvedConfig(),
-                                        nonApplicationRootPath)))
+                        .handler(spaRoutingHandler)
                         .build());
             }
         }

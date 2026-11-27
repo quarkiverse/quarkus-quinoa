@@ -7,11 +7,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class QuinoaRecorderTest {
+class QuinoaHandlersTest {
 
     @Test
     void handledMethodsContainsOnlyGetHeadOptions() {
-        var methods = QuinoaRecorder.HANDLED_METHODS.stream()
+        var methods = QuinoaHandlers.HANDLED_METHODS.stream()
                 .map(Object::toString)
                 .toList();
         assertTrue(methods.contains("GET"));
@@ -26,28 +26,28 @@ class QuinoaRecorderTest {
     @Test
     void isIgnoredMatchesPrefix() {
         List<String> prefixes = List.of("/api", "/q");
-        assertTrue(QuinoaRecorder.isIgnored("/api/something", prefixes));
-        assertTrue(QuinoaRecorder.isIgnored("/api", prefixes));
-        assertTrue(QuinoaRecorder.isIgnored("/q/dev", prefixes));
-        assertFalse(QuinoaRecorder.isIgnored("/other", prefixes));
-        assertFalse(QuinoaRecorder.isIgnored("/", prefixes));
+        assertTrue(QuinoaHandlers.isIgnored("/api/something", prefixes));
+        assertTrue(QuinoaHandlers.isIgnored("/api", prefixes));
+        assertTrue(QuinoaHandlers.isIgnored("/q/dev", prefixes));
+        assertFalse(QuinoaHandlers.isIgnored("/other", prefixes));
+        assertFalse(QuinoaHandlers.isIgnored("/", prefixes));
     }
 
     @Test
     void isIgnoredDoesNotMatchPartialSegment() {
         List<String> prefixes = List.of("/api");
         // /api-docs should NOT match /api prefix (different path segment)
-        assertFalse(QuinoaRecorder.isIgnored("/api-docs", prefixes));
+        assertFalse(QuinoaHandlers.isIgnored("/api-docs", prefixes));
         // /api/something should match
-        assertTrue(QuinoaRecorder.isIgnored("/api/something", prefixes));
+        assertTrue(QuinoaHandlers.isIgnored("/api/something", prefixes));
     }
 
     @Test
     void matchesPathSeparatedPrefix() {
-        assertTrue(QuinoaRecorder.matchesPathSeparatedPrefix("/api/something", "/api"));
-        assertTrue(QuinoaRecorder.matchesPathSeparatedPrefix("/api", "/api"));
-        assertFalse(QuinoaRecorder.matchesPathSeparatedPrefix("/api-docs", "/api"));
-        assertFalse(QuinoaRecorder.matchesPathSeparatedPrefix("/other", "/api"));
-        assertTrue(QuinoaRecorder.matchesPathSeparatedPrefix("/anything", "/"));
+        assertTrue(QuinoaHandlers.matchesPathSeparatedPrefix("/api/something", "/api"));
+        assertTrue(QuinoaHandlers.matchesPathSeparatedPrefix("/api", "/api"));
+        assertFalse(QuinoaHandlers.matchesPathSeparatedPrefix("/api-docs", "/api"));
+        assertFalse(QuinoaHandlers.matchesPathSeparatedPrefix("/other", "/api"));
+        assertTrue(QuinoaHandlers.matchesPathSeparatedPrefix("/anything", "/"));
     }
 }
